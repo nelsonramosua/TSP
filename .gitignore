@@ -1,0 +1,4 @@
+*.o
+TSP_COMPARISON
+graphs/*.png
+.vscode/
