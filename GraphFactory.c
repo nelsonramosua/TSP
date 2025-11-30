@@ -1,8 +1,16 @@
 #include "headers/GraphFactory.h"
+#include "headers/Graph.h"
 #include <stdlib.h>
 #include <math.h>
 
 // ---------------------- MATRIX GRAPHS ----------------------
+
+// Helper: write graph automatically to /graphs/<name>.dot
+static void _writeDOT(const Graph* g, const char* name) {
+    char path[256];
+    snprintf(path, sizeof(path), "graphs/%s.dot", name);
+    GraphWriteDOT(g, path);
+}
 
 Graph* GraphFactory_CreateMatrixGraph15(void) {
     unsigned int N = 15;
@@ -30,6 +38,8 @@ Graph* GraphFactory_CreateMatrixGraph15(void) {
     for (unsigned int i = 0; i < N; i++)
         for (unsigned int j = i + 1; j < N; j++)
             GraphAddWeightedEdge(g, i, j, w[i][j]);
+    
+    _writeDOT(g, "MatrixGraph15");
 
     return g;
 }
@@ -66,6 +76,8 @@ Graph* GraphFactory_CreateMatrixGraph20(void) {
         for (unsigned int j = i + 1; j < N; j++)
             GraphAddWeightedEdge(g, i, j, w[i][j]);
 
+    _writeDOT(g, "MatrixGraph20");
+
     return g;
 }
 
@@ -90,6 +102,8 @@ Graph* GraphFactory_CreateEuclideanGraph15(void) {
             double dy = coords[i][1] - coords[j][1];
             GraphAddWeightedEdge(g, i, j, sqrt(dx*dx + dy*dy));
         }
+
+    _writeDOT(g, "EuclideanGraph15");
 
     return g;
 }
@@ -117,5 +131,8 @@ Graph* GraphFactory_CreateRandomEuclideanGraph(unsigned int N, double maxX, doub
         }
 
     free(x); free(y);
+
+    _writeDOT(g, "RandomEuclideanGraph");
+    
     return g;
 }

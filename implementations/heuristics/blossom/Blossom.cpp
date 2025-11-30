@@ -1,4 +1,8 @@
-// Blossom.cpp
+// Blossom.cpp - implements blossom algorithm for Christofides.c
+//
+// All credit to https://github.com/suddhabrato/edmonds-blossom-algorithm, I adapted from it.
+//
+// November 2025.
 
 #include <bits/stdc++.h>
 #include "Blossom.hpp"

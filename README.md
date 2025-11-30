@@ -4,7 +4,7 @@ This repository implements multiple algorithms to solve the **Traveling Salesman
 
 ---
 
-## Project Structure 📁
+## Project Structure
 
 ```
 TSP/
@@ -41,7 +41,7 @@ TSP/
 
 ---
 
-## Implemented Algorithms 📈
+## Implemented Algorithms
 
 | Algorithm                 | Type            | Complexity (worst case)                | Notes                                                                 |
 | :------------------------ | :-------------: | :------------------------------------: | :------------------------------------------------------------------- |
@@ -56,14 +56,14 @@ TSP/
 
 ---
 
-## Compilation Instructions ⚙️
+## Compilation Instructions
 
 This project uses **GCC** and **G++** to compile C and C++ code (for the Blossom algorithm).
 
 1. **Clone the repository:**
 
     ```bash
-    git clone <repo_url>
+    git clone https://github.com/nelsonramosua/TSP
     cd TSP
     ```
 
@@ -87,7 +87,7 @@ This project uses **GCC** and **G++** to compile C and C++ code (for the Blossom
 
 ---
 
-## Graphs 🗺️
+## Graphs
 
 The project includes:
 
@@ -103,7 +103,7 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 
 ---
 
-## Notes and Recommendations ✨
+## Notes and Recommendations
 
 * For small graphs ($N \le 12$), Exhaustive Search guarantees optimal results. However, it is disabled. Uncomment to enable.
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended.
@@ -111,6 +111,17 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * Use 2-Opt Improvement as a post-processing step to refine heuristic solutions.
 
 ---
+
+## Resources used
+
+* https://cse442-17f.github.io/Traveling-Salesman-Algorithms/
+* https://algorithms.discrete.ma.tum.de/graph-algorithms/hierholzer/index_en.html
+* https://alon.kr/posts/christofides
+* https://en.wikipedia.org/wiki/Blossom_algorithm
+* https://github.com/suddhabrato/edmonds-blossom-algorithm
+* https://www.geeksforgeeks.org/dsa/travelling-salesman-problem-greedy-approach/
+
+--- 
 
 ## Author
 

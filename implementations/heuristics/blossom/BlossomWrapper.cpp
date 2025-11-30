@@ -1,3 +1,9 @@
+// BlossomWrapper.cpp - implements a wrapper for blossom algorithm for Christofides.c
+//
+// All credit for the algorithm to https://github.com/suddhabrato/edmonds-blossom-algorithm, I adapted from it.
+//
+// November 2025.
+
 #include "BlossomWrapper.h"
 #include <vector>
 #include <algorithm>
@@ -17,10 +23,9 @@ struct WeightedBlossom {
     }
 
     void solve() {
-        // Simple greedy for MWPM (replace with full Edmonds if needed)
         for (int u = 0; u < N; u++) {
             if (match[u] != -1) continue;
-            double best = 1e18;
+            double best = 1e18; // DBL_MAX
             int best_v = -1;
             for (int v = 0; v < N; v++) {
                 if (match[v] == -1 && cost[u][v] < best) {

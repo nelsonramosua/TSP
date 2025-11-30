@@ -1,108 +1,111 @@
-// ExhaustiveSearch.c  // Brute-force method.
+// ExhaustiveSearch.c  - Solves TSP via Brute-force method.
+//
+// Nelson Ramos, 124921.
+//
+// November, 2025.
+//
+// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+
 #include "../../TravelingSalesmanProblem.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h> 
 #include <limits.h>
 
-// Helper to swap two elements in an array
+// Helper function to swap two elements in an array.
+static void swap(unsigned int* a, unsigned int* b);
+
+// Recursive Helper.
+static void recursiveTspHelper(unsigned int* currentPath, int startIndex, unsigned int N, const Graph* g, Tour* bestTour);
+
+Tour* ExhaustiveSearch_FindTour(const Graph* g) {
+    unsigned int N = GraphGetNumVertices(g);
+    if (N < 2) return NULL; // must have at least 3 vert.
+
+    // create Best Tour struct.
+    Tour* bestTour = TourCreate(N);
+    if (!bestTour) return NULL;
+
+    // init best cost to biggest double (DBL_MAX)
+    bestTour->cost = DBL_MAX;
+
+    // ready array for permutation (1 to N-1)
+    unsigned int* innerVertices = (unsigned int*) malloc((N - 1) * sizeof(unsigned int));
+    if (!innerVertices) { TourDestroy(&bestTour); return NULL; }
+
+    for (unsigned int i = 0; i < N - 1; i++) {
+        // it holds atfirst [1, 2, ..., N-1]
+        innerVertices[i] = i + 1; 
+    }
+
+    // recursively solve. starts at index 0 (fixing the first vert.)
+    recursiveTspHelper(innerVertices, 0, N, g, bestTour);
+
+    free(innerVertices);
+
+    // graph connect?
+    if (bestTour->cost == DBL_MAX) {
+        fprintf(stderr, "Warning: Brute Force failed to find a path (graph disconnected?).\n");
+        TourDestroy(&bestTour);
+        return NULL;
+    }
+    
+    return bestTour;
+}
+
 static void swap(unsigned int* a, unsigned int* b) {
     unsigned int temp = *a;
     *a = *b;
     *b = temp;
 }
 
-// Recursive function to find the minimum cost tour
-// current_path: The array of vertices being permuted (initially V_1 to V_N-1)
-// start_index: The position in current_path we are fixing in this step
-// N: Total number of vertices in the graph
-// g: The graph structure
-// best_tour: Pointer to the tour structure storing the best result found so far
-static void solve_tsp_recursive(
-    unsigned int* current_path, 
-    int start_index, 
-    unsigned int N, 
-    const Graph* g, 
-    Tour* best_tour
-) {
-    // Base Case: All inner vertices (N-1) have been placed
-    if ((unsigned int)start_index == N - 1) { 
-        // 1. Construct the Full Tour (0, P_1, ..., P_N-1, 0)
-        Tour* current_tour = TourCreate(N);
-        if (!current_tour) return; // Allocation failure
+static void recursiveTspHelper(unsigned int* currentPath, int startIndex, unsigned int N, const Graph* g, Tour* bestTour) {
+    // Base Case: All N-1 inner vertices have been placed in the permutation.
+    if ((unsigned int)startIndex == N - 1) { 
+        Tour* currentTour = TourCreate(N);
+        if (!currentTour) return; 
         
-        current_tour->path[0] = 0; // Fixed start
+        currentTour->path[0] = 0; // start node 0
+        
+        // copy permutation into tour path
         for (unsigned int i = 0; i < N - 1; i++) {
-            current_tour->path[i + 1] = current_path[i];
+            currentTour->path[i + 1] = currentPath[i];
         }
-        current_tour->path[N] = 0; // Closing the loop
+        currentTour->path[N] = 0; // close the loop back to 0
 
-        // 2. Calculate Cost
-        double current_cost = 0.0;
+        // calc cost of tour.
+        double currentCost = 0.0;
         for (unsigned int i = 0; i < N; i++) {
-            unsigned int u = current_tour->path[i];
-            unsigned int v = current_tour->path[i + 1];
-            current_cost += GetEdgeWeight(g, u, v);
+            unsigned int u = currentTour->path[i];
+            unsigned int v = currentTour->path[i + 1];
+            
+            currentCost += GetEdgeWeight(g, u, v);
         }
-        current_tour->cost = current_cost;
+        currentTour->cost = currentCost;
 
-        // 3. Update Best Tour Found
-        if (current_cost < best_tour->cost) {
-            // Copy the new, cheaper tour into the best_tour structure
-            best_tour->cost = current_cost;
+        // update bestTour
+        if (currentCost < bestTour->cost) {
+            // new optimal Tour
+            bestTour->cost = currentCost;
             for (unsigned int i = 0; i <= N; i++) {
-                best_tour->path[i] = current_tour->path[i];
+                bestTour->path[i] = currentTour->path[i];
             }
         }
         
-        TourDestroy(&current_tour);
+        TourDestroy(&currentTour);
         return;
     }
 
-    // Recursive Step: Generate permutations
-    for (unsigned int i = start_index; i < N - 1; i++) {
-        swap(&current_path[start_index], &current_path[i]);
+    // gen perms by swapping elements
+    for (unsigned int i = startIndex; i < N - 1; i++) {
+        // swap the element at startIndex with element at i
+        swap(&currentPath[startIndex], &currentPath[i]);
         
-        solve_tsp_recursive(current_path, start_index + 1, N, g, best_tour);
+        // move to the next index
+        recursiveTspHelper(currentPath, startIndex + 1, N, g, bestTour);
         
-        // Backtrack: Restore the original order for the next iteration
-        swap(&current_path[start_index], &current_path[i]);
+        // backtrack
+        swap(&currentPath[startIndex], &currentPath[i]);
     }
-}
-
-
-Tour* ExhaustiveSearch_FindTour(const Graph* g) {
-    unsigned int N = GraphGetNumVertices(g);
-    if (N < 2) return NULL;
-
-    // 1. Setup the Best Tour Structure
-    Tour* best_tour = TourCreate(N);
-    if (!best_tour) return NULL;
-
-    // Initialize best cost to maximum
-    best_tour->cost = DBL_MAX;
-
-    // 2. Setup the Array for Permutation (Vertices 1 to N-1)
-    // Size is N-1.
-    unsigned int* inner_vertices = (unsigned int*) malloc((N - 1) * sizeof(unsigned int));
-    if (!inner_vertices) { TourDestroy(&best_tour); return NULL; }
-
-    for (unsigned int i = 0; i < N - 1; i++) {
-        // inner_vertices holds [1, 2, ..., N-1]
-        inner_vertices[i] = i + 1; 
-    }
-
-    // 3. Run the Recursive Solver (Starts fixing the first inner vertex)
-    solve_tsp_recursive(inner_vertices, 0, N, g, best_tour);
-
-    free(inner_vertices);
-
-    // If the graph is disconnected (impossible for a path to exist), cost will be DBL_MAX
-    if (best_tour->cost == DBL_MAX) {
-        fprintf(stderr, "Warning: Brute Force failed to find a path (graph disconnected?).\n");
-        TourDestroy(&best_tour);
-        return NULL;
-    }
-    
-    return best_tour;
 }

@@ -1,17 +1,24 @@
-// NearestNeighbour.c
+// NearestNeighbour.c - Implements Nearest Neighbour approximation algorithm.
+//
+// Nelson Ramos, 124921.
+//
+// November, 2025.
+// 
+// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+
 #include "../../TravelingSalesmanProblem.h"
 #include <stdlib.h>
 #include <float.h>
-#include <string.h> // For memset
+#include <string.h> 
 
 Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
-    unsigned int N = GraphGetNumVertices(g);
-    if (N == 0 || startVertex >= N) return NULL;
+    unsigned int numVertices = GraphGetNumVertices(g);
+    if (numVertices == 0 || startVertex >= numVertices) return NULL;
     
-    Tour* tour = TourCreate(N);
+    Tour* tour = TourCreate(numVertices);
     if (!tour) return NULL;
 
-    int* visited = (int*) calloc(N, sizeof(int));
+    int* visited = (int*) calloc(numVertices, sizeof(int));
     if (!visited) { TourDestroy(&tour); return NULL; }
 
     unsigned int currentV = startVertex;
@@ -20,41 +27,34 @@ Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
     tour->cost = 0.0;
     unsigned int pathIndex = 1;
 
-    // 1. Build the path
-    while (pathIndex < N) {
+    // build path
+    while (pathIndex < numVertices) {
         double minWeight = DBL_MAX;
         unsigned int nextV = UINT_MAX;
 
-        unsigned int* adjacents = GraphGetAdjacentsTo((Graph*)g, currentV);
-        double* distances = GraphGetDistancesToAdjacents((Graph*)g, currentV);
+        for (unsigned int v = 0; v < numVertices; v++) {
+            // skip cur & visited vert.
+            if (v == currentV || visited[v]) {
+                continue;
+            }
 
-        unsigned int num_neighbors = adjacents[0];
+            double weight = GetEdgeWeight(g, currentV, v);
 
-        // printf("DEBUG: Current V=%u, Neighbors=%u\n", currentV, num_neighbors);
-        if (adjacents && distances) {
-            for (unsigned int i = 1; i <= num_neighbors; i++) {
-                // printf("DEBUG: Neighbor %u: V=%u, Weight=%.2f, Visited=%d\n", i, adjacents[i], distances[i], visited[adjacents[i]]);
-
-                unsigned int v = adjacents[i];
-                double weight = distances[i];
-                
-                if (v < N && !visited[v] && weight < minWeight) { 
-                    minWeight = weight;
-                    nextV = v;
-                }
+            // see if edge is new shortest connection
+            if (weight < minWeight) { 
+                minWeight = weight;
+                nextV = v;
             }
         }
 
-        if (adjacents) free(adjacents);
-        if (distances) free(distances);
-
         if (nextV != UINT_MAX) {
+            // found nearest unvisited neighbour
             tour->path[pathIndex++] = nextV;
             visited[nextV] = 1;
             tour->cost += minWeight;
-            currentV = nextV;
+            currentV = nextV; // move to new vertex
         } else {
-            // Should not happen for a complete graph
+            // only happens if graph is disconnected (should not happen)
             fprintf(stderr, "Error: Nearest Neighbour failed to find next unvisited vertex.\n");
             TourDestroy(&tour);
             free(visited);
@@ -62,28 +62,20 @@ Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
         }
     }
 
-    // 2. Close the tour (N -> startVertex)
+    // close tour 
     tour->path[pathIndex] = startVertex;
-    // Find the weight of the closing edge
-    // NOTE: Need an auxiliary function in Graph.c or rely on adjacents array structure
-    unsigned int* finalAdj = GraphGetAdjacentsTo((Graph*)g, currentV);
-    double* finalDist = GraphGetDistancesToAdjacents((Graph*)g, currentV);
-
-    // FIX: Get the degree (casting away const) to control the loop safely
-    unsigned int final_num_neighbors = finalAdj[0]; // <-- FIX HERE
-
-    if (finalAdj && finalDist) {
-        // Iterate safely using the degree
-        for (unsigned int i = 1; i <= final_num_neighbors; i++) { // <-- FIX HERE
-            if (finalAdj[i] == startVertex) {
-                tour->cost += finalDist[i];
-                break;
-            }
-        }
+    
+    double finalEdgeWeight = GetEdgeWeight(g, currentV, startVertex);
+    
+    // check if final edge is valid
+    if (finalEdgeWeight == DBL_MAX) {
+        fprintf(stderr, "Error: Nearest Neighbour failed to close the tour (final edge missing).\n");
+        TourDestroy(&tour);
+        free(visited);
+        return NULL;
     }
 
-    if (finalAdj) free(finalAdj);
-    if (finalDist) free(finalDist);
+    tour->cost += finalEdgeWeight;
     
     free(visited);
     return tour;
