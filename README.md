@@ -11,22 +11,24 @@ TSP/
 ├── headers/                # Header files
 │   ├── Graph.h
 │   ├── GraphFactory.h
+│   ├── Metaheuristics.h
 │   └── SortedList.h
 ├── implementations/
 │   ├── exact/              # Exact algorithms
 │   │   └── ExhaustiveSearch.c
 │   ├── graph/              # Graph utilities
 │   │   ├── Graph.c
-│   │   ├── GraphHelpers.c
 │   │   └── SortedList.c
 │   ├── heuristics/         # Heuristic algorithms
 │   │   ├── Greedy.c
 │   │   ├── NearestNeighbour.c
+│   │   ├── NearestInsertion.c
 │   │   ├── Christofides.c
 │   │   └── blossom/        # Blossom implementation (C++)
 │   ├── metaheuristics/     # Meta-heuristics
 │   │   ├── TwoOpt.c
 │   │   ├── SimulatedAnnealing.c
+│   │   ├── GeneticAlgorithm.c
 │   │   └── AntColony.c
 │   └── mst/                # Minimum Spanning Tree utilities
 │       ├── Prim_MST.c
@@ -38,6 +40,10 @@ TSP/
 ├── Makefile
 └── TravelingSalesmanProblem.h # Main project header
 ```
+--- 
+## Metaheuristic Algorithms
+
+The macro configurations for the metaheuristic algorithms can be tuned in headers/Metaheuristics.h.
 
 ---
 
@@ -48,10 +54,12 @@ TSP/
 | **Exhaustive Search**     | Exact           | $O(N!)$                                | Finds the optimal solution; infeasible for $N > 12–15$.              |
 | **Nearest Neighbor**      | Heuristic       | $O(N^2)$                               | Fast, but solution quality may vary; starting point affects the tour. |
 | **Greedy Heuristic**      | Heuristic       | $O(N^2 \log N)$                        | Builds a tour by repeatedly selecting the shortest available edge.   |
+| **Nearest Insertion** | Heuristic | $O(N^2)$ | Constructive method: selects the unvisited node closest to any edge in the current partial tour. |
 | **Christofides Algorithm**| Heuristic       | $O(N^3)$                               | Guarantees a tour $\le 1.5\times$ optimal for metric TSP.            |
 | **2-Opt Improvement**     | Meta-heuristic  | $O(N^2 \times \text{iterations})$      | Local search to improve an existing tour; often used after Nearest Neighbor or Greedy. |
 | **Simulated Annealing**   | Meta-heuristic  | $O(N^2 \times \text{iterations})$      | Probabilistic improvement using 2-opt swaps; good balance between exploration and runtime. |
 | **Ant Colony Optimization** | Meta-heuristic | $O(N^2 \times \text{iterations} \times \text{ants})$ | Probabilistic search guided by pheromone trails; computationally heavier but can yield high-quality solutions. |
+| **Genetic Algorithm (GA)** | Meta-heuristic | $O(N^2 \times \text{Generations} \times \text{Population})$ | Population-based search simulating evolution (selection, crossover, mutation). Requires careful parameter tuning. |
 | **Lower Bound (MST)**     | Utility         | $O(E \log N)$                          | Provides a minimum cost estimate using a **Minimum Spanning Tree**. |
 
 ---
@@ -109,6 +117,7 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended.
 * For large graphs ($N > 100$), meta-heuristics like Simulated Annealing and Ant Colony Optimization provide good approximations.
 * Use 2-Opt Improvement as a post-processing step to refine heuristic solutions.
+* Genetic Algorithm performance is highly dependent on parameters. 
 * I could not for the life of me get Christofides working well... I tried everything... As a last ditch effort, I included a C++ implementation of the Blossom algorithm for computing the Minimum Weight Perfect Matching (MWPM)... But that does not work well.
 
 ---

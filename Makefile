@@ -1,8 +1,8 @@
 # C and C++ compilers
 CC = gcc
 CXX = g++
-CFLAGS = -Wall -Wextra -g -std=c99 -Iheaders -O2
-CXXFLAGS = -Wall -Wextra -g -std=c++17 -Iheaders
+CFLAGS = -Wall -Wextra -g -Iheaders -O2
+CXXFLAGS = -Wall -Wextra -g -Iheaders
 LDFLAGS = -lm
 
 # Source directories
