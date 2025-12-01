@@ -15,12 +15,12 @@
 // I could not for the life of me get this to work well... must have some bug in here.
 
 #include "../../TravelingSalesmanProblem.h"
+#include "blossom/BlossomWrapper.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
 #include <string.h>
-#include "blossom/BlossomWrapper.h"
 
 // Forward declarations
 
@@ -34,7 +34,7 @@ Graph* computeExactMwpm(const Graph* g, unsigned int* odd, unsigned int oddCount
 // finds an Eulerian tour by Hierholzer's alg, optimized for a given edge count matrix.
 unsigned int* findEulerianTourFromEdgeCounts(const int *edgeCntIn, unsigned int N, unsigned int *tourSize);
 
-// Converts the Eulerian tour into a Hamiltonian cycle by skipping repeated vertices (shortcut).
+// converts the Eulerian tour into a Hamiltonian cycle by skipping repeated vertices (shortcut).
 double shortcutEuler(const Graph* g, unsigned int* euler, unsigned int size, unsigned int* hamilton, unsigned int N);
 
 // external MST function. go to implementations/mst/Prim_MST.c
@@ -70,7 +70,7 @@ Tour* Christofides_FindTour(const Graph* g) {
         free(adj);
     }
 
-    // --- add matching edges ---
+    // add matching edges
     if (matching) 
         for (unsigned int u = 0; u < numVertices; u++) {
             unsigned int* adj = GraphGetAdjacentsTo(matching, u);

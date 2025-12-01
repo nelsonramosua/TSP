@@ -95,7 +95,7 @@ The project includes:
 * **Fixed Euclidean Graph:** `GraphFactory_CreateEuclideanGraph15`.
 * **Random Euclidean Graphs:** `GraphFactory_CreateRandomEuclideanGraph(N, maxX, maxY)`.
 
-Graph outputs in DOT format are saved in `graphs/` and can be visualized with **Graphviz**:
+Graph outputs in DOT format are saved in `graphs/` and can be visualized directly in VSCODE with **Graphviz** extension or via terminal:
 
 ```bash
 dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
@@ -109,17 +109,19 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended.
 * For large graphs ($N > 100$), meta-heuristics like Simulated Annealing and Ant Colony Optimization provide good approximations.
 * Use 2-Opt Improvement as a post-processing step to refine heuristic solutions.
+* I could not for the life of me get Christofides working well... I tried everything... As a last ditch effort, I included a C++ implementation of the Blossom algorithm for computing the Minimum Weight Perfect Matching (MWPM)... But that does not work well.
 
 ---
 
 ## Resources used
-
+* **Main resource used:** https://youtu.be/GiDsjIBOVoA?si=zEtD3WFBlUYQO_LN 
 * https://cse442-17f.github.io/Traveling-Salesman-Algorithms/
 * https://algorithms.discrete.ma.tum.de/graph-algorithms/hierholzer/index_en.html
 * https://alon.kr/posts/christofides
 * https://en.wikipedia.org/wiki/Blossom_algorithm
 * https://github.com/suddhabrato/edmonds-blossom-algorithm
 * https://www.geeksforgeeks.org/dsa/travelling-salesman-problem-greedy-approach/
+* https://youtu.be/oXb2nC-e_EA?si=3G2oxIMb31RO8N8n
 
 --- 
 

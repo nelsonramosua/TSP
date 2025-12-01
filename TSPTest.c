@@ -1,20 +1,27 @@
+// TSPTest.c - Tests different versions of TSP algorithms.
+//
+// Nelson Ramos, 124921.
+//
+// November, 2025.
+//
+// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+
 #include "TravelingSalesmanProblem.h"
 #include "GraphFactory.h"
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
-// Helper function: run all algorithms on a single graph
+// helper: run all algs on a graph
 static void RunTSPAlgorithms(Graph* g, const char* graphName) {
     if (!g) return;
 
-    printf("\n============================================\n");
-    printf("      TESTING GRAPH: %s\n", graphName);
-    printf("============================================\n");
+    printf("\n\n\t\tTESTING GRAPH: %s\n", graphName);
 
     // Lower Bound (MST)
     double lower_bound = LowerBound_MST(g);
-    printf("  **LOWER BOUND (MST Cost): %.2f**\n", lower_bound);
-    printf("--------------------------------------------\n");
+    printf("\t**LOWER BOUND (MST Cost): %.2f**\n", lower_bound);
 
     /* disabled. turn on if the graphs you're testing have < 12 vertices.
     // 1. Brute-Force
@@ -42,7 +49,19 @@ static void RunTSPAlgorithms(Graph* g, const char* graphName) {
     printf("\n[Greedy Heuristic]\n");
     TourDisplay(greedy_tour);
 
-    // 5. Christofides Algorithm
+    // 5. Nearest Insertion Heuristic
+    Tour* nearestInsertionTour = NearestInsertion_FindTour(g);
+    printf("\n[Nearest Insertion Heuristic]\n");
+    TourDisplay(nearestInsertionTour);
+    TourDestroy(&nearestInsertionTour);
+
+    // 6. Farthest Insertion Heuristic
+    Tour* farthestInsertionTour = NearestInsertion_FindTour(g);
+    printf("\n[Farthest Insertion Heuristic]\n");
+    TourDisplay(farthestInsertionTour);
+    TourDestroy(&farthestInsertionTour);
+
+    // 6. Christofides Algorithm (could not get it working correctly...)
     Tour* christofides_tour = Christofides_FindTour(g);
     printf("\n[Christofides Algorithm]\n");
     TourDisplay(christofides_tour);
@@ -68,13 +87,16 @@ static void RunTSPAlgorithms(Graph* g, const char* graphName) {
     TourDisplay(aco_tour);
     TourDestroy(&aco_tour);
 
-    printf("\n============================================\n");
-    printf("      TESTING COMPLETE: %s\n", graphName);
-    printf("============================================\n\n");
+    Tour* ga_tour = GeneticAlgorithm_FindTour(g);
+    printf("\n[Genetic Algorithm Optimization]\n");
+    TourDisplay(ga_tour);
+    TourDestroy(&ga_tour);
+
+    printf("TESTING COMPLETE: %s\n", graphName);
 }
 
 int main(void) {
-    printf("Running TSP Algorithm Comparison Suite...\n");
+    srand(time(NULL)); 
 
     // --- STATIC GRAPHS ---
     Graph* g1 = GraphFactory_CreateMatrixGraph15();

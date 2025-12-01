@@ -1,7 +1,7 @@
 # C and C++ compilers
 CC = gcc
 CXX = g++
-CFLAGS = -Wall -Wextra -g -std=c99 -Iheaders
+CFLAGS = -Wall -Wextra -g -std=c99 -Iheaders -O2
 CXXFLAGS = -Wall -Wextra -g -std=c++17 -Iheaders
 LDFLAGS = -lm
 
@@ -16,17 +16,18 @@ TEST_DIR = tests
 
 # C object files
 C_OBJS = $(GRAPH_DIR)/Graph.o \
-         $(GRAPH_DIR)/GraphHelpers.o \
          $(GRAPH_DIR)/SortedList.o \
          $(MST_DIR)/Prim_MST.o \
          $(MST_DIR)/LowerBound_MST.o \
          $(EXACT_DIR)/ExhaustiveSearch.o \
          $(HEUR_DIR)/NearestNeighbour.o \
          $(HEUR_DIR)/Greedy.o \
+         $(HEUR_DIR)/NearestInsertion.o \
          $(HEUR_DIR)/Christofides.o \
          $(META_DIR)/TwoOpt.o \
          $(META_DIR)/SimulatedAnnealing.o \
          $(META_DIR)/AntColony.o \
+         $(META_DIR)/GeneticAlgorithm.o \
          GraphFactory.o \
          Tour.o \
          TSPTest.o

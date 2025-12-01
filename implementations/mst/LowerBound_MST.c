@@ -1,17 +1,24 @@
-// LowerBound_MST.c
+// Prim_MST.c - Determines LowerBound Cost for TSP by MST.
+//
+// Nelson Ramos, 124921.
+//
+// November, 2025.
+//
+// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+
 #include "../../TravelingSalesmanProblem.h"
 #include <stdio.h>
 
 // Forward declaration of the MST calculation function from Prim_MST.c
 extern double Prim_CalculateMSTCost(const Graph* g); 
 
-// The public interface for the Lower Bound calculation
+// public interface for the Lower Bound calculation
 double LowerBound_MST(const Graph* g) {
     if (!GraphIsWeighted(g) || GraphIsDigraph(g)) {
         fprintf(stderr, "Error: Lower bound calculation requires a weighted, non-digraph.\n");
         return 0.0;
     }
     
-    // The cost of the MST is the standard lower bound for TSP
+    // cost of MST is the standard lower bound for TSP
     return Prim_CalculateMSTCost(g);
 }

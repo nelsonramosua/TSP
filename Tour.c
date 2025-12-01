@@ -1,4 +1,11 @@
-// Tour.c
+// Tour.c - Implements basic ADT Tour for TSP, defined in TravelingSalesmanProblem.h.
+//
+// Nelson Ramos, 124921.
+//
+// November, 2025.
+//
+// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+
 #include "TravelingSalesmanProblem.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,28 +14,27 @@ Tour* TourCreate(unsigned int numVertices) {
     Tour* t = (Tour*) malloc(sizeof(Tour));
     if (!t) return NULL;
 
-    // Path array size is numVertices + 1 to close the cycle
+    // path arr size is numVertices + 1 (to close cycle)
     t->path = (unsigned int*) calloc(numVertices + 1, sizeof(unsigned int));
     if (!t->path) { free(t); return NULL; }
     
-    // Use the first element for size, assuming full path is N+1 long.
+    // first element is size
     t->numVertices = numVertices + 1; 
     t->cost = 0.0;
     
-    // Initialize path elements to UINT_MAX as a sentinel for uninitialized
-    for (unsigned int i = 0; i < t->numVertices; i++) {
-        t->path[i] = UINT_MAX;
-    }
-
+    // init path elems to UINT_MAX
+    for (unsigned int i = 0; i < t->numVertices; i++) t->path[i] = UINT_MAX;
+    
     return t;
 }
 
 void TourDestroy(Tour** p) {
-    if (p && *p) {
-        free((*p)->path);
-        free(*p);
-        *p = NULL;
-    }
+    Tour* t = *p;
+
+    free(t->path);
+    free(t);
+
+    *p = NULL;
 }
 
 double TourGetCost(const Tour* t) {
@@ -41,6 +47,7 @@ void TourDisplay(const Tour* t) {
         printf("  Tour is NULL.\n");
         return;
     }
+
     printf("  Cost: %.2f\n", t->cost);
     printf("  Path: ");
     for (unsigned int i = 0; i < t->numVertices; i++) {

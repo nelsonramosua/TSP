@@ -1,20 +1,28 @@
+// GraphFactory.c - Creates some test graphs.
+//
+// Nelson Ramos, 124921. 
+//
+// November, 2025.
+//
+// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+
+// Generated with help from AI!
+
 #include "headers/GraphFactory.h"
 #include "headers/Graph.h"
 #include <stdlib.h>
 #include <math.h>
 
-// ---------------------- MATRIX GRAPHS ----------------------
-
-// Helper: write graph automatically to /graphs/<name>.dot
+// helper to write graph automatically to /graphs/<name>.dot
 static void _writeDOT(const Graph* g, const char* name) {
     char path[256];
-    snprintf(path, sizeof(path), "graphs/%s.dot", name);
+    snprintf(path, sizeof(path), "graphs/%s.dot", name); // try to avoid buffer overflow...
     GraphWriteDOT(g, path);
 }
 
 Graph* GraphFactory_CreateMatrixGraph15(void) {
-    unsigned int N = 15;
-    Graph* g = GraphCreate(N, 0, 1);
+    unsigned int numVertices = 15;
+    Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
 
     double w[15][15] = {
@@ -35,9 +43,9 @@ Graph* GraphFactory_CreateMatrixGraph15(void) {
         {10, 12, 11, 17, 8, 13, 9, 10, 8, 12, 15, 9, 12, 11, 0}
     };
 
-    for (unsigned int i = 0; i < N; i++)
-        for (unsigned int j = i + 1; j < N; j++)
-            GraphAddWeightedEdge(g, i, j, w[i][j]);
+    for (unsigned int vert1 = 0; vert1 < numVertices; vert1++)
+        for (unsigned int j = vert1 + 1; j < numVertices; j++)
+            GraphAddWeightedEdge(g, vert1, j, w[vert1][j]);
     
     _writeDOT(g, "MatrixGraph15");
 
@@ -45,8 +53,8 @@ Graph* GraphFactory_CreateMatrixGraph15(void) {
 }
 
 Graph* GraphFactory_CreateMatrixGraph20(void) {
-    unsigned int N = 20;
-    Graph* g = GraphCreate(N, 0, 1);
+    unsigned int numVertices = 20;
+    Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
 
     double w[20][20] = {
@@ -72,8 +80,8 @@ Graph* GraphFactory_CreateMatrixGraph20(void) {
         {21,19,17,15,14,15,13,13,12,11,10,8,7,6,5,4,3,2,1,0}
     };
 
-    for (unsigned int i = 0; i < N; i++)
-        for (unsigned int j = i + 1; j < N; j++)
+    for (unsigned int i = 0; i < numVertices; i++)
+        for (unsigned int j = i + 1; j < numVertices; j++)
             GraphAddWeightedEdge(g, i, j, w[i][j]);
 
     _writeDOT(g, "MatrixGraph20");
@@ -84,8 +92,8 @@ Graph* GraphFactory_CreateMatrixGraph20(void) {
 // ---------------------- EUCLIDEAN GRAPHS ----------------------
 
 Graph* GraphFactory_CreateEuclideanGraph15(void) {
-    unsigned int N = 15;
-    Graph* g = GraphCreate(N, 0, 1);
+    unsigned int numVertices = 15;
+    Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
 
     double coords[15][2] = {
@@ -96,8 +104,8 @@ Graph* GraphFactory_CreateEuclideanGraph15(void) {
         {5,5}, {6,5}, {5.5,6}
     };
 
-    for (unsigned int i = 0; i < N; i++)
-        for (unsigned int j = i + 1; j < N; j++) {
+    for (unsigned int i = 0; i < numVertices; i++)
+        for (unsigned int j = i + 1; j < numVertices; j++) {
             double dx = coords[i][0] - coords[j][0];
             double dy = coords[i][1] - coords[j][1];
             GraphAddWeightedEdge(g, i, j, sqrt(dx*dx + dy*dy));
@@ -110,21 +118,21 @@ Graph* GraphFactory_CreateEuclideanGraph15(void) {
 
 // ---------------------- RANDOM EUCLIDEAN GRAPHS ----------------------
 
-Graph* GraphFactory_CreateRandomEuclideanGraph(unsigned int N, double maxX, double maxY) {
-    Graph* g = GraphCreate(N, 0, 1);
+Graph* GraphFactory_CreateRandomEuclideanGraph(unsigned int numVertices, double maxX, double maxY) {
+    Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
 
-    double* x = malloc(N * sizeof(double));
-    double* y = malloc(N * sizeof(double));
+    double* x = malloc(numVertices * sizeof(double));
+    double* y = malloc(numVertices * sizeof(double));
     if (!x || !y) { free(x); free(y); GraphDestroy(&g); return NULL; }
 
-    for (unsigned int i = 0; i < N; i++) {
+    for (unsigned int i = 0; i < numVertices; i++) {
         x[i] = ((double)rand() / RAND_MAX) * maxX;
         y[i] = ((double)rand() / RAND_MAX) * maxY;
     }
 
-    for (unsigned int i = 0; i < N; i++)
-        for (unsigned int j = i + 1; j < N; j++) {
+    for (unsigned int i = 0; i < numVertices; i++)
+        for (unsigned int j = i + 1; j < numVertices; j++) {
             double dx = x[i] - x[j];
             double dy = y[i] - y[j];
             GraphAddWeightedEdge(g, i, j, sqrt(dx*dx + dy*dy));

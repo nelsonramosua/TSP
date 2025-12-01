@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 
 #include "SortedList.h"
 
@@ -201,7 +202,10 @@ Graph* GraphFromFile(FILE* f) {
   unsigned int numVertices;
   int isDigraph, isWeighted;
 
-  fscanf(f, "%u %d %d", &numVertices, &isDigraph, &isWeighted);
+  if (fscanf(f, "%u %d %d", &numVertices, &isDigraph, &isWeighted) != 3) {
+    fprintf(stderr, "Error: Failed to read graph properties from file.\n");
+    return NULL;
+  }
 
   Graph* g = GraphCreate(numVertices, isDigraph, isWeighted);
 
@@ -707,4 +711,25 @@ int GraphWriteDOT(const Graph* g, const char* filename) {
     fprintf(f, "}\n");
     fclose(f);
     return 1;
+}
+
+double GetEdgeWeight(const Graph* g, unsigned int v, unsigned int w) {
+    if (v == w) return 0.0; // should not happen
+
+    unsigned int* adj = GraphGetAdjacentsTo(g, v);
+    double* dist = GraphGetDistancesToAdjacents(g, v); 
+
+    unsigned int num_adj = (unsigned int)dist[0]; // 1st element of arr is number of adj vertices
+    double weight = DBL_MAX; // preset (vertex dne)
+
+    for (unsigned int i = 1; i <= num_adj; i++) {
+        if (adj[i] == w) {
+            weight = dist[i]; 
+            break;
+        }
+    }
+
+    free(adj);
+    free(dist);
+    return weight;
 }

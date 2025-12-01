@@ -76,10 +76,12 @@ unsigned int GraphGetVertexInDegree(Graph* g, unsigned int v);
 
 int GraphAddEdge(Graph* g, unsigned int v, unsigned int w);
 
-int GraphAddWeightedEdge(Graph* g, unsigned int v, unsigned int w,
-                         double weight);
+int GraphAddWeightedEdge(Graph* g, unsigned int v, unsigned int w, double weight);
 
 int GraphRemoveEdge(Graph* g, unsigned int v, unsigned int w);
+
+// NELSON RAMOS! (November, 2025).
+double GetEdgeWeight(const Graph* g, unsigned int v, unsigned int w);
 
 // CHECKING
 
