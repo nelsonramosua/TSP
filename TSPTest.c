@@ -21,7 +21,7 @@ static void RunTSPAlgorithms(Graph* g, const char* graphName) {
 
     // Lower Bound (MST)
     double lower_bound = LowerBound_MST(g);
-    printf("\t**LOWER BOUND (MST Cost): %.2f**\n", lower_bound);
+    printf("\t\t**LOWER BOUND (MST Cost): %.2f**\n", lower_bound);
 
     /* disabled. turn on if the graphs you're testing have < 12 vertices.
     // 1. Brute-Force

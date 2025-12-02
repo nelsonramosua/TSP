@@ -16,5 +16,6 @@ Graph* GraphFactory_CreateMatrixGraph20(void);
 Graph* GraphFactory_CreateEuclideanGraph15(void);
 Graph* GraphFactory_CreateRandomEuclideanGraph(unsigned int N, double maxX, double maxY);
 // Add your own!
+// You can also read Graphs from File (see Graph ADT interface)!
 
 #endif // GRAPH_FACTORY_H
