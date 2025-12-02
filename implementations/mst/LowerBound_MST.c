@@ -1,4 +1,4 @@
-// Prim_MST.c - Determines LowerBound Cost for TSP by MST.
+// LowerBound_MST.c - Determines LowerBound Cost for TSP by MST.
 //
 // Nelson Ramos, 124921.
 //

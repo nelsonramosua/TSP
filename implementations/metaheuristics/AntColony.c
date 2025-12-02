@@ -8,6 +8,7 @@
 
 // Resources used:
 // https://youtu.be/oXb2nC-e_EA?si=3G2oxIMb31RO8N8n
+// https://www.researchgate.net/publication/324417976_Using_the_Bees_Algorithm_to_solve_a_stochastic_optimisation_problem
 
 #include "../../TravelingSalesmanProblem.h"
 #include "../../headers/Metaheuristics.h"
