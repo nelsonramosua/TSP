@@ -61,7 +61,7 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 
 ## Implemented Algorithms
 
-| Algorithm                 | Type            | Complexity (worst case)                | Notes                                                                 |
+| Algorithm                 | Type            | Time Complexity (worst case)                | Notes                                                                 |
 | :------------------------ | :-------------: | :------------------------------------: | :------------------------------------------------------------------- |
 | **Exhaustive Search**     | Exact           | $O(N!)$                                | Finds the optimal solution; infeasible for $N \ge 12$.              |
 | **Exhaustive Search with Pruning** | Exact           | $O(N!)$                                | Optimized exhaustive search that prunes branches based on cost bounds. Still infeasible for $N \ge 12$.|
@@ -78,7 +78,7 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 
 **Notes**: 
 Time complexity does not tell the whole story... even more so for small $N$ (numVertices). 
-Meta-heuristic algorithms are more computationaly heavy than Christofides, being guided by their parameters/configuration, even though Christofides' algorithm has the worst, worst-case time complexity ($O(N^3)$). \
+Meta-heuristic algorithms are more computationaly heavy than Christofides, being guided by their parameters/configuration, even though Christofides' algorithm has the worst, worst-case time complexity, $O(N^3)$. \
 Some of these (pex: Lower Bound & Greedy) could be improved if an auxiliary ADT, min-heap / priority queue, had been introduced and used. They would then have complexities, respectively, $O(E \times log N)$ and $O(N^2 \times log N)$. For simplicity purposes, it wasn't. **Go ahead and try! :)**
 
 ---
