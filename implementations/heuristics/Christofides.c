@@ -1,5 +1,7 @@
 // Christofides.c - Implements Christofides' algorithm (guaranteed 1.5-approximation for TSP).
 //
+// O(N^3).
+//
 // Nelson Ramos, 124921.
 //
 // November, 2025.

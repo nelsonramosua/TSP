@@ -1,5 +1,7 @@
 // Greedy.c - Implements Greedy approximation algorithm.
 //
+// O(N^3), but this could be improved for O(N^2 * log(N)).
+//
 // Nelson Ramos, 124921.
 //
 // November, 2025.

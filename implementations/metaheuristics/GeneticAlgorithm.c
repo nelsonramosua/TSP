@@ -1,4 +1,6 @@
 // GeneticAlgorithm.c - Implements the Genetic Algorithm (GA) metaheuristic for TSP.
+// 
+// O(N^2 * Generations * Population)
 //
 // Nelson Ramos, 124921.
 //
@@ -19,6 +21,8 @@
 #include <time.h>
 #include <float.h>
 #include <string.h>
+
+// Tune parameters in headers/Metaheuristics.h.
 
 // Represents an individual solution (chromosome) in the population
 typedef struct Individual {

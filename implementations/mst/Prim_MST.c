@@ -1,5 +1,7 @@
 // Prim_MST.c - Implements Prim's algorithm to find the Minimum Spanning Tree (MST).
 //
+// O(N^2).
+//
 // Nelson Ramos, 124921.
 //
 // November, 2025.

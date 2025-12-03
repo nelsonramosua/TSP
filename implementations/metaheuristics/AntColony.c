@@ -1,5 +1,7 @@
 // AntColony.c - Implements the Ant Colony Optimization (ACO) metaheuristic for TSP.
 // 
+// O(N^2 * iterations * ants) = O(N^3 * iterations).
+//
 // Nelson Ramos, 124921.
 //
 // November, 2025.
@@ -9,6 +11,8 @@
 // Resources used:
 // https://youtu.be/oXb2nC-e_EA?si=3G2oxIMb31RO8N8n
 // https://www.researchgate.net/publication/324417976_Using_the_Bees_Algorithm_to_solve_a_stochastic_optimisation_problem
+
+// Tune parameters in headers/Metaheuristics.h.
 
 #include "../../TravelingSalesmanProblem.h"
 #include "../../headers/Metaheuristics.h"

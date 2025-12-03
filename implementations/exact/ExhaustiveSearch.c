@@ -1,5 +1,7 @@
 // ExhaustiveSearch.c  - Solves TSP via Brute-force method.
 //
+// O(N!).
+//
 // Nelson Ramos, 124921.
 //
 // November, 2025.
@@ -88,9 +90,7 @@ static void recursiveTspHelper(unsigned int* currentPath, int startIndex, unsign
         if (currentCost < bestTour->cost) {
             // new optimal Tour
             bestTour->cost = currentCost;
-            for (unsigned int i = 0; i <= N; i++) {
-                bestTour->path[i] = currentTour->path[i];
-            }
+            for (unsigned int i = 0; i <= N; i++) bestTour->path[i] = currentTour->path[i];
         }
         
         TourDestroy(&currentTour);

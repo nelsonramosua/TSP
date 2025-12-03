@@ -1,5 +1,7 @@
 // NearestInsertion.c - Implements the Nearest Insertion constructive heuristic for TSP.
 //
+// O(N^3).
+//
 // Nelson Ramos, 124921.
 //
 // November, 2025.
@@ -96,9 +98,7 @@ Tour* NearestInsertion_FindTour(const Graph* g) {
     }
 
     // copy path to final Tour struct.
-    for (unsigned int i = 0; i < numVertices; i++) {
-        finalTour->path[i] = partialPath[i];
-    }
+    for (unsigned int i = 0; i < numVertices; i++) finalTour->path[i] = partialPath[i];
     finalTour->path[numVertices] = finalTour->path[0]; // close cycle
     
     // calc. final cost

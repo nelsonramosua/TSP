@@ -1,5 +1,7 @@
 // SimulatedAnnealing.c - Implements the Simulated Annealing (SA) metaheuristic for TSP.
 // 
+// O(N^2 * iterations) = O(N^3 * SA_MULTIPLIER).
+//
 // Nelson Ramos, 124921.
 //
 // November, 2025.
@@ -8,6 +10,8 @@
 
 // Resources used:
 // https://youtu.be/1kgbwosVUPs?si=mo5kmlKF9NMWHPg2
+
+// Tune parameters in headers/Metaheuristics.h.
 
 #include "../../TravelingSalesmanProblem.h"
 #include "../../headers/Metaheuristics.h"

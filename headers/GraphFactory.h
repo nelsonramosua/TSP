@@ -11,18 +11,21 @@
 
 #include "../TravelingSalesmanProblem.h"
 
-Graph* GraphFactory_CreateMatrixGraph15(void);
-Graph* GraphFactory_CreateMatrixGraph20(void);
-Graph* GraphFactory_CreateEuclideanGraph15(void);
-Graph* GraphFactory_CreateRandomEuclideanGraph(unsigned int N, double maxX, double maxY);
+Graph* CreateGraphAula(void);
 
-// tsplib graphs
+Graph* CreateMatrixGraph15(void);
+Graph* CreateMatrixGraph20(void);
+Graph* CreateEuclideanGraph15(void);
+
+Graph* CreateRandomEuclideanGraph(unsigned int N, double maxX, double maxY);
+
+// TSPLIB graphs
 // see here: https://github.com/mastqe/tsplib/
-Graph* GraphFactory_CreateEil51Graph(void);
-Graph* GraphFactory_CreateOliver30Graph(void);
-Graph* GraphFactory_CreateSwiss42Graph(void);
-Graph* GraphFactory_CreateBays29Graph(void);
-Graph* GraphFactory_CreateA280Graph(void);
+Graph* CreateEil51Graph(void);
+Graph* CreateOliver30Graph(void);
+Graph* CreateSwiss42Graph(void);
+Graph* CreateBays29Graph(void);
+Graph* CreateA280Graph(void);
 
 // Add your own!
 // You can also read Graphs from files (see Graph ADT interface)!

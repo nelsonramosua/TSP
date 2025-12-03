@@ -1,7 +1,7 @@
 # C and C++ compilers
 CC = gcc
 CXX = g++
-CFLAGS = -Wall -Wextra -g -Iheaders -O2
+CFLAGS = -Wall -Wextra -g -Iheaders -O3 -march=native
 CXXFLAGS = -Wall -Wextra -g -Iheaders
 LDFLAGS = -lm
 
@@ -20,6 +20,8 @@ C_OBJS = $(GRAPH_DIR)/Graph.o \
          $(MST_DIR)/Prim_MST.o \
          $(MST_DIR)/LowerBound_MST.o \
          $(EXACT_DIR)/ExhaustiveSearch.o \
+         $(EXACT_DIR)/ExhaustiveSearchPruning.o \
+         $(EXACT_DIR)/HeldKarp.o \
          $(HEUR_DIR)/NearestNeighbour.o \
          $(HEUR_DIR)/Greedy.o \
          $(HEUR_DIR)/NearestInsertion.o \

@@ -1,5 +1,7 @@
 // NearestNeighbour.c - Implements Nearest Neighbour approximation algorithm.
 //
+// O(N^2).
+//
 // Nelson Ramos, 124921.
 //
 // November, 2025.

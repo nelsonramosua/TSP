@@ -1,5 +1,7 @@
 // TwoOpt.c - Implements the 2-Opt local search algorithm.
 //
+// O(N^3).
+//
 // Nelson Ramos, 124921.
 //
 // November, 2025.
@@ -76,7 +78,6 @@ Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour) {
             }
         }
         
-        // label used by 'goto' for restarting the outer loop
         restartLoops:; 
     }
     

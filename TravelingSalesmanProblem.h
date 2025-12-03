@@ -30,12 +30,16 @@ Tour* TourCreate(unsigned int numVertices);
 void TourDestroy(Tour** p);
 void TourDisplay(const Tour* t);
 double TourGetCost(const Tour* t);
+int TourInvariant(const Tour* t, unsigned int numVertices);
 
 // Lower Bounding / MST (Implemented in LowerBound_MST.c)
 double LowerBound_MST(const Graph* g);
 
 // Brute-force method (Implemented in ExhaustiveSearch.c)
 Tour* ExhaustiveSearch_FindTour(const Graph* g);
+Tour* ExhaustiveSearchPruning_FindTour(const Graph* g);
+
+Tour* HeldKarp_FindTour(const Graph* g);
 
 // Heuristics (Implemented in their respective .c files)
 Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex);

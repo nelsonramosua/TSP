@@ -27,7 +27,26 @@ static double _euclideanDistance(double x1, double y1, double x2, double y2) {
     return round(sqrt(dx*dx + dy*dy));
 }
 
-Graph* GraphFactory_CreateMatrixGraph15(void) {
+Graph* CreateGraphAula(void) {
+    unsigned int numVertices = 4;
+    Graph* g = GraphCreate(numVertices, 0, 1);
+    if (!g) return NULL;
+
+    GraphAddWeightedEdge(g, 0, 1, 20);
+    GraphAddWeightedEdge(g, 0, 2, 42);
+    GraphAddWeightedEdge(g, 0, 3, 35);
+
+    GraphAddWeightedEdge(g, 1, 3, 34);
+    GraphAddWeightedEdge(g, 1, 2, 30);
+
+    GraphAddWeightedEdge(g, 2, 3, 12);
+    
+    _writeDOT(g, "GraphAula");
+
+    return g;
+}
+
+Graph* CreateMatrixGraph15(void) {
     unsigned int numVertices = 15;
     Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
@@ -59,7 +78,7 @@ Graph* GraphFactory_CreateMatrixGraph15(void) {
     return g;
 }
 
-Graph* GraphFactory_CreateMatrixGraph20(void) {
+Graph* CreateMatrixGraph20(void) {
     unsigned int numVertices = 20;
     Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
@@ -98,7 +117,7 @@ Graph* GraphFactory_CreateMatrixGraph20(void) {
 
 // ---------------------- EUCLIDEAN GRAPHS ----------------------
 
-Graph* GraphFactory_CreateEuclideanGraph15(void) {
+Graph* CreateEuclideanGraph15(void) {
     unsigned int numVertices = 15;
     Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
@@ -122,7 +141,7 @@ Graph* GraphFactory_CreateEuclideanGraph15(void) {
     return g;
 }
 
-Graph* GraphFactory_CreateRandomEuclideanGraph(unsigned int numVertices, double maxX, double maxY) {
+Graph* CreateRandomEuclideanGraph(unsigned int numVertices, double maxX, double maxY) {
     Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
 
@@ -149,7 +168,7 @@ Graph* GraphFactory_CreateRandomEuclideanGraph(unsigned int numVertices, double 
 }
 
 // tsplib graph. Best solution: 426
-Graph* GraphFactory_CreateEil51Graph(void) {
+Graph* CreateEil51Graph(void) {
     const unsigned int numVertices = 51;
     Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
@@ -157,13 +176,13 @@ Graph* GraphFactory_CreateEil51Graph(void) {
     double coords[51][2] = {
         {37, 52}, {49, 49}, {52, 64}, {20, 26}, {40, 30},
         {21, 47}, {17, 63}, {31, 62}, {52, 33}, {51, 21},
-        {42, 41}, {31, 32}, {5, 25}, {12, 42}, {36, 16},
+        {42, 41}, {31, 32}, { 5, 25}, {12, 42}, {36, 16},
         {52, 41}, {27, 23}, {17, 33}, {13, 13}, {57, 58},
-        {62, 42}, {42, 57}, {16, 57}, {8, 52}, {7, 38},
+        {62, 42}, {42, 57}, {16, 57}, { 8, 52}, {07, 38},
         {27, 68}, {30, 48}, {43, 67}, {58, 48}, {58, 27},
         {37, 69}, {38, 46}, {46, 10}, {61, 33}, {62, 63},
-        {63, 69}, {32, 22}, {45, 35}, {59, 15}, {5, 6},
-        {10, 17}, {21, 10}, {5, 64}, {30, 15}, {39, 10},
+        {63, 69}, {32, 22}, {45, 35}, {59, 15}, { 5,  6},
+        {10, 17}, {21, 10}, { 5, 64}, {30, 15}, {39, 10},
         {32, 39}, {25, 32}, {25, 55}, {48, 28}, {56, 37},
         {30, 40}
     };
@@ -180,7 +199,7 @@ Graph* GraphFactory_CreateEil51Graph(void) {
 }
 
 // tsplib graph: oliver30. Best solution: 420
-Graph* GraphFactory_CreateOliver30Graph(void) {
+Graph* CreateOliver30Graph(void) {
     const unsigned int numVertices = 30;
     Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
@@ -207,7 +226,7 @@ Graph* GraphFactory_CreateOliver30Graph(void) {
 }
 
 // tsplib graph. Best solution: 1273
-Graph* GraphFactory_CreateSwiss42Graph(void) {
+Graph* CreateSwiss42Graph(void) {
     const unsigned int numVertices = 42;
     Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
@@ -268,7 +287,7 @@ Graph* GraphFactory_CreateSwiss42Graph(void) {
 }
 
 // tsplib graph. Best solution: 2020
-Graph* GraphFactory_CreateBays29Graph(void) {
+Graph* CreateBays29Graph(void) {
     const unsigned int numVertices = 29;
     Graph* g = GraphCreate(numVertices, 0, 1);
     if (!g) return NULL;
@@ -315,7 +334,7 @@ Graph* GraphFactory_CreateBays29Graph(void) {
 }
 
 // tsplib graph. Best solution: 2579
-Graph* GraphFactory_CreateA280Graph(void) {
+Graph* CreateA280Graph(void) {
     const unsigned int numVertices = 280;
     double coords[280][2] = {
         {288, 149}, {288, 129}, {270, 133}, {256, 141}, {256, 157}, {246, 157}, {236, 169}, 
@@ -373,3 +392,5 @@ Graph* GraphFactory_CreateA280Graph(void) {
 
     return g;
 }
+
+// Add your own!
