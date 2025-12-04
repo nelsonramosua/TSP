@@ -12,25 +12,33 @@
 #ifndef _TRAVELING_SALESMAN_PROBLEM_H_
 #define _TRAVELING_SALESMAN_PROBLEM_H_
 
-#include "Graph.h"      // The Graph ADT interface (All Credit to AED Professors)
-#include "SortedList.h" // The SortedList ADT interface (All Credit to AED Professors)
+#include "headers/Graph.h"      // The Graph ADT interface (All Credit to AED Professors)
+#include "headers/SortedList.h" // The SortedList ADT interface (All Credit to AED Professors)
+#include "headers/NamedGraph.h" // Optional display with city names
 
 #include <stdio.h>
 #include <limits.h>
 #include <float.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct _Tour {
     unsigned int* path;          // Array of vertices in the tour (V1, V2, ..., VN, V1)
     unsigned int numVertices;    // Number of vertices in the path 
     double cost;                 // Total cost of the tour
+
+    const char** cityNames;      // Optional city names for display
 } Tour; 
 
 // Function prototypes for Tour ADT (Implemented in Tour.c)
 Tour* TourCreate(unsigned int numVertices);
+Tour* TourDeepCopy(const Tour* src);
 void TourDestroy(Tour** p);
 void TourDisplay(const Tour* t);
 double TourGetCost(const Tour* t);
 int TourInvariant(const Tour* t, unsigned int numVertices);
+
+void TourMapCityNames(Tour* t, const NamedGraph* ng);
 
 // Lower Bounding / MST (Implemented in LowerBound_MST.c)
 double LowerBound_MST(const Graph* g);

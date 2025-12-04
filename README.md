@@ -18,6 +18,8 @@ TSP/
 │   ├── Graph.h
 │   ├── GraphFactory.h
 │   ├── Metaheuristics.h
+│   ├── NamedGraph.h        # Abstraction layer for graphs with names as vertices.
+│   ├── TSPTest.h           # Test driver header
 │   └── SortedList.h
 ├── implementations/
 │   ├── exact/              # Exact algorithms
@@ -26,6 +28,7 @@ TSP/
 │   │   └── ExhaustiveSearch.c
 │   ├── graph/              # Graph utilities
 │   │   ├── Graph.c
+│   │   ├── NamedGraph.c    # Abstraction layer for graphs with names as vertices.
 │   │   └── SortedList.c
 │   ├── heuristics/         # Heuristic algorithms
 │   │   ├── Greedy.c
@@ -119,6 +122,7 @@ This project uses **GCC** and **G++** to compile C and C++ code (for the importe
 The project includes:
 
 * The **Graph presented in AED Class 23**, `CreateGraphAula`.
+* A **real-world Graph**, based on **Portuguese cities**, `CreatePortugal12CitiesGraph`.
 * **Predefined Matrix Graphs:** `CreateMatrixGraph15` and `CreateMatrixGraph20`.
 * **Fixed Euclidean Graph:** `CreateEuclideanGraph15`.
 * **Random Euclidean Graphs:** `CreateRandomEuclideanGraph(N, maxX, maxY)`.
@@ -131,6 +135,7 @@ Graph outputs in DOT format are saved in `graphs/` and can be visualized directl
 ```bash
 dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 ```
+**Note**: Only if cities names are set for each vertex will the Tour and DOT generation use those names. Otherwise, the default is the vertex index (0 upto numVertices). See, pex, graphs/GraphAula.dot & Bays29Graph.dot.
 
 ---
 

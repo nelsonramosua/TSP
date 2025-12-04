@@ -10,14 +10,15 @@
 
 #include "headers/GraphFactory.h"
 #include "headers/Graph.h"
+#include "headers/NamedGraph.h"
 #include <stdlib.h>
 #include <math.h>
 
 // helper to write graph automatically to /graphs/<name>.dot
-static void _writeDOT(const Graph* g, const char* name) {
+static void _writeDOT(const NamedGraph* ng, const char* name) {
     char path[256];
     snprintf(path, sizeof(path), "graphs/%s.dot", name); // try to avoid buffer overflow...
-    GraphWriteDOT(g, path);
+    GraphWriteDOT(ng->g, path, ng->cityNames);
 }
 
 // helper to calc euclidean distance between two points
@@ -27,29 +28,134 @@ static double _euclideanDistance(double x1, double y1, double x2, double y2) {
     return round(sqrt(dx*dx + dy*dy));
 }
 
-Graph* CreateGraphAula(void) {
+NamedGraph* CreateGraphAula(void) {
     unsigned int numVertices = 4;
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
 
-    GraphAddWeightedEdge(g, 0, 1, 20);
-    GraphAddWeightedEdge(g, 0, 2, 42);
-    GraphAddWeightedEdge(g, 0, 3, 35);
+    NamedGraphSetCityName(namedGraph, 0, "A");
+    NamedGraphSetCityName(namedGraph, 1, "B");
+    NamedGraphSetCityName(namedGraph, 2, "C");
+    NamedGraphSetCityName(namedGraph, 3, "D");
 
-    GraphAddWeightedEdge(g, 1, 3, 34);
-    GraphAddWeightedEdge(g, 1, 2, 30);
+    GraphAddWeightedEdge(namedGraph->g, 0, 1, 20);
+    GraphAddWeightedEdge(namedGraph->g, 0, 2, 42);
+    GraphAddWeightedEdge(namedGraph->g, 0, 3, 35);
 
-    GraphAddWeightedEdge(g, 2, 3, 12);
+    GraphAddWeightedEdge(namedGraph->g, 1, 3, 34);
+    GraphAddWeightedEdge(namedGraph->g, 1, 2, 30);
+
+    GraphAddWeightedEdge(namedGraph->g, 2, 3, 12);
     
-    _writeDOT(g, "GraphAula");
+    _writeDOT(namedGraph, "GraphAula");
 
-    return g;
+    return namedGraph;
 }
 
-Graph* CreateMatrixGraph15(void) {
+NamedGraph* CreatePortugal12CitiesGraph(void) {
+    unsigned int numVertices = 12;
+    NamedGraph* ng = NamedGraphCreate(numVertices);
+    if (!ng) return NULL;
+
+    // Definir nomes das cidades
+    NamedGraphSetCityName(ng, 0, "Lisboa");
+    NamedGraphSetCityName(ng, 1, "Porto");
+    NamedGraphSetCityName(ng, 2, "Coimbra");
+    NamedGraphSetCityName(ng, 3, "Braga");
+    NamedGraphSetCityName(ng, 4, "Aveiro");
+    NamedGraphSetCityName(ng, 5, "Faro");
+    NamedGraphSetCityName(ng, 6, "Leiria");
+    NamedGraphSetCityName(ng, 7, "Santarém");
+    NamedGraphSetCityName(ng, 8, "Setúbal");
+    NamedGraphSetCityName(ng, 9, "Viseu");
+    NamedGraphSetCityName(ng, 10, "Évora");
+    NamedGraphSetCityName(ng, 11, "Guimarães");
+
+    GraphAddWeightedEdge(ng->g, 0, 1, 313);  // Lisboa ↔ Porto
+    GraphAddWeightedEdge(ng->g, 0, 2, 196);  // Lisboa ↔ Coimbra
+    GraphAddWeightedEdge(ng->g, 0, 3, 366);  // Lisboa ↔ Braga
+    GraphAddWeightedEdge(ng->g, 0, 4, 244);  // Lisboa ↔ Aveiro
+    GraphAddWeightedEdge(ng->g, 0, 5, 299);  // Lisboa ↔ Faro
+    GraphAddWeightedEdge(ng->g, 0, 6, 129);  // Lisboa ↔ Leiria
+    GraphAddWeightedEdge(ng->g, 0, 7, 78);   // Lisboa ↔ Santarém
+    GraphAddWeightedEdge(ng->g, 0, 8, 48);   // Lisboa ↔ Setúbal
+    GraphAddWeightedEdge(ng->g, 0, 9, 292);  // Lisboa ↔ Viseu
+    GraphAddWeightedEdge(ng->g, 0, 10, 150); // Lisboa ↔ Évora
+    GraphAddWeightedEdge(ng->g, 0, 11, 395); // Lisboa ↔ Guimarães
+
+    GraphAddWeightedEdge(ng->g, 1, 2, 117);  // Porto ↔ Coimbra
+    GraphAddWeightedEdge(ng->g, 1, 3, 53);   // Porto ↔ Braga
+    GraphAddWeightedEdge(ng->g, 1, 4, 68);   // Porto ↔ Aveiro
+    GraphAddWeightedEdge(ng->g, 1, 5, 570);  // Porto ↔ Faro (aprox.)
+    GraphAddWeightedEdge(ng->g, 1, 6, 184);  // Porto ↔ Leiria (aprox.)
+    GraphAddWeightedEdge(ng->g, 1, 7, 254);  // Porto ↔ Santarém (aprox.)
+    GraphAddWeightedEdge(ng->g, 1, 8, 308);  // Porto ↔ Setúbal (aprox.)
+    GraphAddWeightedEdge(ng->g, 1, 9, 133);  // Porto ↔ Viseu
+    GraphAddWeightedEdge(ng->g, 1, 10, 620); // Porto ↔ Évora (aprox.)
+    GraphAddWeightedEdge(ng->g, 1, 11, 55);  // Porto ↔ Guimarães
+
+    GraphAddWeightedEdge(ng->g, 2, 3, 100);  // Coimbra ↔ Braga (aprox.)
+    GraphAddWeightedEdge(ng->g, 2, 4, 60);   // Coimbra ↔ Aveiro
+    GraphAddWeightedEdge(ng->g, 2, 5, 500);  // Coimbra ↔ Faro
+    GraphAddWeightedEdge(ng->g, 2, 6, 130);  // Coimbra ↔ Leiria (aprox.)
+    GraphAddWeightedEdge(ng->g, 2, 7, 165);  // Coimbra ↔ Santarém (aprox.)
+    GraphAddWeightedEdge(ng->g, 2, 8, 200);  // Coimbra ↔ Setúbal (aprox.)
+    GraphAddWeightedEdge(ng->g, 2, 9, 75);   // Coimbra ↔ Viseu (aprox.)
+    GraphAddWeightedEdge(ng->g, 2, 10, 360); // Coimbra ↔ Évora (aprox.)
+    GraphAddWeightedEdge(ng->g, 2, 11, 140); // Coimbra ↔ Guimarães (aprox.)
+
+    GraphAddWeightedEdge(ng->g, 3, 4, 135);  // Braga ↔ Aveiro (aprox.)
+    GraphAddWeightedEdge(ng->g, 3, 5, 580);  // Braga ↔ Faro (aprox.)
+    GraphAddWeightedEdge(ng->g, 3, 6, 210);  // Braga ↔ Leiria (aprox.)
+    GraphAddWeightedEdge(ng->g, 3, 7, 320);  // Braga ↔ Santarém (aprox.)
+    GraphAddWeightedEdge(ng->g, 3, 8, 350);  // Braga ↔ Setúbal (aprox.)
+    GraphAddWeightedEdge(ng->g, 3, 9, 150);  // Braga ↔ Viseu (aprox.)
+    GraphAddWeightedEdge(ng->g, 3, 10, 600); // Braga ↔ Évora (aprox.)
+    GraphAddWeightedEdge(ng->g, 3, 11, 22);  // Braga ↔ Guimarães
+
+    GraphAddWeightedEdge(ng->g, 4, 5, 500);  // Aveiro ↔ Faro
+    GraphAddWeightedEdge(ng->g, 4, 6, 100);  // Aveiro ↔ Leiria (aprox.)
+    GraphAddWeightedEdge(ng->g, 4, 7, 180);  // Aveiro ↔ Santarém (aprox.)
+    GraphAddWeightedEdge(ng->g, 4, 8, 200);  // Aveiro ↔ Setúbal (aprox.)
+    GraphAddWeightedEdge(ng->g, 4, 9, 100);  // Aveiro ↔ Viseu (aprox.)
+    GraphAddWeightedEdge(ng->g, 4, 10, 400); // Aveiro ↔ Évora (aprox.)
+    GraphAddWeightedEdge(ng->g, 4, 11, 110); // Aveiro ↔ Guimarães (aprox.)
+
+    GraphAddWeightedEdge(ng->g, 5, 6, 450);  // Faro ↔ Leiria (aprox.)
+    GraphAddWeightedEdge(ng->g, 5, 7, 380);  // Faro ↔ Santarém (aprox.)
+    GraphAddWeightedEdge(ng->g, 5, 8, 250);  // Faro ↔ Setúbal (aprox.)
+    GraphAddWeightedEdge(ng->g, 5, 9, 500);  // Faro ↔ Viseu (aprox.)
+    GraphAddWeightedEdge(ng->g, 5, 10, 250); // Faro ↔ Évora (aprox.)
+    GraphAddWeightedEdge(ng->g, 5, 11, 580); // Faro ↔ Guimarães (aprox.)
+
+    GraphAddWeightedEdge(ng->g, 6, 7, 70);   // Leiria ↔ Santarém (aprox.)
+    GraphAddWeightedEdge(ng->g, 6, 8, 100);  // Leiria ↔ Setúbal (aprox.)
+    GraphAddWeightedEdge(ng->g, 6, 9, 180);  // Leiria ↔ Viseu (aprox.)
+    GraphAddWeightedEdge(ng->g, 6, 10, 260); // Leiria ↔ Évora (aprox.)
+    GraphAddWeightedEdge(ng->g, 6, 11, 210); // Leiria ↔ Guimarães (aprox.)
+
+    GraphAddWeightedEdge(ng->g, 7, 8, 45);   // Santarém ↔ Setúbal (aprox.)
+    GraphAddWeightedEdge(ng->g, 7, 9, 230);  // Santarém ↔ Viseu (aprox.)
+    GraphAddWeightedEdge(ng->g, 7, 10, 150); // Santarém ↔ Évora (aprox.)
+    GraphAddWeightedEdge(ng->g, 7, 11, 300); // Santarém ↔ Guimarães (aprox.)
+
+    GraphAddWeightedEdge(ng->g, 8, 9, 310);  // Setúbal ↔ Viseu (aprox.)
+    GraphAddWeightedEdge(ng->g, 8, 10, 90);  // Setúbal ↔ Évora (aprox.)
+    GraphAddWeightedEdge(ng->g, 8, 11, 360); // Setúbal ↔ Guimarães (aprox.)
+
+    GraphAddWeightedEdge(ng->g, 9, 10, 400); // Viseu ↔ Évora (aprox.)
+    GraphAddWeightedEdge(ng->g, 9, 11, 130); // Viseu ↔ Guimarães (aprox.)
+
+    GraphAddWeightedEdge(ng->g, 10, 11, 600);// Évora ↔ Guimarães (aprox.)
+
+    _writeDOT(ng, "Portugal12CitiesGraph");
+    return ng;
+}
+
+NamedGraph* CreateMatrixGraph15(void) {
     unsigned int numVertices = 15;
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
 
     double w[15][15] = {
         {0, 12, 7, 23, 9, 34, 15, 28, 18, 14, 30, 16, 25, 20, 10},
@@ -71,17 +177,17 @@ Graph* CreateMatrixGraph15(void) {
 
     for (unsigned int vert1 = 0; vert1 < numVertices; vert1++)
         for (unsigned int vert2 = vert1 + 1; vert2 < numVertices; vert2++)
-            GraphAddWeightedEdge(g, vert1, vert2, w[vert1][vert2]);
+            GraphAddWeightedEdge(namedGraph->g, vert1, vert2, w[vert1][vert2]);
     
-    _writeDOT(g, "MatrixGraph15");
+    _writeDOT(namedGraph, "MatrixGraph15");
 
-    return g;
+    return namedGraph;
 }
 
-Graph* CreateMatrixGraph20(void) {
+NamedGraph* CreateMatrixGraph20(void) {
     unsigned int numVertices = 20;
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices); // always return NamedGraph
+    if (!namedGraph) return NULL;
 
     double w[20][20] = {
         {0,2,4,6,7,5,8,10,9,11,12,14,13,15,16,17,18,19,20,21},
@@ -108,46 +214,44 @@ Graph* CreateMatrixGraph20(void) {
 
     for (unsigned int i = 0; i < numVertices; i++)
         for (unsigned int j = i + 1; j < numVertices; j++)
-            GraphAddWeightedEdge(g, i, j, w[i][j]);
+            GraphAddWeightedEdge(namedGraph->g, i, j, w[i][j]);
 
-    _writeDOT(g, "MatrixGraph20");
+    _writeDOT(namedGraph, "MatrixGraph20");
 
-    return g;
+    return namedGraph;
 }
 
 // ---------------------- EUCLIDEAN GRAPHS ----------------------
 
-Graph* CreateEuclideanGraph15(void) {
+NamedGraph* CreateEuclideanGraph15(void) {
     unsigned int numVertices = 15;
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
 
     double coords[15][2] = {
-        {0,0}, {2,0}, {1,1},
-        {10,0}, {12,0}, {11,1},
-        {0,10}, {2,10}, {1,11},
-        {10,10}, {12,10}, {11,11},
+        {0,0}, {2,0}, {1,1}, {10,0}, {12,0}, {11,1},
+        {0,10}, {2,10}, {1,11}, {10,10}, {12,10}, {11,11},
         {5,5}, {6,5}, {5.5,6}
     };
 
     for (unsigned int i = 0; i < numVertices; i++)
         for (unsigned int j = i + 1; j < numVertices; j++) {
             double dist = _euclideanDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
-            GraphAddWeightedEdge(g, i, j, dist);
+            GraphAddWeightedEdge(namedGraph->g, i, j, dist);
         }
 
-    _writeDOT(g, "EuclideanGraph15");
+    _writeDOT(namedGraph, "EuclideanGraph15");
 
-    return g;
+    return namedGraph;
 }
 
-Graph* CreateRandomEuclideanGraph(unsigned int numVertices, double maxX, double maxY) {
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
+NamedGraph* CreateRandomEuclideanGraph(unsigned int numVertices, double maxX, double maxY) {
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
 
     double* x = malloc(numVertices * sizeof(double));
     double* y = malloc(numVertices * sizeof(double));
-    if (!x || !y) { free(x); free(y); GraphDestroy(&g); return NULL; }
+    if (!x || !y) { free(x); free(y); NamedGraphDestroy(&namedGraph); return NULL; }
 
     for (unsigned int i = 0; i < numVertices; i++) {
         x[i] = ((double)rand() / RAND_MAX) * maxX;
@@ -157,21 +261,21 @@ Graph* CreateRandomEuclideanGraph(unsigned int numVertices, double maxX, double 
     for (unsigned int i = 0; i < numVertices; i++)
         for (unsigned int j = i + 1; j < numVertices; j++) {
             double weight = _euclideanDistance(x[i], y[i], x[j], y[j]);
-            GraphAddWeightedEdge(g, i, j, weight);
+            GraphAddWeightedEdge(namedGraph->g, i, j, weight);
         }
 
     free(x); free(y);
 
-    _writeDOT(g, "RandomEuclideanGraph");
-    
-    return g;
+    _writeDOT(namedGraph, "RandomEuclideanGraph");
+
+    return namedGraph;
 }
 
 // tsplib graph. Best solution: 426
-Graph* CreateEil51Graph(void) {
+NamedGraph* CreateEil51Graph(void) {
     const unsigned int numVertices = 51;
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
 
     double coords[51][2] = {
         {37, 52}, {49, 49}, {52, 64}, {20, 26}, {40, 30},
@@ -190,19 +294,19 @@ Graph* CreateEil51Graph(void) {
     for (unsigned int i = 0; i < numVertices; i++) 
         for (unsigned int j = i + 1; j < numVertices; j++) {
             double dist = _euclideanDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
-            GraphAddWeightedEdge(g, i, j, dist);
+            GraphAddWeightedEdge(namedGraph->g, i, j, dist);
         }
 
-    _writeDOT(g, "Eil51Graph");
+    _writeDOT(namedGraph, "Eil51Graph");
 
-    return g;
+    return namedGraph;
 }
 
 // tsplib graph: oliver30. Best solution: 420
-Graph* CreateOliver30Graph(void) {
+NamedGraph* CreateOliver30Graph(void) {
     const unsigned int numVertices = 30;
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
 
     // (Oliver et al. 1987)
     double coords[30][2] = {
@@ -217,19 +321,19 @@ Graph* CreateOliver30Graph(void) {
     for (unsigned int i = 0; i < numVertices; i++) 
         for (unsigned int j = i + 1; j < numVertices; j++) {
             double dist = _euclideanDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
-            GraphAddWeightedEdge(g, i, j, dist);
+            GraphAddWeightedEdge(namedGraph->g, i, j, dist);
         }
 
-    _writeDOT(g, "Oliver30Graph");
+    _writeDOT(namedGraph, "Oliver30Graph");
 
-    return g;
+    return namedGraph;
 }
 
 // tsplib graph. Best solution: 1273
-Graph* CreateSwiss42Graph(void) {
+NamedGraph* CreateSwiss42Graph(void) {
     const unsigned int numVertices = 42;
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
 
     double w[42][42] = {
         {0, 15, 30, 23, 32, 55, 33, 37, 92, 114, 92, 110, 96, 90, 74, 76, 82, 67, 72, 78, 82, 159, 122, 131, 206, 112, 57, 28, 43, 70, 65, 66, 37, 103, 84, 125, 129, 72, 126, 141, 183, 124},
@@ -278,19 +382,19 @@ Graph* CreateSwiss42Graph(void) {
 
     for (unsigned int i = 0; i < numVertices; i++) 
         for (unsigned int j = i + 1; j < numVertices; j++) {
-            GraphAddWeightedEdge(g, i, j, w[i][j]);
+            GraphAddWeightedEdge(namedGraph->g, i, j, w[i][j]);
         }
     
-    _writeDOT(g, "Swiss42Graph");
+    _writeDOT(namedGraph, "Swiss42Graph");
 
-    return g;
+    return namedGraph;
 }
 
 // tsplib graph. Best solution: 2020
-Graph* CreateBays29Graph(void) {
+NamedGraph* CreateBays29Graph(void) {
     const unsigned int numVertices = 29;
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
 
     double w[29][29] = {
         {  0, 107, 241, 190, 124,  80, 316,  76, 152, 157, 283, 133, 113, 297, 228, 129, 348, 276, 188, 150,  65, 341, 184,  67, 221, 169, 108,  45, 167},
@@ -326,16 +430,20 @@ Graph* CreateBays29Graph(void) {
 
     for (unsigned int i = 0; i < numVertices; i++) 
         for (unsigned int j = i + 1; j < numVertices; j++) 
-            GraphAddWeightedEdge(g, i, j, w[i][j]);
+            GraphAddWeightedEdge(namedGraph->g, i, j, w[i][j]);
 
-    _writeDOT(g, "Bays29Graph");
+    _writeDOT(namedGraph, "Bays29Graph");
 
-    return g;
+    return namedGraph;
 }
 
 // tsplib graph. Best solution: 2579
-Graph* CreateA280Graph(void) {
+NamedGraph* CreateA280Graph(void) {
     const unsigned int numVertices = 280;
+
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
+
     double coords[280][2] = {
         {288, 149}, {288, 129}, {270, 133}, {256, 141}, {256, 157}, {246, 157}, {236, 169}, 
         {228, 169}, {228, 161}, {220, 169}, {212, 169}, {204, 169}, {196, 169}, {188, 169}, 
@@ -379,18 +487,15 @@ Graph* CreateA280Graph(void) {
         {220, 145}, {228, 145}, {236, 145}, {246, 141}, {252, 125}, {260, 129}, {280, 133}
     };
 
-    Graph* g = GraphCreate(numVertices, 0, 1);
-    if (!g) return NULL;
-
     for (unsigned int i = 0; i < numVertices; i++) 
         for (unsigned int j = i + 1; j < numVertices; j++) {
             double dist = _euclideanDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
-            GraphAddWeightedEdge(g, i, j, dist);
+            GraphAddWeightedEdge(namedGraph->g, i, j, dist);
         }
 
-    _writeDOT(g, "A280Graph");
+    _writeDOT(namedGraph, "A280Graph");
 
-    return g;
+    return namedGraph;
 }
 
 // Add your own!

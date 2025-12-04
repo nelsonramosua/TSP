@@ -17,6 +17,7 @@ TEST_DIR = tests
 # C object files
 C_OBJS = $(GRAPH_DIR)/Graph.o \
          $(GRAPH_DIR)/SortedList.o \
+         $(GRAPH_DIR)/NamedGraph.o \
          $(MST_DIR)/Prim_MST.o \
          $(MST_DIR)/LowerBound_MST.o \
          $(EXACT_DIR)/ExhaustiveSearch.o \
