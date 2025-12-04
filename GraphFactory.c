@@ -9,8 +9,7 @@
 // Generated with help from AI!
 
 #include "headers/GraphFactory.h"
-#include "headers/Graph.h"
-#include "headers/NamedGraph.h"
+#include "TravelingSalesmanProblem.h"
 #include <stdlib.h>
 #include <math.h>
 

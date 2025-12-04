@@ -9,10 +9,7 @@
 #ifndef _TSP_TEST_H_
 #define _TSP_TEST_H_
 
-#include "Graph.h"
-#include "NamedGraph.h"
 #include "../TravelingSalesmanProblem.h"
-#include <stdlib.h>
 
 typedef struct {
     Tour* (*tspFun)(const Graph*, void*);  // generic function pointer to TSP implementation
@@ -25,6 +22,7 @@ static void RunTSPAlgorithms(NamedGraph* ng, const char* graphName, double actua
 static void TestAndRunNamedGraph(NamedGraph* (*creatorFun)(void), const char* graphName, double knownOptimalCost);
 static void ExecuteAndDisplay(NamedGraph* ng, unsigned int numVertices, TSPAlgorithm alg);
 
+// Abstraction adapters.
 static Tour* ExhaustiveSearch_Adapter(const Graph* g, void* unused) {
     (void)unused;
     return ExhaustiveSearch_FindTour((Graph*)g);

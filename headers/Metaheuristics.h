@@ -9,6 +9,8 @@
 #ifndef METAHEURISTICS_H
 #define METAHEURISTICS_H
 
+#include "../TravelingSalesmanProblem.h"
+
 // Configuration for Simulated Annealing (SA)
 #define SA_MIN_TEMP 1e-6 // when to stop algorithm
 #define SA_COOLING_RATE 0.90 // how quickly temperature decreases (0 - 1)

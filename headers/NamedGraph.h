@@ -9,10 +9,10 @@
 #ifndef _NAMED_GRAPH_H_
 #define _NAMED_GRAPH_H_
 
-#include "Graph.h"
 #include <stdlib.h>
+#include <Graph.h>
 
-typedef struct {
+typedef struct _NamedGraph {
     Graph* g;
     char** cityNames;  // size = GraphGetNumVertices(g)
 } NamedGraph;

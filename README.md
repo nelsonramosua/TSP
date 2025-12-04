@@ -5,6 +5,7 @@ This repository implements multiple algorithms to solve the **Traveling Salesman
 For purposes of this project, I chose to reuse the Graph implementation by AED Professors, which also uses a Sorted List. It would, in fact, have been better to create a new ADT, but for time reasons, I reused that one.
 
 I do not deserve (full) credit for this project. I based my implementations on resources available on the internet (research papers, youtube videos, blog posts, etc.); furthermore, I had AI assistance (Claude Opus 4.5) for some of the implementations.
+Some of these are mere transcriptions of code available online (mostly C++ code). Thus, I do not take credit for those implementations. This was done only for comparison.
 
 This project was done for academic and fun purposes, and thus should not be taken seriously into a production environment.
 
@@ -14,42 +15,45 @@ This project was done for academic and fun purposes, and thus should not be take
 
 ```
 TSP/
-├── headers/                # Header files
+├── headers/                    # Header files
 │   ├── Graph.h
 │   ├── GraphFactory.h
+│   ├── LowerBounds.h
 │   ├── Metaheuristics.h
-│   ├── NamedGraph.h        # Abstraction layer for graphs with names as vertices.
-│   ├── TSPTest.h           # Test driver header
+│   ├── NamedGraph.h            # Abstraction layer for graphs with names as vertices.
+│   ├── TSPTest.h               # Test driver header
 │   └── SortedList.h
 ├── implementations/
-│   ├── exact/              # Exact algorithms
-|   |   ├── HeldKarp.c
-|   |   ├── ExhaustiveSearchPruning.c
+│   ├── exact/                  # Exact algorithms
+│   |   ├── HeldKarp.c
+│   |   ├── ExhaustiveSearchPruning.c
 │   │   └── ExhaustiveSearch.c
-│   ├── graph/              # Graph utilities
+│   ├── graph/                  # Graph utilities
 │   │   ├── Graph.c
-│   │   ├── NamedGraph.c    # Abstraction layer for graphs with names as vertices.
+│   │   ├── NamedGraph.c        # Abstraction layer for graphs with names as vertices.
 │   │   └── SortedList.c
-│   ├── heuristics/         # Heuristic algorithms
+│   ├── heuristics/             # Heuristic algorithms
 │   │   ├── Greedy.c
 │   │   ├── NearestNeighbour.c
 │   │   ├── NearestInsertion.c
 │   │   ├── Christofides.c
-│   │   └── blossom/        # Blossom implementation (C++) (imported!)
-│   ├── metaheuristics/     # Meta-heuristics
+│   │   └── blossom/            # Blossom implementation (C++) (imported!)
+│   ├── lowerBounds/            # Lower Bound algorithms
+│   │   ├── LowerBound_HeldKarp.c
+│   │   └── LowerBound_MST.c
+│   ├── metaheuristics/         # Meta-heuristics
 │   │   ├── TwoOpt.c
 │   │   ├── SimulatedAnnealing.c
 │   │   ├── GeneticAlgorithm.c
 │   │   └── AntColony.c
-│   └── mst/                # Minimum Spanning Tree utilities
-│       ├── Prim_MST.c
-│       └── LowerBound_MST.c
-├── graphs/                 # Predefined and generated graphs (.dot)
-├── TSPTest.c               # Comparison driver
-├── Tour.c                  # Tour structure and utilities
-├── GraphFactory.c          # Predefined graph generation
+│   └── mst/                    # Minimum Spanning Tree utilities (used by Christofides.c & LowerBound_MST.c).
+│       └── Prim_MST.c
+├── graphs/                     # Predefined and generated graphs (.dot)
+├── TSPTest.c                   # Comparison driver
+├── Tour.c                      # Tour structure and utilities
+├── GraphFactory.c              # Predefined graph generation
 ├── Makefile
-└── TravelingSalesmanProblem.h # Main project header
+└── TravelingSalesmanProblem.h  # Main project header
 ```
 
 **Note**: In the future, I would like to implement IPSO, as described in this paper: https://www.researchgate.net/publication/271285365_ISPO_A_New_Way_to_Solve_Traveling_Salesman_Problem.\
@@ -77,7 +81,8 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 | **Simulated Annealing**   | Meta-heuristic  | $O(N^2 \times \text{Iterations}) = O(N^3 \times \text{SA-MULTIPLIER})$      | Probabilistic improvement using 2-opt swaps. |
 | **Ant Colony Optimization** | Meta-heuristic | $O(N^2 \times \text{Iterations} \times \text{Ants}) = O(N^3 \times \text{Iterations})$ | Probabilistic search guided by pheromone trails; computationally heavier but can yield high-quality solutions. |
 | **Genetic Algorithm (GA)** | Meta-heuristic | $O(N^2 \times \text{Generations} \times \text{Population})$ | Population-based search simulating evolution (selection, crossover, mutation). Depending on the # Generations, it can be very slow. For the current parameters, that's for around $N \ge 55$.|
-| **Lower Bound (MST)**     | Utility         | $O(N^2)$                          | Provides a minimum cost estimate using a **Minimum Spanning Tree**. |
+| **Lower Bound MST**     | Utility         | $O(N^2)$                          | Provides a minimum cost estimate using a **Minimum Spanning Tree**. |
+| **Lower Bound Held-Karp Lagrangian Relaxation**     | Utility         | $O(N^2)$                          | Provides a minimum cost estimate using a **Held-Karp Lagrangian Relaxation**. |
 
 **Notes**: 
 Time complexity does not tell the whole story... even more so for small $N$ (numVertices). 
@@ -160,6 +165,8 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * https://www.geeksforgeeks.org/dsa/travelling-salesman-problem-greedy-approach/
 * https://youtu.be/oXb2nC-e_EA?si=3G2oxIMb31RO8N8n
 * https://www.researchgate.net/publication/271285365_ISPO_A_New_Way_to_Solve_Traveling_Salesman_Problem
+* https://www.sciencedirect.com/science/article/pii/S0377221796002147
+* https://github.com/corail-research/learning-hk-bound/blob/main/solver/src/hk2.cc
 * (and a few more, indicated in their respective C files)
 
 --- 

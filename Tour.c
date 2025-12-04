@@ -7,6 +7,7 @@
 // You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
 
 #include "TravelingSalesmanProblem.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 

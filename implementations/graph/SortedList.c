@@ -10,7 +10,7 @@
 // SORTED LIST implementation based on a linked list
 //
 
-#include "SortedList.h"
+#include "../../TravelingSalesmanProblem.h"
 
 #include <assert.h>
 #include <stdlib.h>

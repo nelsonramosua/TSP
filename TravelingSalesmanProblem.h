@@ -14,7 +14,7 @@
 
 #include "headers/Graph.h"      // The Graph ADT interface (All Credit to AED Professors)
 #include "headers/SortedList.h" // The SortedList ADT interface (All Credit to AED Professors)
-#include "headers/NamedGraph.h" // Optional display with city names
+#include "headers/NamedGraph.h"     // Optional display with city names
 
 #include <stdio.h>
 #include <limits.h>
@@ -40,8 +40,9 @@ int TourInvariant(const Tour* t, unsigned int numVertices);
 
 void TourMapCityNames(Tour* t, const NamedGraph* ng);
 
-// Lower Bounding / MST (Implemented in LowerBound_MST.c)
+// Lower Boundings
 double LowerBound_MST(const Graph* g);
+double LowerBound_HeldKarp(const Graph* g);
 
 // Brute-force method (Implemented in ExhaustiveSearch.c)
 Tour* ExhaustiveSearch_FindTour(const Graph* g);

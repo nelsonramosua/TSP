@@ -11,6 +11,7 @@ GRAPH_DIR = $(SRC_DIR)/graph
 HEUR_DIR = $(SRC_DIR)/heuristics
 META_DIR = $(SRC_DIR)/metaheuristics
 MST_DIR = $(SRC_DIR)/mst
+LOWER_BOUNDS_DIR = $(SRC_DIR)/lowerBounds
 EXACT_DIR = $(SRC_DIR)/exact
 TEST_DIR = tests
 
@@ -19,7 +20,8 @@ C_OBJS = $(GRAPH_DIR)/Graph.o \
          $(GRAPH_DIR)/SortedList.o \
          $(GRAPH_DIR)/NamedGraph.o \
          $(MST_DIR)/Prim_MST.o \
-         $(MST_DIR)/LowerBound_MST.o \
+         $(LOWER_BOUNDS_DIR)/LowerBound_MST.o \
+         $(LOWER_BOUNDS_DIR)/LowerBound_HeldKarp.o \
          $(EXACT_DIR)/ExhaustiveSearch.o \
          $(EXACT_DIR)/ExhaustiveSearchPruning.o \
          $(EXACT_DIR)/HeldKarp.o \

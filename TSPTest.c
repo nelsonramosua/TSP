@@ -67,9 +67,10 @@ static void RunTSPAlgorithms(NamedGraph* ng, const char* graphName, double actua
     Tour* nn_tour = NULL;
 
     // Lower Bound (MST)
-    double lower_bound = LowerBound_MST(g);
-    printf("\t\t**LOWER BOUND (MST Cost): %.2f**\n", lower_bound);
-    if (actualCost != -1) printf("\t\tActual Best Cost: %.2f\n", actualCost);
+    double lower_bound_mst = LowerBound_MST(g);
+    double lower_bound_hk = LowerBound_HeldKarp(g);
+    printf("\t**LOWER BOUNDS: %.2f (MST) | %.2f (HKLR)**\n", lower_bound_mst, lower_bound_hk);
+    if (actualCost != -1) printf("\t     Actual Best Cost: %.2f (%s)\n", actualCost, numVertices > 20 ? "by TSPLIB" : "by HK DP");
 
     // 0. Brute-Force (only for GraphGetNumVertices(ng->g) <= 12)
     ExecuteAndDisplay(ng, numVertices, (TSPAlgorithm){

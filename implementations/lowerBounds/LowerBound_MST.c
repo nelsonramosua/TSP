@@ -7,6 +7,8 @@
 // You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
 
 #include "../../TravelingSalesmanProblem.h"
+#include "../../headers/LowerBounds.h"
+
 #include <stdio.h>
 
 // Forward declaration of the MST calculation function from Prim_MST.c

@@ -6,15 +6,13 @@
 // Graph - Using a list of adjacency lists representation
 //
 
-#include "Graph.h"
+#include "../../TravelingSalesmanProblem.h"
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
 #include <string.h>
-
-#include "SortedList.h"
 
 // GLOBAL COUNTER FOR UNIQUE EDGE IDs
 static unsigned int _EdgeNextID = 0; 
