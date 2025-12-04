@@ -21,6 +21,7 @@ Tour* TourCreate(unsigned int numVertices) {
     // first element is size
     t->numVertices = numVertices + 1; 
     t->cost = 0.0;
+    t->cityNames = NULL;
     
     // init path elems to UINT_MAX
     for (unsigned int i = 0; i < t->numVertices; i++) t->path[i] = UINT_MAX;
@@ -28,31 +29,73 @@ Tour* TourCreate(unsigned int numVertices) {
     return t;
 }
 
+Tour* TourDeepCopy(const Tour* src) {
+    if (!src) return NULL;
+
+    Tour* copy = (Tour*) malloc(sizeof(Tour));
+    if (!copy) return NULL;
+
+    copy->numVertices = src->numVertices;
+    copy->cost = src->cost;
+
+    // deep copy path array
+    copy->path = (unsigned int*) malloc(copy->numVertices * sizeof(unsigned int));
+    if (!copy->path) { free(copy); return NULL; }
+    for (unsigned int i = 0; i < copy->numVertices; i++) copy->path[i] = src->path[i];
+    
+    // copy city names ptr 
+    copy->cityNames = src->cityNames;
+
+    return copy;
+}
+
 void TourDestroy(Tour** p) {
     Tour* t = *p;
 
     free(t->path);
-    free(t);
+    t->path = NULL;
+    t->cityNames = NULL;
 
+    free(t);
     *p = NULL;
 }
 
 double TourGetCost(const Tour* t) {
-    if (!t) return -1.0;
-    return t->cost;
+    return t ? t->cost : -1.0;
+}
+
+void TourMapCityNames(Tour* tour, const NamedGraph* ng) {
+    if (!tour || !ng) return;
+
+    unsigned int numVertices = GraphGetNumVertices(ng->g);
+
+    tour->cityNames = malloc(numVertices * sizeof(const char*));
+    if (!tour->cityNames) return;
+
+    // temporary buffer to hold default names if needed
+    static char defaultNames[512][16]; // max 512 vertices, name length 15
+
+    for (unsigned int i = 0; i < numVertices; i++) {
+        if (ng->cityNames && ng->cityNames[i]) {
+            tour->cityNames[i] = ng->cityNames[i];  // use user-defined name
+        } else {
+            snprintf(defaultNames[i], sizeof(defaultNames[i]), "%u", i); // default: vertex index
+            tour->cityNames[i] = defaultNames[i];
+        }
+    }
 }
 
 void TourDisplay(const Tour* t) {
-    if (!t) {
-        printf("  Tour is NULL.\n");
-        return;
-    }
+    if (!t) { printf("  Tour is NULL.\n"); return; }
 
     printf("  Cost: %.2f\n", t->cost);
     printf("  Path: ");
     for (unsigned int i = 0; i < t->numVertices; i++) {
         if (t->path[i] == UINT_MAX) break; 
-        printf("%u", t->path[i]);
+
+        if (t->cityNames) printf("%s", t->cityNames[t->path[i]]); // if city names are available, print them
+        else printf("%u", t->path[i]);                            // else print vertex indices
+
         if (i < t->numVertices - 1 && t->path[i+1] != UINT_MAX) printf(" -> ");
     }
     printf("\n");
@@ -63,59 +106,23 @@ static int isPermutation(const unsigned int* path, unsigned int numVertices);
 
 // Checks invariant properties of a Tour structure.
 int TourInvariant(const Tour* t, unsigned int numVertices) {
-    if (!t || !t->path) return 0; 
-
-    if (t->numVertices != (numVertices + 1)) {
-        fprintf(stderr, "[Invariant Error] Path array size (%u) should be N+1 (%u).\n", t->numVertices, numVertices + 1);
-        return 0;
-    }
-
-    if (t->cost < 0.0) {
-        fprintf(stderr, "[Invariant Error] Tour cost cannot be negative (%.2f).\n", t->cost);
-        return 0;
-    }
-    
-    if (!isPermutation(t->path, numVertices)) {
-        fprintf(stderr, "[Invariant Error] Path is not a valid permutation of vertices 0 to %u.\n", numVertices - 1);
-        return 0;
-    }
-
-    if (t->path[numVertices] != t->path[0]) {
-        fprintf(stderr, "[Invariant Error] Cycle not closed: Path[%u] (%u) != Path[0] (%u).\n", numVertices, t->path[numVertices], t->path[0]);
-        return 0;
-    }
-
+    if (!t || !t->path) return 0;
+    if (t->numVertices != numVertices + 1) return 0;
+    if (t->cost < 0.0) return 0;
+    if (!isPermutation(t->path, numVertices)) return 0;
+    if (t->path[numVertices] != t->path[0]) return 0;
     return 1;
 }
-
+    
 static int isPermutation(const unsigned int* path, unsigned int numVertices) {
-    if (numVertices == 0) return 1;
-
-    int* visited = (int*) calloc(numVertices, sizeof(int));
-    if (!visited) {
-        fprintf(stderr, "[Invariant Error] Memory allocation failed for permutation check.\n");
-        return 0;
-    }
+    int* visited = calloc(numVertices, sizeof(int));
+    if (!visited) return 0;
 
     for (unsigned int i = 0; i < numVertices; i++) {
-        unsigned int vertice = path[i];
-
-        if (vertice >= numVertices) {
-            fprintf(stderr, "[Invariant Detail] Vertice %u out of range [0, %u].\n", vertice, numVertices - 1);
-            free(visited);
-            return 0;
-        }
-
-        if (visited[vertice]) {
-            fprintf(stderr, "[Invariant Detail] Duplicate vertice found: %u.\n", vertice);
-            free(visited);
-            return 0;
-        }
-
-        visited[vertice] = 1;
+        if (path[i] >= numVertices || visited[path[i]]) { free(visited); return 0; }
+        visited[path[i]] = 1;
     }
 
     free(visited);
-
     return 1;
 }
