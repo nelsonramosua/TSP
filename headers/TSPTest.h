@@ -18,9 +18,9 @@ typedef struct {
     void* extra;                           // Generic extra argument (Tour* or unsigned int* or NULL)
 } TSPAlgorithm;
 
-static void RunTSPAlgorithms(NamedGraph* ng, const char* graphName, double actualCost, Tour* hk_tour);
-static void TestAndRunNamedGraph(NamedGraph* (*creatorFun)(void), const char* graphName, double knownOptimalCost);
-static void ExecuteAndDisplay(NamedGraph* ng, unsigned int numVertices, TSPAlgorithm alg);
+static void runTSPAlgorithms(NamedGraph* ng, const char* graphName, double actualCost, Tour* hk_tour);
+static void testRunNamedGraph(NamedGraph* (*creatorFun)(void), const char* graphName, double knownOptimalCost);
+static void executeDisplay(NamedGraph* ng, unsigned int numVertices, TSPAlgorithm alg);
 
 // Abstraction adapters.
 static Tour* ExhaustiveSearch_Adapter(const Graph* g, void* unused) {

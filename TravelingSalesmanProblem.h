@@ -21,6 +21,7 @@
 #include <float.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 typedef struct _Tour {
     unsigned int* path;          // Array of vertices in the tour (V1, V2, ..., VN, V1)
