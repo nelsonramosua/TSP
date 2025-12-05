@@ -4,14 +4,36 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
-
-// Generated with help from AI!
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 #include "headers/GraphFactory.h"
 #include "TravelingSalesmanProblem.h"
 #include <stdlib.h>
 #include <math.h>
+
+/*
+I suggest you add your own test graphs! To that effect, here's how you do it in this code base:
+1) Firstly, you define a function in the header, GraphFactory.h. pex: NamedGraph* CreateGraphTest(void);
+2) Then, you have to implement that function here. To that effect, you have two options:
+    i) If you want the graph to have named vertices (pex, Cities (see CreateGraphAula() )), 
+        you use GraphFactory_AddEdgeByCityNames(NamedGraph* namedGraph, const char* nameA, const char* nameB, double weight);
+        pex: GraphFactory_AddEdgeByCityNames(namedGraph, "A", "B", 20); this defines an edge between vertice A and vertice B w/ weight 20.
+        TourDisplay will then print the path with the named vertices (pex: A -> B -> C -> D -> A).
+    ii) Otherwise, if you just want a simpler Graph with indices as verticeNames (see, pex, CreateMatrixGraph15() )
+        you simply use GraphAddWeightedEdge(namedGraph->g, vert1, vert2, weight); 
+        pex: GraphAddWeightedEdge(namedGraph->g, 0, 1, 20); this defines an edge between vertice of index 0 and vertice of index 1 w/ weight 20.
+        TourDisplay will then print the path with vertices' indices (pex: 0 -> 1 -> 2 -> 3 -> 0). (mapping equivalent to A -> B -> C -> D -> A).
+3) Finally, you call this creatorFun in the testDriver, TSPTest.c, in main().
+    pex, with the this example, testRunNamedGraph(CreateGraphTest, "NAME (you put nane here)", -1);
+    Now, about that last value (-1): if you KNOW (well-known example, pex TSPLIB) the bestCost, you put it there, 
+    however, if you want Held-Karp DP to try to find the real bestCost, you leave it at -1. 
+    Just beware that I've defined it so Held-Karp only runs for numVertices <= 20. 
+    So, for N>20, you will have no realBestCost (no exact algorithm has runtime for determining it).
+    In any case, you still have the two lower bound !estimations! (MST (by Prim) and Held-Karp Lagrangian Relaxation (not to be confused with Held-Karp DP!)).
+    which will be lower but let you have some idea of the bestTourCost.
+
+Reviewing: Add prototype in GraphFactory.h. Add function here (see by example from given ones). Call it in Test Driver.
+*/
 
 // helper to write graph automatically to /graphs/<name>.dot
 static void _writeDOT(const NamedGraph* ng, const char* name) {
@@ -24,7 +46,16 @@ static void _writeDOT(const NamedGraph* ng, const char* name) {
 static double _euclideanDistance(double x1, double y1, double x2, double y2) {
     double dx = x1 - x2;
     double dy = y1 - y2;
-    return round(sqrt(dx*dx + dy*dy));
+    return round(sqrt(dx*dx + dy*dy)); // if you want weights to have decimal points, don't round. (One of these actually uses unrounded values).
+}
+
+static void GraphFactory_AddEdgeByCityNames(NamedGraph* namedGraph, const char* nameA, const char* nameB, double weight) {
+    int indexA = NamedGraphGetOrAssignIndex(namedGraph, nameA);
+    if (indexA == -1) return;
+    int indexB = NamedGraphGetOrAssignIndex(namedGraph, nameB);
+    if (indexB == -1) return;
+    
+    GraphAddWeightedEdge(namedGraph->g, (unsigned int)indexA, (unsigned int)indexB, weight);
 }
 
 NamedGraph* CreateGraphAula(void) {
@@ -32,19 +63,12 @@ NamedGraph* CreateGraphAula(void) {
     NamedGraph* namedGraph = NamedGraphCreate(numVertices);
     if (!namedGraph) return NULL;
 
-    NamedGraphSetCityName(namedGraph, 0, "A");
-    NamedGraphSetCityName(namedGraph, 1, "B");
-    NamedGraphSetCityName(namedGraph, 2, "C");
-    NamedGraphSetCityName(namedGraph, 3, "D");
-
-    GraphAddWeightedEdge(namedGraph->g, 0, 1, 20);
-    GraphAddWeightedEdge(namedGraph->g, 0, 2, 42);
-    GraphAddWeightedEdge(namedGraph->g, 0, 3, 35);
-
-    GraphAddWeightedEdge(namedGraph->g, 1, 3, 34);
-    GraphAddWeightedEdge(namedGraph->g, 1, 2, 30);
-
-    GraphAddWeightedEdge(namedGraph->g, 2, 3, 12);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "A", "B", 20); 
+    GraphFactory_AddEdgeByCityNames(namedGraph, "A", "C", 42); 
+    GraphFactory_AddEdgeByCityNames(namedGraph, "A", "D", 35); 
+    GraphFactory_AddEdgeByCityNames(namedGraph, "B", "D", 34);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "B", "C", 30);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "C", "D", 12);
     
     _writeDOT(namedGraph, "GraphAula");
 
@@ -56,98 +80,172 @@ NamedGraph* CreatePortugal12CitiesGraph(void) {
     NamedGraph* ng = NamedGraphCreate(numVertices);
     if (!ng) return NULL;
 
-    // Definir nomes das cidades
-    NamedGraphSetCityName(ng, 0, "Lisboa");
-    NamedGraphSetCityName(ng, 1, "Porto");
-    NamedGraphSetCityName(ng, 2, "Coimbra");
-    NamedGraphSetCityName(ng, 3, "Braga");
-    NamedGraphSetCityName(ng, 4, "Aveiro");
-    NamedGraphSetCityName(ng, 5, "Faro");
-    NamedGraphSetCityName(ng, 6, "Leiria");
-    NamedGraphSetCityName(ng, 7, "Santarém");
-    NamedGraphSetCityName(ng, 8, "Setúbal");
-    NamedGraphSetCityName(ng, 9, "Viseu");
-    NamedGraphSetCityName(ng, 10, "Évora");
-    NamedGraphSetCityName(ng, 11, "Guimarães");
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Porto", 313); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Coimbra", 196); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Braga", 366); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Aveiro", 244); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Faro", 299); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Leiria", 129); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Santarém", 78); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Setúbal", 48); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Viseu", 292); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Évora", 150); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Guimarães", 395); 
 
-    GraphAddWeightedEdge(ng->g, 0, 1, 313);  // Lisboa ↔ Porto
-    GraphAddWeightedEdge(ng->g, 0, 2, 196);  // Lisboa ↔ Coimbra
-    GraphAddWeightedEdge(ng->g, 0, 3, 366);  // Lisboa ↔ Braga
-    GraphAddWeightedEdge(ng->g, 0, 4, 244);  // Lisboa ↔ Aveiro
-    GraphAddWeightedEdge(ng->g, 0, 5, 299);  // Lisboa ↔ Faro
-    GraphAddWeightedEdge(ng->g, 0, 6, 129);  // Lisboa ↔ Leiria
-    GraphAddWeightedEdge(ng->g, 0, 7, 78);   // Lisboa ↔ Santarém
-    GraphAddWeightedEdge(ng->g, 0, 8, 48);   // Lisboa ↔ Setúbal
-    GraphAddWeightedEdge(ng->g, 0, 9, 292);  // Lisboa ↔ Viseu
-    GraphAddWeightedEdge(ng->g, 0, 10, 150); // Lisboa ↔ Évora
-    GraphAddWeightedEdge(ng->g, 0, 11, 395); // Lisboa ↔ Guimarães
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Coimbra", 117); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Braga", 53); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Aveiro", 68); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Faro", 570); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Leiria", 184); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Santarém", 254); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Setúbal", 308); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Viseu", 133); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Évora", 620); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Guimarães", 55); 
 
-    GraphAddWeightedEdge(ng->g, 1, 2, 117);  // Porto ↔ Coimbra
-    GraphAddWeightedEdge(ng->g, 1, 3, 53);   // Porto ↔ Braga
-    GraphAddWeightedEdge(ng->g, 1, 4, 68);   // Porto ↔ Aveiro
-    GraphAddWeightedEdge(ng->g, 1, 5, 570);  // Porto ↔ Faro (aprox.)
-    GraphAddWeightedEdge(ng->g, 1, 6, 184);  // Porto ↔ Leiria (aprox.)
-    GraphAddWeightedEdge(ng->g, 1, 7, 254);  // Porto ↔ Santarém (aprox.)
-    GraphAddWeightedEdge(ng->g, 1, 8, 308);  // Porto ↔ Setúbal (aprox.)
-    GraphAddWeightedEdge(ng->g, 1, 9, 133);  // Porto ↔ Viseu
-    GraphAddWeightedEdge(ng->g, 1, 10, 620); // Porto ↔ Évora (aprox.)
-    GraphAddWeightedEdge(ng->g, 1, 11, 55);  // Porto ↔ Guimarães
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Braga", 100); 
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Aveiro", 60); 
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Faro", 500); 
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Leiria", 130); 
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Santarém", 165); 
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Setúbal", 200); 
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Viseu", 75); 
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Évora", 360); 
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Guimarães", 140); 
 
-    GraphAddWeightedEdge(ng->g, 2, 3, 100);  // Coimbra ↔ Braga (aprox.)
-    GraphAddWeightedEdge(ng->g, 2, 4, 60);   // Coimbra ↔ Aveiro
-    GraphAddWeightedEdge(ng->g, 2, 5, 500);  // Coimbra ↔ Faro
-    GraphAddWeightedEdge(ng->g, 2, 6, 130);  // Coimbra ↔ Leiria (aprox.)
-    GraphAddWeightedEdge(ng->g, 2, 7, 165);  // Coimbra ↔ Santarém (aprox.)
-    GraphAddWeightedEdge(ng->g, 2, 8, 200);  // Coimbra ↔ Setúbal (aprox.)
-    GraphAddWeightedEdge(ng->g, 2, 9, 75);   // Coimbra ↔ Viseu (aprox.)
-    GraphAddWeightedEdge(ng->g, 2, 10, 360); // Coimbra ↔ Évora (aprox.)
-    GraphAddWeightedEdge(ng->g, 2, 11, 140); // Coimbra ↔ Guimarães (aprox.)
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Aveiro", 135); 
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Faro", 580); 
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Leiria", 210); 
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Santarém", 320); 
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Setúbal", 350); 
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Viseu", 150); 
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Évora", 600); 
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Guimarães", 22); 
 
-    GraphAddWeightedEdge(ng->g, 3, 4, 135);  // Braga ↔ Aveiro (aprox.)
-    GraphAddWeightedEdge(ng->g, 3, 5, 580);  // Braga ↔ Faro (aprox.)
-    GraphAddWeightedEdge(ng->g, 3, 6, 210);  // Braga ↔ Leiria (aprox.)
-    GraphAddWeightedEdge(ng->g, 3, 7, 320);  // Braga ↔ Santarém (aprox.)
-    GraphAddWeightedEdge(ng->g, 3, 8, 350);  // Braga ↔ Setúbal (aprox.)
-    GraphAddWeightedEdge(ng->g, 3, 9, 150);  // Braga ↔ Viseu (aprox.)
-    GraphAddWeightedEdge(ng->g, 3, 10, 600); // Braga ↔ Évora (aprox.)
-    GraphAddWeightedEdge(ng->g, 3, 11, 22);  // Braga ↔ Guimarães
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Faro", 500); 
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Leiria", 100); 
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Santarém", 180); 
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Setúbal", 200); 
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Viseu", 100); 
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Évora", 400); 
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Guimarães", 110); 
 
-    GraphAddWeightedEdge(ng->g, 4, 5, 500);  // Aveiro ↔ Faro
-    GraphAddWeightedEdge(ng->g, 4, 6, 100);  // Aveiro ↔ Leiria (aprox.)
-    GraphAddWeightedEdge(ng->g, 4, 7, 180);  // Aveiro ↔ Santarém (aprox.)
-    GraphAddWeightedEdge(ng->g, 4, 8, 200);  // Aveiro ↔ Setúbal (aprox.)
-    GraphAddWeightedEdge(ng->g, 4, 9, 100);  // Aveiro ↔ Viseu (aprox.)
-    GraphAddWeightedEdge(ng->g, 4, 10, 400); // Aveiro ↔ Évora (aprox.)
-    GraphAddWeightedEdge(ng->g, 4, 11, 110); // Aveiro ↔ Guimarães (aprox.)
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Leiria", 450); 
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Santarém", 380); 
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Setúbal", 250); 
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Viseu", 500); 
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Évora", 250); 
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Guimarães", 580); 
 
-    GraphAddWeightedEdge(ng->g, 5, 6, 450);  // Faro ↔ Leiria (aprox.)
-    GraphAddWeightedEdge(ng->g, 5, 7, 380);  // Faro ↔ Santarém (aprox.)
-    GraphAddWeightedEdge(ng->g, 5, 8, 250);  // Faro ↔ Setúbal (aprox.)
-    GraphAddWeightedEdge(ng->g, 5, 9, 500);  // Faro ↔ Viseu (aprox.)
-    GraphAddWeightedEdge(ng->g, 5, 10, 250); // Faro ↔ Évora (aprox.)
-    GraphAddWeightedEdge(ng->g, 5, 11, 580); // Faro ↔ Guimarães (aprox.)
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Santarém", 70); 
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Setúbal", 100); 
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Viseu", 180); 
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Évora", 260); 
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Guimarães", 210); 
 
-    GraphAddWeightedEdge(ng->g, 6, 7, 70);   // Leiria ↔ Santarém (aprox.)
-    GraphAddWeightedEdge(ng->g, 6, 8, 100);  // Leiria ↔ Setúbal (aprox.)
-    GraphAddWeightedEdge(ng->g, 6, 9, 180);  // Leiria ↔ Viseu (aprox.)
-    GraphAddWeightedEdge(ng->g, 6, 10, 260); // Leiria ↔ Évora (aprox.)
-    GraphAddWeightedEdge(ng->g, 6, 11, 210); // Leiria ↔ Guimarães (aprox.)
+    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Setúbal", 45); 
+    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Viseu", 230); 
+    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Évora", 150); 
+    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Guimarães", 300); 
 
-    GraphAddWeightedEdge(ng->g, 7, 8, 45);   // Santarém ↔ Setúbal (aprox.)
-    GraphAddWeightedEdge(ng->g, 7, 9, 230);  // Santarém ↔ Viseu (aprox.)
-    GraphAddWeightedEdge(ng->g, 7, 10, 150); // Santarém ↔ Évora (aprox.)
-    GraphAddWeightedEdge(ng->g, 7, 11, 300); // Santarém ↔ Guimarães (aprox.)
+    GraphFactory_AddEdgeByCityNames(ng, "Setúbal", "Viseu", 310); 
+    GraphFactory_AddEdgeByCityNames(ng, "Setúbal", "Évora", 90); 
+    GraphFactory_AddEdgeByCityNames(ng, "Setúbal", "Guimarães", 360); 
 
-    GraphAddWeightedEdge(ng->g, 8, 9, 310);  // Setúbal ↔ Viseu (aprox.)
-    GraphAddWeightedEdge(ng->g, 8, 10, 90);  // Setúbal ↔ Évora (aprox.)
-    GraphAddWeightedEdge(ng->g, 8, 11, 360); // Setúbal ↔ Guimarães (aprox.)
+    GraphFactory_AddEdgeByCityNames(ng, "Viseu", "Évora", 400); 
+    GraphFactory_AddEdgeByCityNames(ng, "Viseu", "Guimarães", 130); 
 
-    GraphAddWeightedEdge(ng->g, 9, 10, 400); // Viseu ↔ Évora (aprox.)
-    GraphAddWeightedEdge(ng->g, 9, 11, 130); // Viseu ↔ Guimarães (aprox.)
-
-    GraphAddWeightedEdge(ng->g, 10, 11, 600);// Évora ↔ Guimarães (aprox.)
+    GraphFactory_AddEdgeByCityNames(ng, "Évora", "Guimarães", 600);
 
     _writeDOT(ng, "Portugal12CitiesGraph");
+    return ng;
+}
+
+// https://www.researchgate.net/publication/362233733_Determining_Best_Travelling_Salesman_Route_of_12_Cities_of_Europe
+// We corroborate those results.
+NamedGraph* CreateEurope12CitiesGraph(void) {
+    unsigned int numVertices = 12;
+    NamedGraph* ng = NamedGraphCreate(numVertices);
+    if (!ng) return NULL;
+
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Venice", 935.17);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Copenhagen", 1760.56);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Paris", 831.37);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Vilnius", 2248.37);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Amsterdam", 1239.1);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "London", 1139.4);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Istanbul", 2232.73);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Lisbon", 1007.1);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Budapest", 1497.22);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Warsaw", 1863.34);
+    GraphFactory_AddEdgeByCityNames(ng, "Barcelona", "Kyiv", 2394.18);
+
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "Copenhagen", 1139.82);
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "Paris", 846.63);
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "Vilnius", 1378.49);
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "Amsterdam", 942.61);
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "London", 1137.52);
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "Istanbul", 1431.39);
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "Lisbon", 1916.16);
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "Budapest", 562.13);
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "Warsaw", 985.38);
+    GraphFactory_AddEdgeByCityNames(ng, "Venice", "Kyiv", 1460.25);
+
+    GraphFactory_AddEdgeByCityNames(ng, "Copenhagen", "Paris", 1028.85);
+    GraphFactory_AddEdgeByCityNames(ng, "Copenhagen", "Vilnius", 813.47);
+    GraphFactory_AddEdgeByCityNames(ng, "Copenhagen", "Amsterdam", 621.64);
+    GraphFactory_AddEdgeByCityNames(ng, "Copenhagen", "London", 956.13);
+    GraphFactory_AddEdgeByCityNames(ng, "Copenhagen", "Istanbul", 2021.7);
+    GraphFactory_AddEdgeByCityNames(ng, "Copenhagen", "Lisbon", 2479.49);
+    GraphFactory_AddEdgeByCityNames(ng, "Copenhagen", "Budapest", 1013.3);
+    GraphFactory_AddEdgeByCityNames(ng, "Copenhagen", "Warsaw", 671.75);
+    GraphFactory_AddEdgeByCityNames(ng, "Copenhagen", "Kyiv", 1328.22);
+
+    GraphFactory_AddEdgeByCityNames(ng, "Paris", "Vilnius", 1697.96);
+    GraphFactory_AddEdgeByCityNames(ng, "Paris", "Amsterdam", 430.79);
+    GraphFactory_AddEdgeByCityNames(ng, "Paris", "London", 342.15);
+    GraphFactory_AddEdgeByCityNames(ng, "Paris", "Istanbul", 2256.92);
+    GraphFactory_AddEdgeByCityNames(ng, "Paris", "Lisbon", 1452.69);
+    GraphFactory_AddEdgeByCityNames(ng, "Paris", "Budapest", 1246.38);
+    GraphFactory_AddEdgeByCityNames(ng, "Paris", "Warsaw", 1368.29);
+    GraphFactory_AddEdgeByCityNames(ng, "Paris", "Kyiv", 2025.73);
+
+    GraphFactory_AddEdgeByCityNames(ng, "Vilnius", "Amsterdam", 1366.86);
+    GraphFactory_AddEdgeByCityNames(ng, "Vilnius", "London", 1722.96);
+    GraphFactory_AddEdgeByCityNames(ng, "Vilnius", "Istanbul", 1544.93);
+    GraphFactory_AddEdgeByCityNames(ng, "Vilnius", "Lisbon", 3121.04);
+    GraphFactory_AddEdgeByCityNames(ng, "Vilnius", "Budapest", 909.71);
+    GraphFactory_AddEdgeByCityNames(ng, "Vilnius", "Warsaw", 393.15);
+    GraphFactory_AddEdgeByCityNames(ng, "Vilnius", "Kyiv", 589.1);
+
+    GraphFactory_AddEdgeByCityNames(ng, "Amsterdam", "London", 357.32);
+    GraphFactory_AddEdgeByCityNames(ng, "Amsterdam", "Istanbul", 2211.92);
+    GraphFactory_AddEdgeByCityNames(ng, "Amsterdam", "Lisbon", 1864.51);
+    GraphFactory_AddEdgeByCityNames(ng, "Amsterdam", "Budapest", 1145.72);
+    GraphFactory_AddEdgeByCityNames(ng, "Amsterdam", "Warsaw", 1093.46);
+    GraphFactory_AddEdgeByCityNames(ng, "Amsterdam", "Kyiv", 1780.9);
+
+    GraphFactory_AddEdgeByCityNames(ng, "London", "Istanbul", 2499.8);
+    GraphFactory_AddEdgeByCityNames(ng, "London", "Lisbon", 1586.38);
+    GraphFactory_AddEdgeByCityNames(ng, "London", "Budapest", 1449.23);
+    GraphFactory_AddEdgeByCityNames(ng, "London", "Warsaw", 1448.11);
+    GraphFactory_AddEdgeByCityNames(ng, "London", "Kyiv", 2133.4);
+
+    GraphFactory_AddEdgeByCityNames(ng, "Istanbul", "Lisbon", 3236.47);
+    GraphFactory_AddEdgeByCityNames(ng, "Istanbul", "Budapest", 1068.65);
+    GraphFactory_AddEdgeByCityNames(ng, "Istanbul", "Warsaw", 1386.04);
+    GraphFactory_AddEdgeByCityNames(ng, "Istanbul", "Kyiv", 1056.61);
+
+    GraphFactory_AddEdgeByCityNames(ng, "Lisbon", "Budapest", 2470.12);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisbon", "Warsaw", 2759.71);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisbon", "Kyiv", 3352.59);
+
+    GraphFactory_AddEdgeByCityNames(ng, "Budapest", "Warsaw", 544.88);
+    GraphFactory_AddEdgeByCityNames(ng, "Budapest", "Kyiv", 898.99);
+
+    GraphFactory_AddEdgeByCityNames(ng, "Warsaw", "Kyiv", 689.56);
+
+    _writeDOT(ng, "Europe12CitiesGraph");
     return ng;
 }
 
@@ -497,4 +595,4 @@ NamedGraph* CreateA280Graph(void) {
     return namedGraph;
 }
 
-// Add your own!
+// Again, add your own!

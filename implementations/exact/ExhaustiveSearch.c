@@ -6,7 +6,9 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
+
+// We could have used an external module to find permutations (as was suggested in class). I did not do it here.
 
 #include "../../TravelingSalesmanProblem.h"
 
@@ -36,12 +38,9 @@ Tour* ExhaustiveSearch_FindTour(const Graph* g) {
     unsigned int* innerVertices = (unsigned int*) malloc((N - 1) * sizeof(unsigned int));
     if (!innerVertices) { TourDestroy(&bestTour); return NULL; }
 
-    for (unsigned int i = 0; i < N - 1; i++) {
-        // it holds atfirst [1, 2, ..., N-1]
-        innerVertices[i] = i + 1; 
-    }
+    for (unsigned int i = 0; i < N - 1; i++) innerVertices[i] = i + 1; // it holds atfirst [1, 2, ..., N-1]
 
-    // recursively solve. starts at index 0 (fixing the first vert.)
+    // recursively solve. starts at index 0 (fixing the first vert... could be done differently...)
     recursiveTspHelper(innerVertices, 0, N, g, bestTour);
 
     free(innerVertices);
@@ -49,8 +48,7 @@ Tour* ExhaustiveSearch_FindTour(const Graph* g) {
     // graph connect?
     if (bestTour->cost == DBL_MAX) {
         fprintf(stderr, "Warning: Brute Force failed to find a path (graph disconnected?).\n");
-        TourDestroy(&bestTour);
-        return NULL;
+        TourDestroy(&bestTour); return NULL;
     }
     
     return bestTour;
@@ -71,9 +69,7 @@ static void recursiveTspHelper(unsigned int* currentPath, int startIndex, unsign
         currentTour->path[0] = 0; // start node 0
         
         // copy permutation into tour path
-        for (unsigned int i = 0; i < N - 1; i++) {
-            currentTour->path[i + 1] = currentPath[i];
-        }
+        for (unsigned int i = 0; i < N - 1; i++) currentTour->path[i + 1] = currentPath[i]; 
         currentTour->path[N] = 0; // close the loop back to 0
 
         // calc cost of tour.
@@ -104,7 +100,6 @@ static void recursiveTspHelper(unsigned int* currentPath, int startIndex, unsign
         
         // move to the next index
         recursiveTspHelper(currentPath, startIndex + 1, N, g, bestTour);
-        
         // backtrack
         swap(&currentPath[startIndex], &currentPath[i]);
     }

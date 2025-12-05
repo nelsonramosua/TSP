@@ -6,7 +6,7 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // Resources Used:
 // https://youtu.be/W3n6p58mClI?si=bakuahmf1Xnmt9Su
@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <float.h>
 
-// forward declarations:
+// Forward declarations:
 
 // finds best pos to insert a new vertex into partial tour to minimize the resulting cost delta
 static unsigned int findOptimalInsertionPoint(const Graph* g, unsigned int* tour, unsigned int pathLength, unsigned int vK);
@@ -49,17 +49,14 @@ Tour* NearestInsertion_FindTour(const Graph* g) {
             double cost = GetEdgeWeight(g, i, j);
             if (cost < minCost) {
                 minCost = cost;
-                vU = i;
-                vV = j;
+                vU = i; vV = j;
             }
         }
 
 
     // init partial tour
-    partialPath[0] = vU;
-    partialPath[1] = vV;
-    isVisited[vU] = 1;
-    isVisited[vV] = 1;
+    partialPath[0] = vU; partialPath[1] = vV;
+    isVisited[vU] = 1; isVisited[vV] = 1;
     unsigned int pathLength = 2;
 
     // insert remaining N-2 verts
@@ -77,10 +74,7 @@ Tour* NearestInsertion_FindTour(const Graph* g) {
                     if (dist < nearestDist) nearestDist = dist;
                 }
 
-                if (nearestDist < minDistance) {
-                    minDistance = nearestDist;
-                    vK = k;
-                }
+                if (nearestDist < minDistance) { minDistance = nearestDist; vK = k; }
             }
         }
 
@@ -104,8 +98,7 @@ Tour* NearestInsertion_FindTour(const Graph* g) {
     // calc. final cost
     finalTour->cost = calculateTourCost(g, finalTour); 
 
-    free(partialPath);
-    free(isVisited);
+    free(partialPath); free(isVisited);
     return finalTour;
 }
 
@@ -114,6 +107,7 @@ static unsigned int findOptimalInsertionPoint(const Graph* g, unsigned int* tour
     double minCostIncrease = DBL_MAX;
     unsigned int bestIndex = 0;
 
+    // similar idea for SA. see it.
     for (unsigned int i = 0; i < pathLength; i++) {
         unsigned int vA = tour[i];
         // index of next vertex (wrapping around for closing edge!)

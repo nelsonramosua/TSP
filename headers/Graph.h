@@ -94,6 +94,7 @@ void GraphDisplay(const Graph* g);
 void GraphListAdjacents(const Graph* g, unsigned int v);
 
 void GraphDisplayDOT(const Graph* g);
+// NELSON RAMOS! (November, 2025).
 int GraphWriteDOT(const Graph* g, const char* filename, char** vertexNames);
 
 #endif  // _GRAPH_

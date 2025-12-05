@@ -6,7 +6,7 @@
 //
 // November, 2025.
 // 
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // Resources used:
 // https://algorithms.discrete.ma.tum.de/graph-algorithms/hierholzer/index_en.html
@@ -30,7 +30,7 @@
 unsigned int* findOddVertices(const Graph* g, unsigned int* count);
 
 // computes the Minimum Weight Perfect Matching (MWPM) on the odd-degree subgraph.
-// uses C++ Blossom library indicated above.
+// uses imported C++ Blossom library indicated above.
 Graph* computeExactMwpm(const Graph* g, unsigned int* odd, unsigned int oddCount);
 
 // finds an Eulerian tour by Hierholzer's alg, optimized for a given edge count matrix.
@@ -91,10 +91,7 @@ Tour* Christofides_FindTour(const Graph* g) {
 
     if (!euler || eulerSize == 0) {
         fprintf(stderr, "Euler tour construction failed.\n");
-        free(odd);
-        GraphDestroy(&mst);
-        GraphDestroy(&matching);
-        return tour;
+        free(odd); GraphDestroy(&mst); GraphDestroy(&matching); return tour;
     }
 
     // eulerian to hamiltonian (with shortcut):
@@ -102,10 +99,7 @@ Tour* Christofides_FindTour(const Graph* g) {
     tour->cost = shortcutEuler(g, euler, eulerSize, tour->path, numVertices);
     tour->path[numVertices] = tour->path[0]; // close loop
 
-    free(odd);
-    free(euler);
-    GraphDestroy(&mst);
-    GraphDestroy(&matching);
+    free(odd); free(euler); GraphDestroy(&mst); GraphDestroy(&matching);
 
     return tour;
 }
@@ -119,7 +113,7 @@ unsigned int* findOddVertices(const Graph* g, unsigned int* count) {
     for (unsigned int v = 0; v < numVertices; v++) {
         unsigned int* adj = GraphGetAdjacentsTo(g, v);
         unsigned int deg = adj[0];
-        free(adj);
+        free(adj); // is doing it this way stupid? maybe we should alter Graph.h. maybe too tired.
         
         if (deg % 2 == 1) odd[(*count)++] = v;
     }
@@ -142,16 +136,14 @@ Graph* computeExactMwpm(const Graph* g, unsigned int* odd, unsigned int oddCount
     int edgeIndex = 0;
 
     // build complete graph on odd verts
-    for (unsigned int i = 0; i < oddCount; i++) {
+    for (unsigned int i = 0; i < oddCount; i++) 
         for (unsigned int j = i + 1; j < oddCount; j++) {
             // u and v inds refer to odd arr inds (0 - oddCount-1)
-            u[edgeIndex] = i; 
-            v[edgeIndex] = j;
+            u[edgeIndex] = i; v[edgeIndex] = j;
             // weight comes from original graph, using the real vert inds (odd[i], odd[j])
             w[edgeIndex] = GetEdgeWeight(g, odd[i], odd[j]);
             edgeIndex++;
         }
-    }
 
     // call the external wrapper to Blossom (which is in cpp)
     int* matchArr = malloc(oddCount * sizeof(int));
@@ -170,10 +162,7 @@ Graph* computeExactMwpm(const Graph* g, unsigned int* odd, unsigned int oddCount
         }
     }
 
-    free(u);
-    free(v);
-    free(w);
-    free(matchArr);
+    free(u); free(v); free(w); free(matchArr);
 
     return matching;
 }
@@ -186,9 +175,7 @@ unsigned int* findEulerianTourFromEdgeCounts(const int *edgeCntIn, unsigned int 
 
     // number of edges
     unsigned int totalEdges = 0;
-    for (unsigned int i = 0; i < numVertices * numVertices; ++i) {
-        totalEdges += (unsigned int)edgeCnt[i];
-    }
+    for (unsigned int i = 0; i < numVertices * numVertices; ++i) totalEdges += (unsigned int)edgeCnt[i];
     
     // max size of Tour is totalEdges + 1 (close loop)
     unsigned int maxSize = totalEdges + 1; 
@@ -197,7 +184,7 @@ unsigned int* findEulerianTourFromEdgeCounts(const int *edgeCntIn, unsigned int 
     if (!stack || !tour) { free(edgeCnt); free(stack); free(tour); *tourSize = 0; return NULL; }
 
     unsigned int stackPtr = 0, tourPtr = 0;
-    stack[stackPtr++] = 0; // start tour at vertex 0 (could be implemented pseudorandomly?)
+    stack[stackPtr++] = 0; // start tour at vertex 0 (could be implemented pseudorandomly?, but prob not worth it)
 
     while (stackPtr > 0) {
         unsigned int u = stack[stackPtr - 1];
@@ -211,10 +198,7 @@ unsigned int* findEulerianTourFromEdgeCounts(const int *edgeCntIn, unsigned int 
             unsigned int a = u < v ? u : v;
             unsigned int b = u < v ? v : u;
             
-            if (edgeCnt[a * numVertices + b] > 0) { 
-                vFound = v; 
-                break; 
-            }
+            if (edgeCnt[a * numVertices + b] > 0) { vFound = v; break; }
         }
 
         if (vFound != numVertices) {
@@ -224,18 +208,12 @@ unsigned int* findEulerianTourFromEdgeCounts(const int *edgeCntIn, unsigned int 
             
             // consume parallel edge
             edgeCnt[a * numVertices + b]--;
-            
             // push new vertex into stack
             stack[stackPtr++] = v;
-        } else {
-            // no available edges from u, add it to the tour and backtrack (pop)
-            tour[tourPtr++] = u;
-            stackPtr--;
-        }
+        } else { tour[tourPtr++] = u; stackPtr--; } // no available edges from u, add it to the tour and backtrack (pop)
     }
 
-    free(stack);
-    free(edgeCnt);
+    free(stack); free(edgeCnt);
 
     // trim array
     unsigned int *res = realloc(tour, tourPtr * sizeof(unsigned int));

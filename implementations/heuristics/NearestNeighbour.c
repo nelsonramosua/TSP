@@ -6,7 +6,7 @@
 //
 // November, 2025.
 // 
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 #include "../../TravelingSalesmanProblem.h"
 
@@ -37,17 +37,12 @@ Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
 
         for (unsigned int v = 0; v < numVertices; v++) {
             // skip cur & visited vert.
-            if (v == currentV || visited[v]) {
-                continue;
-            }
+            if (v == currentV || visited[v]) continue;
 
             double weight = GetEdgeWeight(g, currentV, v);
 
             // see if edge is new shortest connection
-            if (weight < minWeight) { 
-                minWeight = weight;
-                nextV = v;
-            }
+            if (weight < minWeight) { minWeight = weight; nextV = v; }
         }
 
         if (nextV != UINT_MAX) {
@@ -57,11 +52,9 @@ Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
             tour->cost += minWeight;
             currentV = nextV; // move to new vertex
         } else {
-            // only happens if graph is disconnected (should not happen)
+            // only happens if graph is disconnected (should not happen). mind your graph creations!
             fprintf(stderr, "Error: Nearest Neighbour failed to find next unvisited vertex.\n");
-            TourDestroy(&tour);
-            free(visited);
-            return NULL;
+            TourDestroy(&tour); free(visited); return NULL;
         }
     }
 
@@ -73,9 +66,7 @@ Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
     // check if final edge is valid
     if (finalEdgeWeight == DBL_MAX) {
         fprintf(stderr, "Error: Nearest Neighbour failed to close the tour (final edge missing).\n");
-        TourDestroy(&tour);
-        free(visited);
-        return NULL;
+        TourDestroy(&tour); free(visited); return NULL;
     }
 
     tour->cost += finalEdgeWeight;

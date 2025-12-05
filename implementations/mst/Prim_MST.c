@@ -6,13 +6,47 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
+
+// This could be improved for O(E * log N) if a priority queue / min-heap was used... For simplicty purposes, it wasn't. Try!
 
 #include "../../TravelingSalesmanProblem.h"
 
 #include <stdlib.h>
 #include <float.h>
 #include <stdio.h>
+
+// Prim helper
+static double Prim_Internal(const Graph* g, int* parentOut /* may be NULL */);
+double Prim_CalculateMSTCost(const Graph* g);
+
+Graph* MST_PrimGraph(const Graph* g) {
+    unsigned int numVertices = GraphGetNumVertices(g);
+    // MST is only useful for numVertices >= 2
+    if (numVertices <= 1) return NULL;
+
+    int* parent = malloc(numVertices * sizeof(int));
+    if (!parent) return NULL;
+
+    // run Prim algorithm
+    Prim_Internal(g, parent);
+
+    Graph* mst = GraphCreate(numVertices, 0, 1);
+
+    if (!mst) { free(parent); return NULL; }
+
+    // add all MST edges
+    for (unsigned int v = 1; v < numVertices; v++) {
+        if (parent[v] != -1) {
+            // only add edges that were part of MST
+            double w = GetEdgeWeight(g, parent[v], v);
+            GraphAddWeightedEdge(mst, parent[v], v, w);
+        }
+    }
+
+    free(parent);
+    return mst;
+}
 
 // Prim helper
 static double Prim_Internal(const Graph* g, int* parentOut /* may be NULL */) {
@@ -31,15 +65,11 @@ static double Prim_Internal(const Graph* g, int* parentOut /* may be NULL */) {
         return -1.0;
     }
 
-    // det. where to save parent arr
+    // determine where to save parent arr
     if (parentOut) parent = parentOut;
     else {
         parent = malloc(numVertices * sizeof(int));
-        if (!parent) {
-            free(key); 
-            free(inMST); 
-            return -1.0;
-        }
+        if (!parent) { free(key); free(inMST); return -1.0; }
     }
 
     // Init
@@ -60,10 +90,7 @@ static double Prim_Internal(const Graph* g, int* parentOut /* may be NULL */) {
 
         // find next vertex u to add to MST (chooses cheapest incoming edge)
         for (unsigned int v = 0; v < numVertices; v++)
-            if (!inMST[v] && key[v] < minKey) {
-                minKey = key[v];
-                u = v;
-            }
+            if (!inMST[v] && key[v] < minKey) { minKey = key[v]; u = v; }
 
         if (u == -1) break;
 
@@ -89,12 +116,10 @@ static double Prim_Internal(const Graph* g, int* parentOut /* may be NULL */) {
             }
         }
 
-        free(adj);
-        free(dist);
+        free(adj); free(dist);
     }
 
-    free(key);
-    free(inMST);
+    free(key); free(inMST);
 
     if (!parentOut) free(parent);
 
@@ -109,47 +134,4 @@ double Prim_CalculateMSTCost(const Graph* g) {
         return -1.0;
     }
     return Prim_Internal(g, NULL);
-}
-
-// returns list of MST edges
-typedef struct {
-    unsigned int u;
-    unsigned int v;
-    double w;
-} MSTEdge;
-
-typedef struct {
-    MSTEdge* edges;
-    unsigned int count;
-} MSTGraph;
-
-Graph* MST_PrimGraph(const Graph* g) {
-    unsigned int numVertices = GraphGetNumVertices(g);
-    // MST is only useful for numVertices >= 2
-    if (numVertices <= 1) return NULL;
-
-    int* parent = malloc(numVertices * sizeof(int));
-    if (!parent) return NULL;
-
-    // run Prim algorithm
-    Prim_Internal(g, parent);
-
-    Graph* mst = GraphCreate(numVertices, 0, 1);
-
-    if (!mst) {
-        free(parent);
-        return NULL;
-    }
-
-    // add all MST edges
-    for (unsigned int v = 1; v < numVertices; v++) {
-        if (parent[v] != -1) {
-            // only add edges that were part of MST
-            double w = GetEdgeWeight(g, parent[v], v);
-            GraphAddWeightedEdge(mst, parent[v], v, w);
-        }
-    }
-
-    free(parent);
-    return mst;
 }

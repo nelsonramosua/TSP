@@ -4,7 +4,7 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 #include "TravelingSalesmanProblem.h"
 #include "headers/GraphFactory.h"
@@ -14,7 +14,8 @@ int main(void) {
     srand(time(NULL)); 
 
     testRunNamedGraph(CreateGraphAula, "Graph Aula", -1);
-    testRunNamedGraph(CreatePortugal12CitiesGraph, "Portugal Graph", -1);
+    testRunNamedGraph(CreatePortugal12CitiesGraph, "Graph 12 Portuguese Cities", -1);
+    testRunNamedGraph(CreateEurope12CitiesGraph, "Graph 12 European Cities", -1);
     testRunNamedGraph(CreateMatrixGraph15, "Matrix Graph 15 Nodes", -1);
     testRunNamedGraph(CreateMatrixGraph20, "Matrix Graph 20 Nodes", -1);
     testRunNamedGraph(CreateEuclideanGraph15, "Euclidean Graph 15 Nodes", -1);
@@ -24,7 +25,7 @@ int main(void) {
     testRunNamedGraph(CreateBays29Graph, "TSPLIB - Bays29", 2020);
     // testRunNamedGraph(CreateA280Graph, "TSPLIB - A280", 2579); // takes very long. Uncomment to stress test.
 
-    // Add your own! (Add in GraphFactory.c/.h (prototype!) and call here!).
+    // Add your own! (Add in GraphFactory.c/.h (prototype!) and call here!). See GraphFactory.c for more info.
 
     printf("All graphs tested.\n");
     return 0;
@@ -33,7 +34,9 @@ int main(void) {
 // helper: creates, tests, and destroys a NamedGraph
 static void testRunNamedGraph(NamedGraph* (*creatorFun)(void), const char* graphName, double knownOptimalCost) {
     NamedGraph* namedGraph = creatorFun();
+
     if (!namedGraph) return;
+    if (!namedGraph->g) { NamedGraphDestroy(&namedGraph); return; }
 
     unsigned int numVertices = GraphGetNumVertices(namedGraph->g);
     double actualBestCost = knownOptimalCost;
@@ -41,9 +44,11 @@ static void testRunNamedGraph(NamedGraph* (*creatorFun)(void), const char* graph
 
     if (numVertices <= 20 && knownOptimalCost == -1) {
         heldKarpTour = HeldKarp_FindTour(namedGraph->g);
-        TourMapCityNames(heldKarpTour, namedGraph);
-        TourInvariant(heldKarpTour, numVertices);
-        actualBestCost = heldKarpTour->cost;
+        if (heldKarpTour) {
+            TourMapCityNames(heldKarpTour, namedGraph);
+            TourInvariant(heldKarpTour, numVertices);
+            actualBestCost = heldKarpTour->cost;
+        }
     }
 
     runTSPAlgorithms(namedGraph, graphName, actualBestCost, heldKarpTour);
@@ -68,9 +73,9 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
     printf("\t**LOWER BOUNDS: %.2f (MST) | %.2f (HKLR)**\n", lowerBoundMST, lowerBoundHKLR);
     if (actualCost != -1) printf("\t     Actual Best Cost: %.2f (%s)\n", actualCost, numVertices > 20 ? "by TSPLIB" : "by HK DP");
 
-    // 0. Brute-Force (only for GraphGetNumVertices(ng->g) <= 12)
+    // 0. Brute-Force (only for GraphGetNumVertices(ng->g) <= 10)
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
-        .tspFun = ExhaustiveSearch_Adapter, .name = "Brute-Force", .maxVertices = 12, .extra = NULL });
+        .tspFun = ExhaustiveSearch_Adapter, .name = "Brute-Force", .maxVertices = 10, .extra = NULL });
 
     // 0.5. Brute-Force w/ Pruning (only for GraphGetNumVertices(ng->g) <= 12)
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){

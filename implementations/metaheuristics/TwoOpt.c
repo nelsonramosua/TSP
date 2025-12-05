@@ -6,7 +6,9 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
+
+// This could be improved for O(E * log N) if a priority queue / min-heap was used... For simplicty purposes, it wasn't. Try!
 
 // Resources used:
 // https://en.wikipedia.org/wiki/2-opt
@@ -18,15 +20,7 @@
 #include <float.h>
 
 // reverses segment of tour path between inds startIndex and endIndex
-static void TwoOpt_Swap(Tour* tour, unsigned int startIndex, unsigned int endIndex) {
-    while (startIndex < endIndex) {
-        unsigned int temp = tour->path[startIndex];
-        tour->path[startIndex] = tour->path[endIndex];
-        tour->path[endIndex] = temp;
-        startIndex++;
-        endIndex--;
-    }
-}
+static void TwoOpt_Swap(Tour* tour, unsigned int startIndex, unsigned int endIndex);
 
 // tries to improve existing TSP tour using 2-Opt local search method.
 Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour) {
@@ -73,7 +67,7 @@ Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour) {
                     improved = 1;
                     
                     // restart outer loop after improv
-                    goto restartLoops; 
+                    goto restartLoops; // could have redesigned this to not use goto but i'm too lazy.
                 }
             }
         }
@@ -83,4 +77,15 @@ Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour) {
     
     printf("  Final Cost after 2-Opt: %.2f\n", initialTour->cost);
     return initialTour;
+}
+
+// reverses segment of tour path between inds startIndex and endIndex
+static void TwoOpt_Swap(Tour* tour, unsigned int startIndex, unsigned int endIndex) {
+    while (startIndex < endIndex) {
+        unsigned int temp = tour->path[startIndex];
+        tour->path[startIndex] = tour->path[endIndex];
+        tour->path[endIndex] = temp;
+        startIndex++;
+        endIndex--;
+    }
 }

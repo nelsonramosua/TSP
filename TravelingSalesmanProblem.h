@@ -4,7 +4,7 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // https://youtu.be/GiDsjIBOVoA?si=zEtD3WFBlUYQO_LN
 // Read README.md.
@@ -14,7 +14,7 @@
 
 #include "headers/Graph.h"      // The Graph ADT interface (All Credit to AED Professors)
 #include "headers/SortedList.h" // The SortedList ADT interface (All Credit to AED Professors)
-#include "headers/NamedGraph.h"     // Optional display with city names
+#include "headers/NamedGraph.h" // Optional display with city names
 
 #include <stdio.h>
 #include <limits.h>
@@ -24,11 +24,11 @@
 #include <time.h>
 
 typedef struct _Tour {
-    unsigned int* path;          // Array of vertices in the tour (V1, V2, ..., VN, V1)
-    unsigned int numVertices;    // Number of vertices in the path 
-    double cost;                 // Total cost of the tour
+    unsigned int* path;         // Array of vertices in the tour (V1, V2, ..., VN, V1)
+    unsigned int numVertices;   // Number of vertices in the path 
+    double cost;                // Total cost of the tour
 
-    const char** cityNames;      // Optional city names for display
+    char** cityNames;           // Optional city names for display
 } Tour; 
 
 // Function prototypes for Tour ADT (Implemented in Tour.c)

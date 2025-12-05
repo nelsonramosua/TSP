@@ -6,7 +6,9 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
+
+// We could have used an external module to find permutations (as was suggested in class). I did not do it here.
 
 #include "../../TravelingSalesmanProblem.h"
 
@@ -17,7 +19,6 @@
 
 // Helper function to swap two elements in an array.
 static void swap(unsigned int* a, unsigned int* b);
-
 // Recursive Helper with pruning.
 static void recursiveTspHelper(unsigned int* fullPath, int startIndex, unsigned int N, const Graph* g, Tour* bestTour, double currentCost, unsigned int lastVertexInPath);
 
@@ -38,8 +39,7 @@ Tour* ExhaustiveSearchPruning_FindTour(const Graph* g) {
 
     // init path
     fullPath[0] = 0; 
-    for (unsigned int i = 1; i < numVertices; i++) fullPath[i] = i; 
-        // fullPath starts as [0, 1, 2, ..., N-1]
+    for (unsigned int i = 1; i < numVertices; i++) fullPath[i] = i; // fullPath starts as [0, 1, 2, ..., N-1]
     
     // recursively solve. starts at index 1 (fixing the first vert.)
     recursiveTspHelper(fullPath, 1, numVertices, g, bestTour, 0.0, 0);
@@ -49,8 +49,7 @@ Tour* ExhaustiveSearchPruning_FindTour(const Graph* g) {
     // graph connect?
     if (bestTour->cost == DBL_MAX) {
         fprintf(stderr, "Warning: Brute Force failed to find a path (graph disconnected?).\n");
-        TourDestroy(&bestTour);
-        return NULL;
+        TourDestroy(&bestTour); return NULL;
     }
     
     return bestTour;
@@ -99,8 +98,7 @@ static void recursiveTspHelper(unsigned int* fullPath, int startIndex, unsigned 
         swap(&fullPath[startIndex], &fullPath[i]);
         
         // move to the next index
-        recursiveTspHelper(fullPath, startIndex + 1, N, g, bestTour, currentCost + edgeWeight, fullPath[startIndex]);
-        
+        recursiveTspHelper(fullPath, startIndex + 1, N, g, bestTour, currentCost + edgeWeight, fullPath[startIndex]);     
         // backtrack
         swap(&fullPath[startIndex], &fullPath[i]);
     }

@@ -6,7 +6,9 @@
 //
 // November, 2025.
 // 
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
+
+// This could be improved for O(N^2 * log N) if a priority queue / min-heap was used... For simplicty purposes, it wasn't. Try!
 
 // Resources used:
 // https://www.geeksforgeeks.org/dsa/travelling-salesman-problem-greedy-approach/
@@ -40,9 +42,7 @@ Tour* Greedy_FindTour(const Graph* g) {
     tour->path[3] = 0; // close subtour
 
     // calc init cost
-    tour->cost = GetEdgeWeight(g, 0, 1) + 
-                 GetEdgeWeight(g, 1, 2) + 
-                 GetEdgeWeight(g, 2, 0);
+    tour->cost = GetEdgeWeight(g, 0, 1) + GetEdgeWeight(g, 1, 2) + GetEdgeWeight(g, 2, 0);
     
     // iterate until all verts are included
     while (currentTourSize < numVertices) {
@@ -82,10 +82,7 @@ Tour* Greedy_FindTour(const Graph* g) {
 
             // shift elements from closing vertex backwards, up to insertPos
             // loop runs from the cur end of path down to insertPos.
-            for (int k = currentTourSize; k >= (int)insertPos; k--) {
-                // shift is tour->path[k] to tour->path[k + 1]
-                tour->path[k + 1] = tour->path[k];
-            }
+            for (int k = currentTourSize; k >= (int)insertPos; k--) { tour->path[k + 1] = tour->path[k]; } // shift is tour->path[k] to tour->path[k + 1]
             
             // insert vertex
             tour->path[insertPos] = bestInsertV;
@@ -101,9 +98,7 @@ Tour* Greedy_FindTour(const Graph* g) {
         } else {
             // only happens if graph is disconnected (should not happen)
             fprintf(stderr, "Error: Greedy failed to find the next cheapest insertion (graph disconnected?).\n");
-            TourDestroy(&tour);
-            free(visited);
-            return NULL;
+            TourDestroy(&tour); free(visited); return NULL;
         }
     }
 

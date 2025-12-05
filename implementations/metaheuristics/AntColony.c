@@ -6,7 +6,7 @@
 //
 // November, 2025.
 // 
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // Resources used:
 // https://youtu.be/oXb2nC-e_EA?si=3G2oxIMb31RO8N8n
@@ -36,9 +36,9 @@ Tour* AntColony_FindTour(const Graph* g) {
     Tour* bestTour = TourCreate(numVertices);
     if (!bestTour) return NULL;
 
-    srand((unsigned int)time(NULL)); // rand num gen (diff results for diff runs of project).
+    srand((unsigned int)time(NULL)); // rand num gen (diff results for diff runs of project)
 
-    // ACO parameters (change in Metaheuristics.h)
+    // ACO parameters (change in Metaheuristics.h) (we could read MACROS direclty, but this is cleaner)
     unsigned int numAnts = numVertices;
     unsigned int numIterations = ACO_ITERATIONS;
     double alpha = ACO_ALPHA;  // pheromone influence
@@ -46,7 +46,7 @@ Tour* AntColony_FindTour(const Graph* g) {
     double rho = ACO_RHO;    // pheromone evaporation rate
     double Q = ACO_Q;    // pheromone deposit factor
 
-    // Allocate pheromone and heuristic matrices
+    // alloc pheromone and heuristic matrices
     double** tau = malloc(numVertices * sizeof(double*));
     double** eta = malloc(numVertices * sizeof(double*));
     for (unsigned int i = 0; i < numVertices; i++) {
@@ -54,10 +54,8 @@ Tour* AntColony_FindTour(const Graph* g) {
         eta[i] = malloc(numVertices * sizeof(double));
 
         for (unsigned int j = 0; j < numVertices; j++) {
-            if (i == j) {
-                tau[i][j] = 0.0;
-                eta[i][j] = 0.0;
-            } else {
+            if (i == j) { tau[i][j] = 0.0; eta[i][j] = 0.0; } 
+            else {
                 double w = GetEdgeWeight(g, i, j);
                 tau[i][j] = 1.0;              // init uniform pheromone
                 eta[i][j] = (w > 0.0 && w != DBL_MAX) ? 1.0 / w : 0.0; // heuristic = 1/distance (for minimzation)
@@ -103,7 +101,6 @@ Tour* AntColony_FindTour(const Graph* g) {
         // evaporate pheromones on all edgfes
         for (unsigned int i = 0; i < numVertices; i++)
             for (unsigned int j = 0; j < numVertices; j++)
-                // tau = tau * (1 - rho)
                 tau[i][j] *= (1.0 - rho);
 
         // deposit (new) pheromones based on how good ant tours wwere
@@ -126,12 +123,8 @@ Tour* AntColony_FindTour(const Graph* g) {
     bestTour->cost = bestCost;
 
     // Free matrices
-    for (unsigned int i = 0; i < numVertices; i++) {
-        free(tau[i]);
-        free(eta[i]);
-    }
-    free(tau);
-    free(eta);
+    for (unsigned int i = 0; i < numVertices; i++) { free(tau[i]); free(eta[i]); }
+    free(tau); free(eta);
 
     return bestTour;
 }
@@ -147,12 +140,8 @@ static unsigned int selectNextCity(unsigned int current, int* visited, double** 
 
     // calc. product Pheromone^(alpha) * Heuristic^(beta) for unvisited neighbors
     for (unsigned int j = 0; j < numVertices; j++) {
-        if (!visited[j]) {
-            probs[j] = pow(tau[current][j], alpha) * pow(eta[current][j], beta);
-            sum += probs[j];
-        } else {
-            probs[j] = 0.0;
-        }
+        if (!visited[j]) { probs[j] = pow(tau[current][j], alpha) * pow(eta[current][j], beta); sum += probs[j];}
+        else probs[j] = 0.0;
     }
 
     // if sum=0, it means no unvisited neighbors (shouldn't happen in a complete graph)
@@ -175,9 +164,9 @@ static unsigned int selectNextCity(unsigned int current, int* visited, double** 
 
 static double tourCost(const Graph* g, unsigned int* tour, unsigned int numVertices) {
     double cost = 0.0;
-    // Iterate N times (N edges in the cycle)
+    // Iterate numVertices times (numVertices edges in the cycle)
     for (unsigned int i = 0; i < numVertices; i++) {
-        // Edge is (tour[i], tour[(i + 1) % N])
+        // Edge is (tour[i], tour[(i + 1) % numVertices])
         double w = GetEdgeWeight(g, tour[i], tour[(i + 1) % numVertices]);
         if (w == DBL_MAX) return DBL_MAX; // invalid edge
         cost += w;

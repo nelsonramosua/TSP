@@ -6,7 +6,7 @@
 //
 // November, 2025.
 // 
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // Resources used:
 // https://youtu.be/1kgbwosVUPs?si=mo5kmlKF9NMWHPg2
@@ -39,10 +39,8 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
     unsigned int* current = malloc(numVertices * sizeof(unsigned int));
     unsigned int* bestTour = malloc(numVertices * sizeof(unsigned int));
     if (!current || !bestTour) { 
-        if (current) free(current); 
-        if (bestTour) free(bestTour); 
-        TourDestroy(&tour); 
-        return NULL; 
+        if (current) free(current); if (bestTour) free(bestTour); 
+        TourDestroy(&tour); return NULL; 
     }
 
     memcpy(current, initialTour, numVertices * sizeof(unsigned int));
@@ -53,11 +51,10 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
 
     if (bestCost == DBL_MAX) {
         fprintf(stderr, "[SA ERROR] Initial tour is invalid (DBL_MAX cost).\n");
-        free(current);
-        free(bestTour);
-        TourDestroy(&tour);
-        return NULL;
+        free(current); free(bestTour); TourDestroy(&tour); return NULL;
     }
+
+    // until now, just set up. now the alg actually starts
 
     double T = currentCost / 10.0; // start T is the init "heat" of the system
     if (T < 100.0) T = 100.0;     // ensure min starting T
@@ -79,9 +76,9 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
 
             if (i > j) swap(&i, &j); // make sure i < j for simpler segment reversal
             
-            unsigned int a = current[i]; // left node of first removed edge (a)
+            unsigned int a = current[i];                     // left node of first removed edge (a)
             unsigned int b = current[(i + 1) % numVertices]; // right node of first removed edge (b)
-            unsigned int c = current[j]; // left node of second removed edge (C)
+            unsigned int c = current[j];                     // left node of second removed edge (C)
             unsigned int d = current[(j + 1) % numVertices]; // right node of second removed edge (D)
             
             // removed edges: (A, B) and (C, D)
@@ -95,7 +92,7 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
 
             double delta = -weightAB - weightCD + weightAC + weightBD;
 
-            // swap with Metropolis?(hastings?) criterion
+            // swap with Metropolis?(hastings?) (not sure) criterion (find out!)
             if (delta < 0 || exp(-delta / T) > (double)rand() / RAND_MAX) {
                 // 2-opt swap on segment [i+1, j]
                 unsigned int segmentStart = (i + 1) % numVertices;
@@ -106,10 +103,7 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
                 currentCost += delta;
 
                 // update best
-                if (currentCost < bestCost) {
-                    bestCost = currentCost;
-                    memcpy(bestTour, current, numVertices * sizeof(unsigned int));
-                }
+                if (currentCost < bestCost) { bestCost = currentCost; memcpy(bestTour, current, numVertices * sizeof(unsigned int)); }
             }
         }
         T *= alpha; // cool down
@@ -119,8 +113,7 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
     tour->path[numVertices] = bestTour[0]; // close cycle
     tour->cost = bestCost;
 
-    free(current);
-    free(bestTour);
+    free(current); free(bestTour);
     return tour;
 }
 
@@ -136,7 +129,7 @@ static void twoOptSwap(unsigned int* tour, unsigned int i, unsigned int j) {
     while (i < j) swap(&tour[i++], &tour[j--]);
 }
 
-// calc tour cost
+// calc tour cost (same as ACO, yes)
 static double tourCost(const Graph* g, unsigned int* tour, unsigned int numVertices) {
     double cost = 0.0;
     // Iterate N times (N edges in the cycle)
