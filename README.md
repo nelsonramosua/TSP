@@ -51,7 +51,7 @@ TSP/
 │   └── mst/                    # Minimum Spanning Tree utilities (used by Christofides.c & LowerBound_MST.c).
 │       └── Prim_MST.c
 ├── graphs/                     # Predefined and generated graphs (.dot)
-├── build/                      # build objects, when you run make, will go here.
+├── builds/                      # build objects, when you run make, will go here.
 ├── TSPTest.c                   # Comparison driver
 ├── Tour.c                      # Tour structure and utilities
 ├── GraphFactory.c              # Predefined graph generation
