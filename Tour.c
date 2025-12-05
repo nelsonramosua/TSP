@@ -4,7 +4,7 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 #include "TravelingSalesmanProblem.h"
 
@@ -30,6 +30,20 @@ Tour* TourCreate(unsigned int numVertices) {
     return t;
 }
 
+void TourDestroy(Tour** p) {
+    if (!p || !*p) return;
+    Tour* t = *p;
+
+    free(t->path); t->path = NULL;
+
+    if (t->cityNames) {
+        for (int i = 0; i < (int)t->numVertices; i++) if (t->cityNames[i]) { free(t->cityNames[i]); t->cityNames[i] = NULL; }
+        free(t->cityNames); t->cityNames = NULL;
+    }
+
+    free(t); *p = NULL;
+}
+
 Tour* TourDeepCopy(const Tour* src) {
     if (!src) return NULL;
 
@@ -44,21 +58,14 @@ Tour* TourDeepCopy(const Tour* src) {
     if (!copy->path) { free(copy); return NULL; }
     for (unsigned int i = 0; i < copy->numVertices; i++) copy->path[i] = src->path[i];
     
-    // copy city names ptr 
-    copy->cityNames = src->cityNames;
+    // deep copy city names
+    if (src->cityNames) {
+        copy->cityNames = malloc(copy->numVertices * sizeof(char*));
+        if (!copy->cityNames) { free(copy->path); free(copy); return NULL; }
+        for (unsigned int i = 0; i < copy->numVertices; i++) copy->cityNames[i] = src->cityNames[i] ? strdup(src->cityNames[i]) : NULL;
+    } else copy->cityNames = NULL;
 
     return copy;
-}
-
-void TourDestroy(Tour** p) {
-    Tour* t = *p;
-
-    free(t->path);
-    t->path = NULL;
-    t->cityNames = NULL;
-
-    free(t);
-    *p = NULL;
 }
 
 double TourGetCost(const Tour* t) {
@@ -68,21 +75,24 @@ double TourGetCost(const Tour* t) {
 void TourMapCityNames(Tour* tour, const NamedGraph* ng) {
     if (!tour || !ng) return;
 
-    unsigned int numVertices = GraphGetNumVertices(ng->g);
+    // free previous city names if any
+    if (tour->cityNames) {
+        for (unsigned int i = 0; i < tour->numVertices; i++) 
+            if (tour->cityNames[i]) { free(tour->cityNames[i]); tour->cityNames[i] = NULL; }
+        free(tour->cityNames); tour->cityNames = NULL;
+    }
 
-    tour->cityNames = malloc(numVertices * sizeof(const char*));
+    tour->cityNames = malloc(tour->numVertices * sizeof(char*));
     if (!tour->cityNames) return;
 
-    // temporary buffer to hold default names if needed
-    static char defaultNames[512][16]; // max 512 vertices, name length 15
-
-    for (unsigned int i = 0; i < numVertices; i++) {
-        if (ng->cityNames && ng->cityNames[i]) {
-            tour->cityNames[i] = ng->cityNames[i];  // use user-defined name
-        } else {
-            snprintf(defaultNames[i], sizeof(defaultNames[i]), "%u", i); // default: vertex index
-            tour->cityNames[i] = defaultNames[i];
-        }
+    // finally... actually map (with safeguards). I legit lost like 2h trying to fix a memory bug here.
+    for (unsigned int i = 0; i < tour->numVertices; i++) {
+        unsigned int index = tour->path[i];
+        if (index == UINT_MAX || index >= tour->numVertices || !ng->cityNames[index]) {
+            char buffer[64];
+            snprintf(buffer, sizeof(buffer), "%u", index);
+            tour->cityNames[i] = strdup(buffer);
+        } else tour->cityNames[i] = strdup(ng->cityNames[index]);
     }
 }
 
@@ -95,17 +105,17 @@ void TourDisplay(const Tour* t) {
         if (t->path[i] == UINT_MAX) break; 
 
         if (t->cityNames) printf("%s", t->cityNames[t->path[i]]); // if city names are available, print them
-        else printf("%u", t->path[i]);                            // else print vertex indices
+        else printf("%u", t->path[i]);                            // else print vertex indices // this is actually redundant (see mapping above)
 
         if (i < t->numVertices - 1 && t->path[i+1] != UINT_MAX) printf(" -> ");
     }
     printf("\n");
 }
 
-// Helper function to check if the path is a valid permutation of vertices 0 to N-1
+// helper function to check if the path is a valid permutation of vertices 0 to N-1
 static int isPermutation(const unsigned int* path, unsigned int numVertices);
 
-// Checks invariant properties of a Tour structure.
+// checks invariant properties of a Tour structure.
 int TourInvariant(const Tour* t, unsigned int numVertices) {
     if (!t || !t->path) return 0;
     if (t->numVertices != numVertices + 1) return 0;

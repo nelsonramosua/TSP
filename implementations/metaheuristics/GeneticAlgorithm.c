@@ -6,7 +6,7 @@
 //
 // November, 2025.
 // 
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit. 
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // Resources used (severely... :') ):
 // https://towardsdatascience.com/solving-the-travelling-salesman-problem-using-a-genetic-algorithm-c3e87f37f1de/
@@ -72,9 +72,7 @@ Tour* GeneticAlgorithm_FindTour(const Graph* g) {
         newPopulation->individuals = malloc(GA_POPULATION_SIZE * sizeof(Individual));
         
         // elitism (keep best individuals from current pop)
-        for (unsigned int i = 0; i < GA_ELITISM_COUNT; i++) {
-            newPopulation->individuals[i] = CopyIndividual(&(population->individuals[i]), numVertices);
-        }
+        for (unsigned int i = 0; i < GA_ELITISM_COUNT; i++) newPopulation->individuals[i] = CopyIndividual(&(population->individuals[i]), numVertices);
         
         // crossover & mutation for rest of new pop
         for (unsigned int i = GA_ELITISM_COUNT; i < GA_POPULATION_SIZE; i++) {
@@ -86,9 +84,7 @@ Tour* GeneticAlgorithm_FindTour(const Graph* g) {
             Individual offspring = Crossover(&parent1, &parent2, numVertices);
             
             // mutation
-            if (((double)rand() / RAND_MAX) < GA_MUTATION_RATE) {
-                Mutate(&offspring, numVertices);
-            }
+            if (((double)rand() / RAND_MAX) < GA_MUTATION_RATE) Mutate(&offspring, numVertices);
             
             // cleanup temp parent copies
             DestroyIndividual(&parent1);
@@ -114,14 +110,11 @@ Tour* GeneticAlgorithm_FindTour(const Graph* g) {
     Tour* finalTour = TourCreate(numVertices);
     if (!finalTour) { DestroyPopulation(population); DestroyIndividual(&bestOverall); return NULL; }
     
-    for (unsigned int i = 0; i < numVertices; i++) {
-        finalTour->path[i] = bestOverall.path[i];
-    }
+    for (unsigned int i = 0; i < numVertices; i++) finalTour->path[i] = bestOverall.path[i];
     finalTour->path[numVertices] = finalTour->path[0]; // close cycle
     finalTour->cost = bestOverall.cost;
 
-    DestroyPopulation(population);
-    DestroyIndividual(&bestOverall);
+    DestroyPopulation(population); DestroyIndividual(&bestOverall);
 
     return finalTour;
 }
@@ -141,9 +134,7 @@ static Population* InitializePopulation(unsigned int numVertices) {
         if (!pop->individuals[i].path) return NULL; 
         
         // fill path w/ vertices 0 to numVertices-1
-        for (unsigned int j = 0; j < numVertices; j++) {
-            pop->individuals[i].path[j] = j;
-        }
+        for (unsigned int j = 0; j < numVertices; j++) pop->individuals[i].path[j] = j;
 
         // shuffle path to create rand tour (Fisher-Yates)
         // https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
@@ -169,20 +160,15 @@ static void CalculateFitness(const Graph* g, Population* pop) {
         tempTour.numVertices = GraphGetNumVertices(g) + 1; // numVertices + closing edge
         tempTour.path = malloc(tempTour.numVertices * sizeof(unsigned int));
         
-        for(unsigned int j = 0; j < GraphGetNumVertices(g); j++) {
-            tempTour.path[j] = pop->individuals[i].path[j];
-        }
+        for(unsigned int j = 0; j < GraphGetNumVertices(g); j++) tempTour.path[j] = pop->individuals[i].path[j];
         tempTour.path[GraphGetNumVertices(g)] = pop->individuals[i].path[0];
         tempTour.cost = DBL_MAX; // placeholder (calc after)
         
         pop->individuals[i].cost = calculateTourCost(g, &tempTour);
         
         // fitness is inverse of cost (lower cost - higher fitness)
-        if (pop->individuals[i].cost > 0 && pop->individuals[i].cost != DBL_MAX) {
-            pop->individuals[i].fitness = 1.0 / pop->individuals[i].cost;
-        } else {
-            pop->individuals[i].fitness = 0.0;
-        }
+        if (pop->individuals[i].cost > 0 && pop->individuals[i].cost != DBL_MAX) pop->individuals[i].fitness = 1.0 / pop->individuals[i].cost;
+        else pop->individuals[i].fitness = 0.0;
         
         free(tempTour.path);
     }
@@ -220,15 +206,11 @@ static Individual Crossover(const Individual* parent1, const Individual* parent2
     if (p1 == p2) { p2 = (p1 + 1) % numVertices; } 
 
     // copy central segment from p1 to offspring
-    for (unsigned int i = p1; i <= p2; i++) {
-        offspring.path[i] = parent1->path[i];
-    }
+    for (unsigned int i = p1; i <= p2; i++) offspring.path[i] = parent1->path[i];
     
     // fill remaining spots by order of genes in p2
     int* isUsed = (int*) calloc(numVertices, sizeof(int));
-    for (unsigned int i = p1; i <= p2; i++) {
-        isUsed[offspring.path[i]] = 1;
-    }
+    for (unsigned int i = p1; i <= p2; i++) isUsed[offspring.path[i]] = 1;
 
     unsigned int currentOffspringIndex = (p2 + 1) % numVertices;
     for (unsigned int i = 0; i < numVertices; i++) {
@@ -285,10 +267,7 @@ static Individual CopyIndividual(const Individual* original, unsigned int numVer
 }
 
 static void DestroyIndividual(Individual* ind) {
-    if (ind->path) {
-        free(ind->path);
-        ind->path = NULL;
-    }
+    if (ind->path) { free(ind->path); ind->path = NULL; }
     ind->cost = DBL_MAX;
     ind->fitness = 0.0;
 }
@@ -296,9 +275,7 @@ static void DestroyIndividual(Individual* ind) {
 static void DestroyPopulation(Population* pop) {
     if (pop) {
         if (pop->individuals) {
-            for (unsigned int i = 0; i < pop->numIndividuals; i++) {
-                DestroyIndividual(&(pop->individuals[i]));
-            }
+            for (unsigned int i = 0; i < pop->numIndividuals; i++) DestroyIndividual(&(pop->individuals[i]));
             free(pop->individuals);
         }
         free(pop);
@@ -316,7 +293,6 @@ static double calculateTourCost(const Graph* g, const Tour* tour) {
         double edgeCost = GetEdgeWeight(g, vA, vB);
 
         if (edgeCost == DBL_MAX) return DBL_MAX;
-
         totalCost += edgeCost;
     }
 

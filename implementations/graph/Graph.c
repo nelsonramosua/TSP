@@ -6,6 +6,9 @@
 // Graph - Using a list of adjacency lists representation
 //
 
+// I added 2 functions at EOF. 
+// Nelson Ramos.
+
 #include "../../TravelingSalesmanProblem.h"
 
 #include <assert.h>

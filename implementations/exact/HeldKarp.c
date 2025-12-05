@@ -6,7 +6,7 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // I cannot at all take credit for this. It was "transcribed" from the C++ implementation here:
 // https://rosettacode.org/wiki/Held%E2%80%93Karp_algorithm
@@ -51,7 +51,7 @@ Tour* HeldKarp_FindTour(const Graph* g) {
     if (numVertices < 2) return NULL; 
 
     if (numVertices >= (unsigned int)(sizeof(unsigned int) * 8)) return NULL;  // masks are 32-bit. It would cause memory corruption or buffer overruns
-                                                          // ok, because we only test this up to 21 vertices.
+                                                          // ok, because we only test this up to 21 vertices...
 
     // init DP table
     HeldKarpTable* hkt = initializeTable(numVertices);
@@ -131,18 +131,10 @@ Tour* HeldKarp_FindTour(const Graph* g) {
     }
 
     Tour* bestTour = TourCreate(numVertices);
-    if (!bestTour) {
-        destroyTable(hkt);
-        return NULL;
-    }
+    if (!bestTour) { destroyTable(hkt); return NULL; }
     bestTour->cost = finalMinCost;
 
-    if (finalMinCost == DBL_MAX) {
-        // path not found (discon graph, should not happen)
-        TourDestroy(&bestTour);
-        destroyTable(hkt);
-        return NULL;
-    }
+    if (finalMinCost == DBL_MAX) { TourDestroy(&bestTour); destroyTable(hkt); return NULL; } // path not found (discon graph, should not happen)
 
     // reconstruct path backwards w/ parent pointers
     unsigned int* pathIndices = bestTour->path; // path[0] to path[numVertices]
@@ -152,28 +144,20 @@ Tour* HeldKarp_FindTour(const Graph* g) {
     
     // fill path arr backwards, from 2nd-to-last vert (path[numVertices-1]) down to path[1].
     for (unsigned int i = numVertices - 1; i > 0; i--) {
-        if (currentVert == UINT_MAX) {
-            TourDestroy(&bestTour);
-            destroyTable(hkt);
-            return NULL;
-        } 
+        if (currentVert == UINT_MAX) { TourDestroy(&bestTour); destroyTable(hkt); return NULL; } 
 
         pathIndices[i] = currentVert;
         
         unsigned int prevVert = hkt->parent[currentMask][currentVert];
-        if (prevVert == UINT_MAX) {
-            TourDestroy(&bestTour);
-            destroyTable(hkt);
-            return NULL;
-        }
+        if (prevVert == UINT_MAX) { TourDestroy(&bestTour); destroyTable(hkt); return NULL; }
         
         // update state
         currentMask &= ~(1U << currentVert); 
         currentVert = prevVert;
     }
     
-    pathIndices[0] = 0;      // path starts at 0
-    pathIndices[numVertices] = 0; // close cycle
+    pathIndices[0] = 0;             // path starts at 0
+    pathIndices[numVertices] = 0;   // close cycle
 
     destroyTable(hkt);
     return bestTour;

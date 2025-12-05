@@ -18,6 +18,7 @@ TSP/
 ├── headers/                    # Header files
 │   ├── Graph.h
 │   ├── GraphFactory.h
+│   ├── HashMap.h
 │   ├── LowerBounds.h
 │   ├── Metaheuristics.h
 │   ├── NamedGraph.h            # Abstraction layer for graphs with names as vertices.
@@ -30,6 +31,7 @@ TSP/
 │   │   └── ExhaustiveSearch.c
 │   ├── graph/                  # Graph utilities
 │   │   ├── Graph.c
+│   │   ├── HashMap.c           # !SIMPLE! AuxiliaryADT used in NamedGraph to keep mapping (vertexId, cityName).
 │   │   ├── NamedGraph.c        # Abstraction layer for graphs with names as vertices.
 │   │   └── SortedList.c
 │   ├── heuristics/             # Heuristic algorithms
@@ -49,6 +51,7 @@ TSP/
 │   └── mst/                    # Minimum Spanning Tree utilities (used by Christofides.c & LowerBound_MST.c).
 │       └── Prim_MST.c
 ├── graphs/                     # Predefined and generated graphs (.dot)
+├── build/                      # build objects, when you run make, will go here.
 ├── TSPTest.c                   # Comparison driver
 ├── Tour.c                      # Tour structure and utilities
 ├── GraphFactory.c              # Predefined graph generation
@@ -87,7 +90,7 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 **Notes**: 
 Time complexity does not tell the whole story... even more so for small $N$ (numVertices). 
 Meta-heuristic algorithms are more computationaly heavy than Christofides, being guided by their parameters/configuration, even though Christofides' algorithm has the worst, worst-case time complexity, $O(N^3)$. \
-Some of these (pex: Lower Bound & Greedy) could be improved if an auxiliary ADT, min-heap / priority queue, had been introduced and used. They would then have complexities, respectively, $O(E \times log N)$ and $O(N^2 \times log N)$. For simplicity purposes, it wasn't. **Go ahead and try! :)**
+Some of these (pex: MST Lower Bound & Greedy) could be improved if an auxiliary ADT, min-heap / priority queue, had been introduced and used. They would then have complexities, respectively, $O(E \times log N)$ and $O(N^2 \times log N)$. For simplicity purposes, it wasn't. **Go ahead and try! :)**
 
 ---
 
@@ -120,38 +123,44 @@ This project uses **GCC** and **G++** to compile C and C++ code (for the importe
     make clean
     ```
 
+**Note**: you can also run `` make run `` to compile and run automatically, and even ``make runvc`` to compile, run with valgrind and then clean, automatically.\
+However, I caution you to not run past the first test graph with valgring, ad it will incredibly slow (test it!).
+**See Makefile for more info on this**.
+
 ---
 
 ## Graphs
 
-The project includes:
+The project includes, out-of-the-box:
 
 * The **Graph presented in AED Class 23**, `CreateGraphAula`.
 * A **real-world Graph**, based on **Portuguese cities**, `CreatePortugal12CitiesGraph`.
+* Another **real-world Graph**, based on **European cities**, `CreateEurope12CitiesGraph`, corroborating the results of this paper: https://www.researchgate.net/publication/362233733_Determining_Best_Travelling_Salesman_Route_of_12_Cities_of_Europe.
 * **Predefined Matrix Graphs:** `CreateMatrixGraph15` and `CreateMatrixGraph20`.
 * **Fixed Euclidean Graph:** `CreateEuclideanGraph15`.
-* **Random Euclidean Graphs:** `CreateRandomEuclideanGraph(N, maxX, maxY)`.
 * **TSPLIB Graphs**: `CreateEil51Graph`, `CreateOliver30Graph`, `CreateSwiss42Graph`, `CreateBays29Graph` and `CreateA280Graph` (for which ACTUAL best tour costs are presented).
 
-For $N \le 20$, Held-Karp provides ACTUAL best tour costs for the other algorithms (non-TSPLIB). For $N$ over that it would be infeasible to run that algorithm.
+For $N \le 20$, Held-Karp provides ACTUAL best tour costs for the other algorithms (non-TSPLIB). For $N$ over that it would be infeasible to run that algorithm. So, unless you KNOW the actual best tour cost for your algorithm, you won't have any guarantee, because for $N \ge 20$ the exact algorithms do not have runtime to proceed (testing would be too slow)... \
+**Read `GraphFactory.c`** for more info on how you can pass the actualBestTourCost parameter to the Test Driver functions.
 
-Graph outputs in DOT format are saved in `graphs/` and can be visualized directly in VSCODE with **Graphviz** extension or via terminal:
+Graph outputs in DOT format are saved in `graphs/` and can be visualized directly in VSCODE with **Graphviz** extension or via terminal (or even pasted on their website):
 
 ```bash
 dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 ```
-**Note**: Only if cities names are set for each vertex will the Tour and DOT generation use those names. Otherwise, the default is the vertex index (0 upto numVertices). See, pex, graphs/GraphAula.dot & Bays29Graph.dot.
+**Note**: Only if cities names are set for each vertex will the Tour and DOT generation use those names. Otherwise, the default is the vertex index (0 upto numVertices). See, pex, graphs/GraphAula.dot & Bays29Graph.dot.\
+**Read `GraphFactory.c`** for more info on this.
 
 ---
 
 ## Notes
-
+* Some of these will fail for very sparse graphs... Test it and try. That's connected to how TSP is defined.
 * For small graphs ($N \le 12$), Exhaustive Search guarantees optimal results. However, it is disabled. Uncomment to enable.
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended and will provide good approximations.
 * For large graphs ($N > 100$), meta-heuristics like Simulated Annealing and Ant Colony Optimization provide the best **approximations**.
 * Use 2-Opt Improvement as a post-processing step to refine heuristic solutions. At the moment, that's only being done for the Nearest Neighbour Heuristic.
 * Genetic Algorithm performance is highly dependent on parameters (the other metaheuristic algorithms are as well, but, because in these specific implementations, GA allocates and deallocates the most memory (creation and destruction of Populations and Individuals across the number of Generations defined), it will be the slowest (this can be shown further by running with valgrind); the others (SA and ACO) used `unsigned int*` to describe paths, which is more memory efficient, despite not being as descriptive (and that would take us into analyzing Space Complexity as well... but that was not done here)).
-* I could not for the life of me get Christofides working well... I tried everything... As a last ditch effort, I included a C++ implementation of the Blossom algorithm for computing the Minimum Weight Perfect Matching (MWPM)... But that does not work that well.
+* I could not for the life of me get Christofides working well... I tried everything... As a last ditch effort, I included a C++ implementation of the Blossom algorithm for computing the Minimum Weight Perfect Matching (MWPM)... But that does not work that well either.
 
 ---
 

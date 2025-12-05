@@ -4,7 +4,7 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit. 
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 #ifndef _TSP_TEST_H_
 #define _TSP_TEST_H_
@@ -15,6 +15,7 @@ typedef struct {
     Tour* (*tspFun)(const Graph*, void*);  // generic function pointer to TSP implementation
     const char* name;                      // Name for display
     unsigned int maxVertices;              // Limit for slow algorithms
+    
     void* extra;                           // Generic extra argument (Tour* or unsigned int* or NULL)
 } TSPAlgorithm;
 
@@ -23,6 +24,7 @@ static void testRunNamedGraph(NamedGraph* (*creatorFun)(void), const char* graph
 static void executeDisplay(NamedGraph* ng, unsigned int numVertices, TSPAlgorithm alg);
 
 // Abstraction adapters.
+// Maybe should not have abstracted so much the test driver.... :)
 static Tour* ExhaustiveSearch_Adapter(const Graph* g, void* unused) {
     (void)unused;
     return ExhaustiveSearch_FindTour((Graph*)g);

@@ -6,11 +6,12 @@
 //
 // November, 2025.
 //
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit.
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // Resources used:
 // https://www.sciencedirect.com/science/article/pii/S0377221796002147
 // "Transcription"!! of the C++ algorithm here: https://github.com/corail-research/learning-hk-bound/blob/main/solver/src/hk2.cc
+// In fact, I cannot say I fully understand the algorithm... :')
 
 #include "../../TravelingSalesmanProblem.h"
 #include "../../headers/LowerBounds.h"
@@ -26,7 +27,7 @@
 
 static int computeAdjustedOneTree(const Graph* g, const double* pi, unsigned int root, double* outCostOneTree, unsigned int* degrees);
 
-unsigned int root = FIXED_START_ROOT; // fixed root for 1-tree construction
+unsigned int root = FIXED_START_ROOT; // fixed root for 1-tree construction.
 
 // calcs Held-Karp lower bound
 double LowerBound_HeldKarp(const Graph* g) {
@@ -112,11 +113,7 @@ static int computeAdjustedOneTree(const Graph* g, const double* pi, unsigned int
 
     if (!key || !inMst || !parent) { free(key); free(inMst); free(parent); return 0; }
 
-    for (unsigned int i = 0; i < numVertices; i++) {
-        key[i] = DBL_MAX;
-        inMst[i] = 0;
-        parent[i] = -1;
-    }
+    for (unsigned int i = 0; i < numVertices; i++) { key[i] = DBL_MAX; inMst[i] = 0; parent[i] = -1; }
 
     // start vertex != root
     unsigned int start = (root == 0) ? 1 : 0;
@@ -159,10 +156,7 @@ static int computeAdjustedOneTree(const Graph* g, const double* pi, unsigned int
 
     for (unsigned int v = 0; v < numVertices; v++) {
         if (v == root) continue;
-        if (parent[v] != -1) {
-            localDegrees[v] += 1;
-            localDegrees[parent[v]] += 1;
-        }
+        if (parent[v] != -1) { localDegrees[v] += 1; localDegrees[parent[v]] += 1; }
     }
 
     // find two smallest edges incident to root

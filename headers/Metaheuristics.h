@@ -4,7 +4,7 @@
 //
 // November, 2025.
 // 
-// You may freely use and change this code, it has no warranty, and it is not necessary to keep my credit. 
+// You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 #ifndef METAHEURISTICS_H
 #define METAHEURISTICS_H
