@@ -83,10 +83,8 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
 
     // 1. Held-Karp (only for GraphGetNumVertices(ng->g) <= 20)
     printf("\n[Held-Karp]\n");
-    if (heldKarpTour) {
-        TourMapCityNames(heldKarpTour, namedGraph);
-        TourDisplay(heldKarpTour);
-    } else printf("Disabled because graph has too many vertices (%u > %u) and it would be too slow.\n", numVertices, 20);
+    if (heldKarpTour) TourDisplay(heldKarpTour);
+    else printf("Disabled because graph has too many vertices (%u > %u) and it would be too slow.\n", numVertices, 20);
 
     // 2. Nearest Neighbour (called directly to keep nearestNeighbourTour)
     printf("\n[Nearest Neighbour Heuristic]\n");

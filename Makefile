@@ -1,7 +1,7 @@
 CC = gcc
 CXX = g++
 CFLAGS = -Wall -Wextra -g -Iheaders -O3 -march=native
-CFLAGS_VALGRIND = -Wall -Wextra -g -Iheaders -O3 # if you're using native linux OS, you can run valgrind with binary compiled with -march=native
+CFLAGS_VALGRIND = -Wall -Wextra -g -Iheaders -O3 # if you're using native linux OS, you can run valgrind with binary compiled with -march=native (add it back!)
                                                  # if, however, you're using WSL, you have to run without march-native flag (it will be slower).
 CXXFLAGS = -Wall -Wextra -g -Iheaders
 LDFLAGS = -lm

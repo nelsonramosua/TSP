@@ -67,7 +67,7 @@ int HashMapPut(HashMap* map, const char* key, int value) {
     HashMapEntry* current = map->bins[binIndex];
 
     // search (and update)
-    while (current != NULL) {
+    while (current) {
         if (strcmp(current->key, key) == 0) {
             current->value = value; // update value
             return 1;
@@ -97,7 +97,7 @@ int HashMapGet(const HashMap* map, const char* key) {
     HashMapEntry* current = map->bins[bucketIndex];
 
     // search bin
-    while (current != NULL) {
+    while (current) {
         if (strcmp(current->key, key) == 0) return current->value; // found key
         current = current->next;
     }

@@ -35,6 +35,6 @@ void HashMapDestroy(HashMap** map);
 int HashMapPut(HashMap* map, const char* key, int value);
 int HashMapGet(const HashMap* map, const char* key);
 int HashMapRemove(HashMap* map, const char* key);
-int  HashMapSize(const HashMap* map);
+int HashMapSize(const HashMap* map);
 
 #endif // _HASH_MAP_H_
