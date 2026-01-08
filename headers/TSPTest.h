@@ -12,6 +12,12 @@
 #include "../TravelingSalesmanProblem.h"
 
 typedef struct {
+    NamedGraph* (*graphCreator)(void);     // generic function pointer to graph creation function
+    const char* name;                      // Name for display
+    double optimal;                        // optimal TSP solution
+} GraphTestCase;
+
+typedef struct {
     Tour* (*tspFun)(const Graph*, void*);  // generic function pointer to TSP implementation
     const char* name;                      // Name for display
     unsigned int maxVertices;              // Limit for slow algorithms
@@ -20,7 +26,7 @@ typedef struct {
 } TSPAlgorithm;
 
 static void runTSPAlgorithms(NamedGraph* ng, const char* graphName, double actualCost, Tour* hk_tour);
-static void testRunNamedGraph(NamedGraph* (*creatorFun)(void), const char* graphName, double knownOptimalCost);
+static void testRunNamedGraph(GraphTestCase testCase);
 static void executeDisplay(NamedGraph* ng, unsigned int numVertices, TSPAlgorithm alg);
 
 // Abstraction adapters.

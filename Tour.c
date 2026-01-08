@@ -104,8 +104,8 @@ void TourDisplay(const Tour* t) {
     for (unsigned int i = 0; i < t->numVertices; i++) {
         if (t->path[i] == UINT_MAX) break; 
 
-        if (t->cityNames) printf("%s", t->cityNames[t->path[i]]); // if city names are available, print them
-        else printf("%u", t->path[i]);                            // else print vertex indices // this is actually redundant (see mapping above)
+        if (t->cityNames) printf("%s", t->cityNames[i]); // cityNames already mapped by TourMapCityNames
+        else printf("%u", t->path[i]);                   // else print vertex indices
 
         if (i < t->numVertices - 1 && t->path[i+1] != UINT_MAX) printf(" -> ");
     }

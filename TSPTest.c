@@ -10,39 +10,51 @@
 #include "headers/GraphFactory.h"
 #include "headers/TSPTest.h"
 
-int main(void) {
+int main(int argc, char* argv[]) {
     srand(time(NULL)); 
 
-    testRunNamedGraph(CreateGraphAula, "Graph Aula", -1);
-    testRunNamedGraph(CreatePortugal12CitiesGraph, "Graph 12 Portuguese Cities", -1);
-    testRunNamedGraph(CreateEurope12CitiesGraph, "Graph 12 European Cities", -1);
-    testRunNamedGraph(CreateMatrixGraph15, "Matrix Graph 15 Nodes", -1);
-    testRunNamedGraph(CreateMatrixGraph20, "Matrix Graph 20 Nodes", -1);
-    testRunNamedGraph(CreateEuclideanGraph15, "Euclidean Graph 15 Nodes", -1);
-    testRunNamedGraph(CreateEil51Graph, "TSPLIB - Eil51", 426);
-    testRunNamedGraph(CreateOliver30Graph, "TSPLIB - Oliver30", 420);
-    testRunNamedGraph(CreateSwiss42Graph, "TSPLIB - Swiss42", 1273);
-    testRunNamedGraph(CreateBays29Graph, "TSPLIB - Bays29", 2020);
-    // testRunNamedGraph(CreateA280Graph, "TSPLIB - A280", 2579); // takes very long. Uncomment to stress test.
-
+    GraphTestCase tests[] = {
+        {CreateGraphAula, "Graph Aula", -1},
+        {CreateAveiroCitiesGraph, "Aveiro District Cities", -1},
+        {CreatePortugal12CitiesGraph, "Graph 12 Portuguese Cities", -1},
+        {CreateEurope12CitiesGraph, "Graph 12 European Cities", -1},
+        {CreateMatrixGraph15, "Matrix Graph 15 Nodes", -1},
+        {CreateMatrixGraph20, "Matrix Graph 20 Nodes", -1},
+        {CreateEuclideanGraph15, "Euclidean Graph 15 Nodes", -1},
+        {CreateEil51Graph, "TSPLIB - Eil51", 426},
+        {CreateOliver30Graph, "TSPLIB - Oliver30", 420},
+        {CreateSwiss42Graph, "TSPLIB - Swiss42", 1273},
+        {CreateBays29Graph, "TSPLIB - Bays29", 2020},
+        // {CreateA280Graph, "TSPLIB - A280", 2579} // takes very long. Uncomment to stress test.
+    };
     // Add your own! (Add in GraphFactory.c/.h (prototype!) and call here!). See GraphFactory.c for more info.
+
+    int numTests = sizeof(tests) / sizeof(tests[0]); int count = numTests;
+    if (argc > 1) {
+        int arg = atoi(argv[1]);
+        if (arg > 0 && arg <= numTests) count = arg;
+        else printf("Invalid count or count exceeds available tests. Running all %d tests.\n", numTests);
+    }
+
+    printf("Running %d graph test(s)...\n", count);
+    for (int i = 0; i < count; i++) testRunNamedGraph(tests[i]);
 
     printf("All graphs tested.\n");
     return 0;
 }
 
 // helper: creates, tests, and destroys a NamedGraph
-static void testRunNamedGraph(NamedGraph* (*creatorFun)(void), const char* graphName, double knownOptimalCost) {
-    NamedGraph* namedGraph = creatorFun();
+static void testRunNamedGraph(GraphTestCase testCase) {
+    NamedGraph* namedGraph = testCase.graphCreator();
 
     if (!namedGraph) return;
     if (!namedGraph->g) { NamedGraphDestroy(&namedGraph); return; }
 
     unsigned int numVertices = GraphGetNumVertices(namedGraph->g);
-    double actualBestCost = knownOptimalCost;
+    double actualBestCost = testCase.optimal;
     Tour* heldKarpTour = NULL;
 
-    if (numVertices <= 20 && knownOptimalCost == -1) {
+    if (numVertices <= 20 && testCase.optimal == -1) {
         heldKarpTour = HeldKarp_FindTour(namedGraph->g);
         if (heldKarpTour) {
             TourMapCityNames(heldKarpTour, namedGraph);
@@ -51,7 +63,7 @@ static void testRunNamedGraph(NamedGraph* (*creatorFun)(void), const char* graph
         }
     }
 
-    runTSPAlgorithms(namedGraph, graphName, actualBestCost, heldKarpTour);
+    runTSPAlgorithms(namedGraph, testCase.name, actualBestCost, heldKarpTour);
     
     if (heldKarpTour) TourDestroy(&heldKarpTour);
     NamedGraphDestroy(&namedGraph);
@@ -96,9 +108,11 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
     }
 
     // 3. 2-Opt Improvement (based on Nearest Neighbour)
-    Tour * twoOptTour = TourDeepCopy(nearestNeighbourTour);
-    executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
-        .tspFun = TwoOpt_Adapter, .name = "2-Opt Improvement", .maxVertices = 0, .extra = twoOptTour });
+    if (nearestNeighbourTour) {
+        Tour * twoOptTour = TourDeepCopy(nearestNeighbourTour);
+        executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+            .tspFun = TwoOpt_Adapter, .name = "2-Opt Improvement", .maxVertices = 0, .extra = twoOptTour });
+    }
 
     // 4. Greedy
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
@@ -113,12 +127,14 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
         .tspFun = Christofides_Adapter, .name = "Christofides Algorithm", .maxVertices = 0, .extra = NULL });
 
     // 7. Simulated Annealing (based on Nearest Neighbour)
-    unsigned int* initialTour = malloc((numVertices + 1) * sizeof(unsigned int));
-    if (initialTour) {
-        memcpy(initialTour, nearestNeighbourTour->path, (numVertices + 1) * sizeof(unsigned int));
-        executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
-                .tspFun = SimAnnealing_Adapter, .name = "Simulated Annealing", .maxVertices = 0, .extra = initialTour });
-        free(initialTour);
+    if (nearestNeighbourTour) {
+        unsigned int* initialTour = malloc((numVertices + 1) * sizeof(unsigned int));
+        if (initialTour) {
+            memcpy(initialTour, nearestNeighbourTour->path, (numVertices + 1) * sizeof(unsigned int));
+            executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+                    .tspFun = SimAnnealing_Adapter, .name = "Simulated Annealing", .maxVertices = 0, .extra = initialTour });
+            free(initialTour);
+        }
     }
     TourDestroy(&nearestNeighbourTour); // destroy previously left nearestNeighbourTour.
 

@@ -39,7 +39,7 @@ TSP/
 │   │   ├── NearestNeighbour.c
 │   │   ├── NearestInsertion.c
 │   │   ├── Christofides.c
-│   │   └── blossom/            # Blossom implementation (C++) (imported!)
+│   │   └── blossom/            # Blossom algorithm for MWPM
 │   ├── lowerBounds/            # Lower Bound algorithms
 │   │   ├── LowerBound_HeldKarp.c
 │   │   └── LowerBound_MST.c
@@ -59,7 +59,7 @@ TSP/
 └── TravelingSalesmanProblem.h  # Main project header
 ```
 
-**Note**: In the future, I would like to implement IPSO, as described in this paper: https://www.researchgate.net/publication/271285365_ISPO_A_New_Way_to_Solve_Traveling_Salesman_Problem.\
+**Note**: In the future, I would like to implement ISPO, as described in this paper: https://www.researchgate.net/publication/271285365_ISPO_A_New_Way_to_Solve_Traveling_Salesman_Problem.\
 For the moment, I will leave that as an exercise to the reader. :)
 
 --- 
@@ -79,7 +79,7 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 | **Nearest Neighbour**      | Heuristic       | $O(N^2)$                               | Fast, but solution quality may vary; starting point affects the tour. |
 | **Greedy Heuristic**      | Heuristic       | $O(N^3)$                        | Builds a tour by repeatedly selecting the shortest available edge.   |
 | **Nearest Insertion** | Heuristic | $O(N^3)$ | Constructive method: selects the unvisited node closest to any edge in the current partial tour. |
-| **Christofides Algorithm**| Heuristic       | $O(N^3)$                               | Guarantees a tour $\le 1.5\times$ optimal for metric TSP. Could not get it working correctly. |
+| **Christofides Algorithm**| Heuristic       | $O(N^3)$                               | Guarantees a tour $\le 1.5\times$ optimal for metric TSP. Uses Blossom algorithm. |
 | **2-Opt Improvement**     | Meta-heuristic  | $O(N^3)$      | Local search to improve an existing tour; often used after other algorithms. |
 | **Simulated Annealing**   | Meta-heuristic  | $O(N^2 \times \text{Iterations}) = O(N^3 \times \text{SA-MULTIPLIER})$      | Probabilistic improvement using 2-opt swaps. |
 | **Ant Colony Optimization** | Meta-heuristic | $O(N^2 \times \text{Iterations} \times \text{Ants}) = O(N^3 \times \text{Iterations})$ | Probabilistic search guided by pheromone trails; computationally heavier but can yield high-quality solutions. |
@@ -96,7 +96,7 @@ Some of these (pex: MST Lower Bound & Greedy) could be improved if an auxiliary 
 
 ## Compilation Instructions
 
-This project uses **GCC** and **G++** to compile C and C++ code (for the imported Blossom algorithm).
+This project uses **GCC** to compile (100% pure C).
 
 1. **Clone the repository:**
 
@@ -124,7 +124,8 @@ This project uses **GCC** and **G++** to compile C and C++ code (for the importe
     ```
 
 **Note**: you can also run `` make run `` to compile and run automatically, and even ``make runvc`` to compile, run with valgrind and then clean, automatically.\
-However, I caution you to not run past the first test graph with valgring, ad it will incredibly slow (test it!).
+However, I caution you to not run past the first test graph with valgring, ad it will incredibly slow (test it!).\
+Furthermore, you can pass, through terminal, the **number of tests you want to run**, pex: `` make run N=3 ``.\
 **See Makefile for more info on this**.
 
 ---
@@ -160,7 +161,6 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * For large graphs ($N > 100$), meta-heuristics like Simulated Annealing and Ant Colony Optimization provide the best **approximations**.
 * Use 2-Opt Improvement as a post-processing step to refine heuristic solutions. At the moment, that's only being done for the Nearest Neighbour Heuristic.
 * Genetic Algorithm performance is highly dependent on parameters (the other metaheuristic algorithms are as well, but, because in these specific implementations, GA allocates and deallocates the most memory (creation and destruction of Populations and Individuals across the number of Generations defined), it will be the slowest (this can be shown further by running with valgrind); the others (SA and ACO) used `unsigned int*` to describe paths, which is more memory efficient, despite not being as descriptive (and that would take us into analyzing Space Complexity as well... but that was not done here)).
-* I could not for the life of me get Christofides working well... I tried everything... As a last ditch effort, I included a C++ implementation of the Blossom algorithm for computing the Minimum Weight Perfect Matching (MWPM)... But that does not work that well either.
 
 ---
 
@@ -170,7 +170,7 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * https://algorithms.discrete.ma.tum.de/graph-algorithms/hierholzer/index_en.html
 * https://alon.kr/posts/christofides
 * https://en.wikipedia.org/wiki/Blossom_algorithm
-* https://github.com/suddhabrato/edmonds-blossom-algorithm
+* "Combinatorial Optimization" by Korte & Vygen (for the weighted Blossom algorithm)
 * https://www.geeksforgeeks.org/dsa/travelling-salesman-problem-greedy-approach/
 * https://youtu.be/oXb2nC-e_EA?si=3G2oxIMb31RO8N8n
 * https://www.researchgate.net/publication/271285365_ISPO_A_New_Way_to_Solve_Traveling_Salesman_Problem
@@ -183,6 +183,6 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 ## Author
 
 Nelson Ramos (124921),\
-November 2025.
+November 2025 - January 2026.
 
 (This project, once again I remind, used work of other people on the internet, that can be found in the links throughout its implementations)!

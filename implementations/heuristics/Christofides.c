@@ -30,7 +30,6 @@
 unsigned int* findOddVertices(const Graph* g, unsigned int* count);
 
 // computes the Minimum Weight Perfect Matching (MWPM) on the odd-degree subgraph.
-// uses imported C++ Blossom library indicated above.
 Graph* computeExactMwpm(const Graph* g, unsigned int* odd, unsigned int oddCount);
 
 // finds an Eulerian tour by Hierholzer's alg, optimized for a given edge count matrix.
@@ -145,7 +144,7 @@ Graph* computeExactMwpm(const Graph* g, unsigned int* odd, unsigned int oddCount
             edgeIndex++;
         }
 
-    // call the external wrapper to Blossom (which is in cpp)
+    // call the external wrapper to Blossom
     int* matchArr = malloc(oddCount * sizeof(int));
     blossomMWPM((int)oddCount, edgeIndex, u, v, w, matchArr);
 

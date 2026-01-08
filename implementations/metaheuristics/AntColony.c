@@ -36,8 +36,6 @@ Tour* AntColony_FindTour(const Graph* g) {
     Tour* bestTour = TourCreate(numVertices);
     if (!bestTour) return NULL;
 
-    srand((unsigned int)time(NULL)); // rand num gen (diff results for diff runs of project)
-
     // ACO parameters (change in Metaheuristics.h) (we could read MACROS direclty, but this is cleaner)
     unsigned int numAnts = numVertices;
     unsigned int numIterations = ACO_ITERATIONS;

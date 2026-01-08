@@ -65,7 +65,7 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour);
 Tour* AntColony_FindTour(const Graph* g);
 Tour* GeneticAlgorithm_FindTour(const Graph* g);
 
-// In the future, it could be interesting implementing IPSO:
+// In the future, it could be interesting implementing ISPO:
 // https://www.researchgate.net/publication/271285365_ISPO_A_New_Way_to_Solve_Traveling_Salesman_Problem
 
 #endif // _TRAVELING_SALESMAN_PROBLEM_H_

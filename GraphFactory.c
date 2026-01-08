@@ -75,6 +75,47 @@ NamedGraph* CreateGraphAula(void) {
     return namedGraph;
 }
 
+// Aveiro District municipalities
+NamedGraph* CreateAveiroCitiesGraph(void) {
+    unsigned int numVertices = 7;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
+
+    // Municipalities: Oliveira do Bairro, Anadia, Águeda, Ílhavo, Vagos, Arouca, Sever do Vouga
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Oliveira do Bairro", "Anadia", 12);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Oliveira do Bairro", "Águeda", 12);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Oliveira do Bairro", "Ílhavo", 21);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Oliveira do Bairro", "Vagos", 19);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Oliveira do Bairro", "Arouca", 78);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Oliveira do Bairro", "Sever do Vouga", 40);
+
+    
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Águeda", 19);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Ílhavo", 32);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Vagos", 32);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Arouca", 90);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Sever do Vouga", 46);
+    
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Águeda", "Ílhavo", 25);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Águeda", "Vagos", 25);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Águeda", "Arouca", 71);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Águeda", "Sever do Vouga", 31);
+
+    
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Ílhavo", "Vagos", 6.5);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Ílhavo", "Arouca", 77);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Ílhavo", "Sever do Vouga", 45);
+    
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Vagos", "Arouca", 82);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Vagos", "Sever do Vouga", 50);
+
+    GraphFactory_AddEdgeByCityNames(namedGraph, "Arouca", "Sever do Vouga", 38);
+    
+    _writeDOT(namedGraph, "AveiroCitiesGraph");
+
+    return namedGraph;
+}
+
 NamedGraph* CreatePortugal12CitiesGraph(void) {
     unsigned int numVertices = 12;
     NamedGraph* ng = NamedGraphCreate(numVertices);

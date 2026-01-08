@@ -12,6 +12,7 @@
 #include "../TravelingSalesmanProblem.h"
 
 NamedGraph* CreateGraphAula(void);
+NamedGraph* CreateAveiroCitiesGraph(void);
 NamedGraph* CreatePortugal12CitiesGraph(void);
 NamedGraph* CreateEurope12CitiesGraph(void);
 

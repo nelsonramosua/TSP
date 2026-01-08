@@ -52,8 +52,6 @@ static double calculateTourCost(const Graph* g, const Tour* tour);
 Tour* GeneticAlgorithm_FindTour(const Graph* g) {
     unsigned int numVertices = GraphGetNumVertices(g);
     if (numVertices < 2) return NULL;
-    
-    srand(time(NULL));
 
     // init Population
     Population* population = InitializePopulation(numVertices);
@@ -184,7 +182,10 @@ static Individual SelectParent(const Population* pop, unsigned int numVertices) 
         
         if (current.cost < best.cost) {
             // new best individual in tournament
-            if (best.path) DestroyIndividual(&best); 
+            if (best.path) {
+                free(best.path);
+                best.path = NULL;
+            }
             best = CopyIndividual(&current, numVertices);        
         }
     }
@@ -198,6 +199,13 @@ static Individual Crossover(const Individual* parent1, const Individual* parent2
     offspring.path = malloc(numVertices * sizeof(unsigned int));
     offspring.cost = DBL_MAX;
     offspring.fitness = 0.0;
+
+    // safety checks
+    if (!parent1 || !parent1->path || !parent2 || !parent2->path || !offspring.path) {
+        if (offspring.path) free(offspring.path);
+        offspring.path = NULL;
+        return offspring;
+    }
 
     // choose 2 rand cut points (p1 and p2)
     unsigned int p1 = rand() % numVertices;
