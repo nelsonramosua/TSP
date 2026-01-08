@@ -30,12 +30,13 @@ typedef struct {
     double** dp;            // dp[subsetMask][j] reps. min cost of path started at v_0, visiting verts in 'subsetMask' & ending at v_j
     unsigned int** parent;  // parent[subsetMask][j] reps. v_k (before v_j) in optimal path stored in dp[subsetMask][j]
                             // essentially, maintains "predecessor" table.
+    double** dists;         // Precomputed distance matrix O(N^2) to avoid expensive graph lookups in inner loop
     unsigned int numStates;
     unsigned int numVertices;
 } HeldKarpTable;
 
 // Inits & allocs the DP table & parent table.
-static HeldKarpTable* initializeTable(unsigned int numVertices);
+static HeldKarpTable* initializeTable(const Graph* g);
 // Frees memory allocd for HeldKarpTable ADT.
 static void destroyTable(HeldKarpTable* table);
 
@@ -53,8 +54,8 @@ Tour* HeldKarp_FindTour(const Graph* g) {
     if (numVertices >= (unsigned int)(sizeof(unsigned int) * 8)) return NULL;  // masks are 32-bit. It would cause memory corruption or buffer overruns
                                                           // ok, because we only test this up to 21 vertices...
 
-    // init DP table
-    HeldKarpTable* hkt = initializeTable(numVertices);
+    // init DP table (and precompute distances)
+    HeldKarpTable* hkt = initializeTable(g);
     if (!hkt) return NULL;
 
     // mask for set of all verts.
@@ -96,7 +97,8 @@ Tour* HeldKarp_FindTour(const Graph* g) {
                     double previousCost = hkt->dp[subsetMinusJ][k];
                     if (previousCost == DBL_MAX) continue;  // skip if prev path unreachable
 
-                    double edgeWeight = GetEdgeWeight(g, k, j);
+                    // OPTIMIZATION: Use precomputed distance
+                    double edgeWeight = hkt->dists[k][j];
                     if (edgeWeight == DBL_MAX) continue; // skip if edge k->j invalid
 
                     double newCost = previousCost + edgeWeight;
@@ -119,7 +121,7 @@ Tour* HeldKarp_FindTour(const Graph* g) {
         double pathCost = hkt->dp[allVertsMask][j];
         if (pathCost == DBL_MAX) continue;
 
-        double edgeToZero = GetEdgeWeight(g, j, 0);
+        double edgeToZero = hkt->dists[j][0];
         if (edgeToZero == DBL_MAX) continue;
 
         double totalCost = pathCost + edgeToZero;
@@ -149,41 +151,47 @@ Tour* HeldKarp_FindTour(const Graph* g) {
         pathIndices[i] = currentVert;
         
         unsigned int prevVert = hkt->parent[currentMask][currentVert];
-        if (prevVert == UINT_MAX) { TourDestroy(&bestTour); destroyTable(hkt); return NULL; }
-        
-        // update state
-        currentMask &= ~(1U << currentVert); 
+        currentMask &= ~(1U << currentVert); // remove currentVert from mask
         currentVert = prevVert;
     }
-    
-    pathIndices[0] = 0;             // path starts at 0
-    pathIndices[numVertices] = 0;   // close cycle
+    pathIndices[0] = 0; // start
+    pathIndices[numVertices] = 0; // end (loop)
 
     destroyTable(hkt);
     return bestTour;
 }
 
-// Inits & allocs the DP table & parent table.
-static HeldKarpTable* initializeTable(unsigned int numVertices) {
-    if (numVertices < 2) return NULL;
-    
+
+static HeldKarpTable* initializeTable(const Graph* g) {
+    if (!g) return NULL;
+    unsigned int numVertices = GraphGetNumVertices(g);
+    unsigned int numStates = 1U << numVertices;
+
     HeldKarpTable* table = (HeldKarpTable*) malloc(sizeof(HeldKarpTable));
     if (!table) return NULL;
-    
-    table->numVertices = numVertices;
-    // # states (subsets) = 2^numVertices
-    unsigned int numStates = 1U << numVertices;
-    table->numStates = numStates;
 
-    // alloc DP cost table and parent/predecessor table
-    table->dp = (double**) malloc(numStates * sizeof(double*));
-    table->parent = (unsigned int**) malloc(numStates * sizeof(unsigned int*));
-    if (!table->dp || !table->parent) {
-        // cleanup if one alloc ok but next failed
+    table->numVertices = numVertices;
+    table->numStates = numStates;
+    table->dp = (double**) calloc(numStates, sizeof(double*));
+    table->parent = (unsigned int**) calloc(numStates, sizeof(unsigned int*));
+    table->dists = (double**) calloc(numVertices, sizeof(double*));
+    
+    if (!table->dp || !table->parent || !table->dists) {
         if (table->dp) free(table->dp);
         if (table->parent) free(table->parent);
+        if (table->dists) free(table->dists);
         free(table);
         return NULL;
+    }
+
+    // alloc and fill dist matrix
+    for (unsigned int i = 0; i < numVertices; i++) {
+        table->dists[i] = (double*) malloc(numVertices * sizeof(double));
+        if (!table->dists[i]) { destroyTable(table); return NULL; }
+        for (unsigned int j = 0; j < numVertices; j++) {
+            if (i == j) table->dists[i][j] = 0.0;
+            else table->dists[i][j] = GetEdgeWeight(g, i, j);
+        }
     }
 
     for (unsigned int subsetMask = 0; subsetMask < numStates; subsetMask++) {
@@ -207,12 +215,21 @@ static HeldKarpTable* initializeTable(unsigned int numVertices) {
 static void destroyTable(HeldKarpTable* table) {
     if (!table) return;
 
-    for (unsigned int subsetMask = 0; subsetMask < table->numStates; subsetMask++) {
-        free(table->dp[subsetMask]);
-        free(table->parent[subsetMask]);
+    if (table->dp) {
+        for (unsigned int subsetMask = 0; subsetMask < table->numStates; subsetMask++)
+            if (table->dp[subsetMask]) free(table->dp[subsetMask]);
+        free(table->dp);
     }
-    free(table->dp);
-    free(table->parent);
+    if (table->parent) {
+        for (unsigned int subsetMask = 0; subsetMask < table->numStates; subsetMask++)
+            if (table->parent[subsetMask]) free(table->parent[subsetMask]);
+        free(table->parent);
+    }
+    if (table->dists) {
+        for (unsigned int i = 0; i < table->numVertices; i++)
+            if (table->dists[i]) free(table->dists[i]);
+        free(table->dists);
+    }
     free(table);
 }
 

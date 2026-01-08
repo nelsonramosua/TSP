@@ -1,22 +1,17 @@
-// BlossomWrapper.hpp - implements a wrapper for blossom algorithm for Christofides.c
+// BlossomWrapper.h - Minimum Weight Perfect Matching for Christofides algorithm.
 //
-// All credit for the algorithm to https://github.com/suddhabrato/edmonds-blossom-algorithm, I adapted from it.
+// O(n³) --- implementation of Edmonds' weighted Blossom algorithm using the primal-dual method.
 //
-// November 2025.
+// Based on the algorithm described in "Combinatorial Optimization" by Korte & Vygen.
+// https://www.mathematik.uni-muenchen.de/~kpanagio/KombOpt/book.pdf
+//
+// January 2026.
 
-// ports C++ to C.
+// near transcription... so no props to me.
 
 #ifndef BLOSSOM_WRAPPER_H
 #define BLOSSOM_WRAPPER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void blossomMWPM(int N, int E, int* u, int* v, double* w, int* match_out);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

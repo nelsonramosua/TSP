@@ -1,9 +1,7 @@
 CC = gcc
-CXX = g++
 CFLAGS = -Wall -Wextra -g -Iheaders -O3 -march=native
 CFLAGS_VALGRIND = -Wall -Wextra -g -Iheaders -O3 # if you're using native linux OS, you can run valgrind with binary compiled with -march=native (add it back!)
                                                  # if, however, you're using WSL, you have to run without march-native flag (it will be slower).
-CXXFLAGS = -Wall -Wextra -g -Iheaders
 LDFLAGS = -lm
 
 SRC_DIR = implementations
@@ -31,6 +29,7 @@ C_SRCS = $(GRAPH_DIR)/Graph.c \
          $(HEUR_DIR)/Greedy.c \
          $(HEUR_DIR)/NearestInsertion.c \
          $(HEUR_DIR)/Christofides.c \
+         $(HEUR_DIR)/blossom/BlossomWrapper.c \
          $(META_DIR)/TwoOpt.c \
          $(META_DIR)/SimulatedAnnealing.c \
          $(META_DIR)/AntColony.c \
@@ -39,18 +38,14 @@ C_SRCS = $(GRAPH_DIR)/Graph.c \
          Tour.c \
          TSPTest.c
 
-CPP_SRCS = $(HEUR_DIR)/blossom/Blossom.cpp \
-           $(HEUR_DIR)/blossom/BlossomWrapper.cpp
-
 C_OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(C_SRCS))
-CPP_OBJS := $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(CPP_SRCS))
 
 TSP_COMPARISON = TSP_COMPARISON
 
 all: $(TSP_COMPARISON)
 
-$(TSP_COMPARISON): $(C_OBJS) $(CPP_OBJS)
-	$(CXX) $^ -o $@ $(LDFLAGS)
+$(TSP_COMPARISON): $(C_OBJS)
+	$(CC) $^ -o $@ $(LDFLAGS)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -59,18 +54,15 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
 .PHONY: run
 run: $(TSP_COMPARISON)
-	./$(TSP_COMPARISON)
+	./$(TSP_COMPARISON) $(N)
 
 .PHONY: runvc
 runvc: 
 	$(MAKE) clean
-	$(MAKE) CFLAGS="$(CFLAGS_VALGRIND)" CXXFLAGS="$(CXXFLAGS)" $(TSP_COMPARISON)
+	$(MAKE) CFLAGS="$(CFLAGS_VALGRIND)" $(TSP_COMPARISON)
+	$(eval TSP_COMPARISON := $(TSP_COMPARISON) $(N))
 	valgrind --leak-check=full --show-leak-kinds=all -s ./$(TSP_COMPARISON)
 	$(MAKE) clean
 

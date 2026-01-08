@@ -34,13 +34,13 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
     Tour* tour = TourCreate(numVertices);
     if (!tour) return NULL;
 
-    srand((unsigned int)time(NULL)); 
-
     unsigned int* current = malloc(numVertices * sizeof(unsigned int));
     unsigned int* bestTour = malloc(numVertices * sizeof(unsigned int));
     if (!current || !bestTour) { 
-        if (current) free(current); if (bestTour) free(bestTour); 
-        TourDestroy(&tour); return NULL; 
+        if (current) free(current);
+        if (bestTour) free(bestTour); 
+        TourDestroy(&tour);
+        return NULL; 
     }
 
     memcpy(current, initialTour, numVertices * sizeof(unsigned int));

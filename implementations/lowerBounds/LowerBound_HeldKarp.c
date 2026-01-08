@@ -27,8 +27,6 @@
 
 static int computeAdjustedOneTree(const Graph* g, const double* pi, unsigned int root, double* outCostOneTree, unsigned int* degrees);
 
-unsigned int root = FIXED_START_ROOT; // fixed root for 1-tree construction.
-
 // calcs Held-Karp lower bound
 double LowerBound_HeldKarp(const Graph* g) {
     if (!g) return -1.0;
@@ -49,7 +47,7 @@ double LowerBound_HeldKarp(const Graph* g) {
 
     for (unsigned int iter = 0; iter < MAX_ITERS; iter++) {
         double adjustedCost;
-        int ok = computeAdjustedOneTree(g, pi, root, &adjustedCost, degrees);
+        int ok = computeAdjustedOneTree(g, pi, FIXED_START_ROOT, &adjustedCost, degrees);
 
         if (!ok || adjustedCost >= DBL_MAX / 2.0) {
             // discon. w/ adj weights - small rand perturbation

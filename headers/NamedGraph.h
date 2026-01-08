@@ -10,8 +10,8 @@
 #define _NAMED_GRAPH_H_
 
 #include <stdlib.h>
-#include <Graph.h>
 #include "HashMap.h"
+#include "Graph.h"
 
 typedef struct _NamedGraph {
     Graph* g;
