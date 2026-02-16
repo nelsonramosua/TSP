@@ -3,13 +3,13 @@
 // Nelson Ramos, 124921.
 //
 // November, 2025.
-// 
+//
 // You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // it made no sense to use the overkill implementation taught in classes.
 // this is a simple implementation with Separate Chaining. It can be improved substantially. Go ahead! :)
 
-#include "HashMap.h"
+#include "../../headers/HashMap.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -24,15 +24,15 @@ static unsigned int hash(const char* key, unsigned int capacity) {
     unsigned long hashValue = 5381;
     int c;
 
-    while ((c = *key++)) hashValue = ((hashValue << 5) + hashValue) + c; 
-    
+    while ((c = *key++)) hashValue = ((hashValue << 5) + hashValue) + c;
+
     return hashValue % capacity;
 }
 
 HashMap* HashMapCreate(void) {
     HashMap* map = (HashMap*)malloc(sizeof(HashMap));
     if (!map) return NULL;
-    
+
     map->capacity = INITIAL_CAPACITY; // tune in HashMap.h.
     map->bins = (HashMapEntry**)calloc(map->capacity, sizeof(HashMapEntry*));
     if (!map->bins) { free(map); return NULL; }
@@ -43,7 +43,7 @@ HashMap* HashMapCreate(void) {
 
 void HashMapDestroy(HashMap** map) {
     if (!map || !(*map)) return;
-    
+
     HashMap *hashMap = *map;
 
     for (unsigned int i = 0; i < hashMap->capacity; i++) {
@@ -57,12 +57,12 @@ void HashMapDestroy(HashMap** map) {
 
     free(hashMap->bins); free(hashMap);
 
-    *map = NULL; 
+    *map = NULL;
 }
 
 int HashMapPut(HashMap* map, const char* key, int value) {
     if (!map || !key) return 0;
-    
+
     unsigned int binIndex = hash(key, map->capacity);
     HashMapEntry* current = map->bins[binIndex];
 
@@ -81,7 +81,7 @@ int HashMapPut(HashMap* map, const char* key, int value) {
 
     newEntry->next = map->bins[binIndex];
     map->bins[binIndex] = newEntry;
-    
+
     map->size++;
 
     double load = (double)map->size / map->capacity;
@@ -92,7 +92,7 @@ int HashMapPut(HashMap* map, const char* key, int value) {
 
 int HashMapGet(const HashMap* map, const char* key) {
     if (!map || !key) return -1;
-    
+
     unsigned int bucketIndex = hash(key, map->capacity);
     HashMapEntry* current = map->bins[bucketIndex];
 
@@ -102,12 +102,12 @@ int HashMapGet(const HashMap* map, const char* key) {
         current = current->next;
     }
 
-    return -1; 
+    return -1;
 }
 
 int HashMapRemove(HashMap* map, const char* key) {
     if (!map || !key) return 0;
-    
+
     unsigned int binIndex = hash(key, map->capacity);
     HashMapEntry* cur = map->bins[binIndex];
     HashMapEntry* prev = NULL;
@@ -123,7 +123,7 @@ int HashMapRemove(HashMap* map, const char* key) {
             map->size--;
             return 1; // success
         }
-        
+
         // move to next node
         prev = cur;
         cur = cur->next;
@@ -143,7 +143,7 @@ static HashMapEntry* createEntry(const char* key, int value) {
     // duplicate key to make sure map has it
     newEntry->key = strdup(key); // buffer overflow but i'm too lazy.
     if (!newEntry->key) { free(newEntry); return NULL; }
-    
+
     newEntry->value = value;
     newEntry->next = NULL;
     return newEntry;

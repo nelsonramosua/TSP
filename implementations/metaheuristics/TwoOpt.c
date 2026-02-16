@@ -25,8 +25,8 @@ static void TwoOpt_Swap(Tour* tour, unsigned int startIndex, unsigned int endInd
 // tries to improve existing TSP tour using 2-Opt local search method.
 Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour) {
     if (!initialTour || initialTour->numVertices <= 2) return initialTour;
-    
-    unsigned int numVertices = GraphGetNumVertices(g); 
+
+    unsigned int numVertices = GraphGetNumVertices(g);
     int improved = 1;
 
     printf("  Starting 2-Opt. Initial Cost: %.2f\n", initialTour->cost);
@@ -36,8 +36,8 @@ Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour) {
         improved = 0;
 
         // iterate over all possible non-adjacent edge pairs (i-1, i) and (j, j+1)
-        for (unsigned int i = 1; i < numVertices; i++) { 
-            for (unsigned int j = i + 1; j < numVertices; j++) { 
+        for (unsigned int i = 1; i < numVertices; i++) {
+            for (unsigned int j = i + 1; j < numVertices; j++) {
                 // skip adjacent edges and closing edge
                 if (j == i || j == i + 1 || j == numVertices) continue;
 
@@ -65,16 +65,16 @@ Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour) {
                     TwoOpt_Swap(initialTour, i, j);
                     initialTour->cost += costDelta;
                     improved = 1;
-                    
+
                     // restart outer loop after improv
                     goto restartLoops; // could have redesigned this to not use goto but i'm too lazy.
                 }
             }
         }
-        
-        restartLoops:; 
+
+        restartLoops:;
     }
-    
+
     printf("  Final Cost after 2-Opt: %.2f\n", initialTour->cost);
     return initialTour;
 }
