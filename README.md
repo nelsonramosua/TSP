@@ -3,6 +3,7 @@
 [![Language](https://img.shields.io/badge/language-C-blue.svg)](https://devdocs.io/c/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Year](https://img.shields.io/badge/year-2025-orange.svg)]()
+[![CI Status](https://github.com/nelsonramosua/TSP/workflows/TSP%20CI%2FCD/badge.svg)](https://github.com/nelsonramosua/TSP/actions)
 
 This repository implements multiple algorithms to solve the **Traveling Salesman Problem (TSP)**, including exact methods, heuristics, and meta-heuristics. It aims to compare the (best) Tours (paths, if you want) found by each.
 
