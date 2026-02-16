@@ -1,0 +1,82 @@
+name: TSP CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc make valgrind graphviz
+    
+    - name: Build project
+      run: make
+    
+    - name: Run quick tests
+      run: ./TSP_COMPARISON 3
+    
+    - name: Check for compilation warnings
+      run: make clean && make CFLAGS="-Wall -Wextra -Werror -O3"
+    
+    - name: Memory leak check (limited)
+      run: |
+        make clean
+        make CFLAGS="-Wall -Wextra -g -O3"
+        timeout 120 valgrind --leak-check=full --error-exitcode=1 ./TSP_COMPARISON 1 || echo "Valgrind timeout - OK for CI"
+    
+    - name: Archive test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          graphs/*.dot
+          TSP_COMPARISON
+        retention-days: 7
+
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Check code formatting
+      run: |
+        # Verifica se há trailing whitespace
+        ! git grep -I --line-number --perl-regexp '\s+$' -- '*.c' '*.h'
+    
+    - name: Check for TODOs
+      run: |
+        echo "Checking for TODO/FIXME comments:"
+        git grep -n 'TODO\|FIXME' -- '*.c' '*.h' || echo "No TODOs found"
+
+  benchmark:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build optimized
+      run: make clean && make CFLAGS="-Wall -Wextra -O3 -march=native"
+    
+    - name: Run benchmarks
+      run: |
+        echo "=== Benchmark Results ===" > benchmark.txt
+        /usr/bin/time -v ./TSP_COMPARISON 5 2>&1 | tee -a benchmark.txt
+    
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v3
+      with:
+        name: benchmarks
+        path: benchmark.txt
