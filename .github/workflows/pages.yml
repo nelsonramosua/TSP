@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - 'docs/ARCHITECTURE.md'
       - '.github/workflows/docs/**'
       - 'README.md'
       - 'CHANGELOG.md'
@@ -34,25 +35,44 @@ jobs:
 
     - name: Prepare docs for Jekyll
       run: |
-        # Create folder
         mkdir -p docs
-
-        # Funç to add Front Matter
+        
         prepare_file() {
-          local file=$1
+          local src=$1
           local title=$2
-          local dest="docs/$(basename $file)"
+          local filename=$(basename "$src")
+          local dest="docs/$filename"
+          
+          if [ ! -f "$src" ]; then
+            if [ -f "docs/$filename" ]; then
+              src="docs/$filename"
+              mv "$src" "${src}.tmp"
+              src="${src}.tmp"
+            else
+              echo "Warning: $filename not found anywhere. Skipping..."
+              return
+            fi
+          fi
+
+          echo "Processing $filename..."
           echo "---" > "$dest"
           echo "layout: default" >> "$dest"
           echo "title: $title" >> "$dest"
+          
+          if [[ "$filename" == "ARCHITECTURE.md" ]]; then
+            echo "mermaid: true" >> "$dest"
+          fi
+          
           echo "---" >> "$dest"
           echo "" >> "$dest"
-          cat "$file" >> "$dest"
+          cat "$src" >> "$dest"
+          
+          [ -f "${dest}.tmp" ] && rm "${dest}.tmp"
         }
 
         prepare_file "README.md" "Home"
         prepare_file "CHANGELOG.md" "Changelog"
-        prepare_file "docs/ARCHITECTURE.md" "Architecture"
+        prepare_file "ARCHITECTURE.md" "Architecture"
         prepare_file ".github/CONTRIBUTING.md" "Contributing"
 
     - name: Build Jekyll site
