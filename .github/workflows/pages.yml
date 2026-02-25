@@ -35,39 +35,41 @@ jobs:
 
     - name: Prepare docs for Jekyll
       run: |
+        mkdir -p temp_processing
         mkdir -p docs
         
         prepare_file() {
-          local src=$1
+          local src_path=$1
           local title=$2
-          local filename=$(basename "$src")
-          local dest="docs/$filename"
+          local filename=$(basename "$src_path")
+          local final_dest="docs/$filename"
           
-          if [ ! -f "$src" ]; then
-            if [ -f "docs/$filename" ]; then
-              src="docs/$filename"
-              mv "$src" "${src}.tmp"
-              src="${src}.tmp"
-            else
-              echo "Warning: $filename not found anywhere. Skipping..."
-              return
-            fi
+          echo "Checking $src_path..."
+          
+          if [ -f "$src_path" ]; then
+            REAL_SRC="$src_path"
+          elif [ -f "docs/$filename" ]; then
+            REAL_SRC="docs/$filename"
+          else
+            echo "Warning: $filename not found. Skipping."
+            return
           fi
 
-          echo "Processing $filename..."
-          echo "---" > "$dest"
-          echo "layout: default" >> "$dest"
-          echo "title: $title" >> "$dest"
+          TMP_FILE="temp_processing/$filename"
+          echo "---" > "$TMP_FILE"
+          echo "layout: default" >> "$TMP_FILE"
+          echo "title: $title" >> "$TMP_FILE"
           
           if [[ "$filename" == "ARCHITECTURE.md" ]]; then
-            echo "mermaid: true" >> "$dest"
+            echo "mermaid: true" >> "$TMP_FILE"
           fi
           
-          echo "---" >> "$dest"
-          echo "" >> "$dest"
-          cat "$src" >> "$dest"
+          echo "---" >> "$TMP_FILE"
+          echo "" >> "$TMP_FILE"
+          cat "$REAL_SRC" >> "$TMP_FILE"
           
-          [ -f "${dest}.tmp" ] && rm "${dest}.tmp"
+          mv "$TMP_FILE" "$final_dest"
+          echo "Successfully prepared $final_dest"
         }
 
         prepare_file "README.md" "Home"
