@@ -16,10 +16,10 @@ An educational implementation of **algorithms** to solve the Traveling Salesman 
 ## Links
 
 - [GitHub Repository](https://github.com/nelsonramosua/TSP)
-- [Readme](README.md)
-- [Architecture](ARCHITECTURE.md)
-- [Changelog](CHANGELOG.md)
-- [Contributing Guide](CONTRIBUTING.md)
+- [README]({{ "/README.html" | relative_url }})
+- [Architecture]({{ "/ARCHITECTURE.html" | relative_url }})
+- [Changelog]({{ "/CHANGELOG.html" | relative_url }})
+- [Contributing Guide]({{ "/CONTRIBUTING.html" | relative_url }})
 - [Report a Bug](https://github.com/nelsonramosua/TSP/issues/new?template=bug_report.yml)
 - [Propose an Algorithm](https://github.com/nelsonramosua/TSP/issues/new?template=new_algorithm.yml)
 
