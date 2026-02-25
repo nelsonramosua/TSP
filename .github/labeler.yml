@@ -1,47 +1,63 @@
-# Label configuration for auto-labeler
-# Maps labels to file path patterns.
+# Label configuration for auto-labeler (v5 compatible)
 
 exact-algorithm:
-  - implementations/exact/**
+  - changed-files:
+    - any-glob-to-any-file: implementations/exact/**
 
 heuristic:
-  - implementations/heuristics/**
+  - changed-files:
+    - any-glob-to-any-file: implementations/heuristics/**
 
 metaheuristic:
-  - implementations/metaheuristics/**
+  - changed-files:
+    - any-glob-to-any-file: implementations/metaheuristics/**
 
 graph-utils:
-  - implementations/graph/**
-  - headers/Graph.h
-  - headers/NamedGraph.h
-  - headers/HashMap.h
-  - headers/SortedList.h
+  - changed-files:
+    - any-glob-to-any-file:
+      - implementations/graph/**
+      - headers/Graph.h
+      - headers/NamedGraph.h
+      - headers/HashMap.h
+      - headers/SortedList.h
 
 lower-bounds:
-  - implementations/lowerBounds/**
-  - headers/LowerBounds.h
+  - changed-files:
+    - any-glob-to-any-file:
+      - implementations/lowerBounds/**
+      - headers/LowerBounds.h
 
 mst:
-  - implementations/mst/**
+  - changed-files:
+    - any-glob-to-any-file: implementations/mst/**
 
 test-driver:
-  - TSPTest.c
-  - headers/TSPTest.h
+  - changed-files:
+    - any-glob-to-any-file:
+      - TSPTest.c
+      - headers/TSPTest.h
 
 graph-factory:
-  - GraphFactory.c
-  - headers/GraphFactory.h
+  - changed-files:
+    - any-glob-to-any-file:
+      - GraphFactory.c
+      - headers/GraphFactory.h
 
 tour:
-  - Tour.c
+  - changed-files:
+    - any-glob-to-any-file: Tour.c
 
 build:
-  - Makefile
+  - changed-files:
+    - any-glob-to-any-file: Makefile
 
 documentation:
-  - README.md
-  - docs/**
-  - "*.md"
+  - changed-files:
+    - any-glob-to-any-file:
+      - README.md
+      - docs/**
+      - "*.md"
 
 ci-cd:
-  - .github/**
+  - changed-files:
+    - any-glob-to-any-file: .github/**

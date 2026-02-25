@@ -59,7 +59,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential zip
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          brew install gcc make coreutils zip
+          brew install gcc make coreutils zip || true
         fi
 
     - name: Build release binary
@@ -232,6 +232,7 @@ jobs:
       with:
         context: .
         push: true
+        file: DOCKERFILE  # <-- ADICIONA ISTO
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha

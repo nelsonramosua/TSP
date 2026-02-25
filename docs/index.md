@@ -13,6 +13,18 @@ An educational implementation of **algorithms** to solve the Traveling Salesman 
 
 ---
 
+## Links
+
+- [GitHub Repository](https://github.com/nelsonramosua/TSP)
+- [Architecture](README.md)
+- [Architecture](ARCHITECTURE.md)
+- [Changelog](CHANGELOG.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Report a Bug](https://github.com/nelsonramosua/TSP/issues/new?template=bug_report.yml)
+- [Propose an Algorithm](https://github.com/nelsonramosua/TSP/issues/new?template=new_algorithm.yml)
+
+---
+
 ## Implemented Algorithms
 
 | Algorithm | Type | Worst-case |
@@ -73,14 +85,3 @@ Actual optimal: **9057.46 km**
 ## System Overview
 
 ![System Overview](systemOverview.png)
-
----
-
-## Links
-
-- [GitHub Repository](https://github.com/nelsonramosua/TSP)
-- [Architecture](ARCHITECTURE.md)
-- [Changelog](../CHANGELOG.md)
-- [Contributing Guide](../.github/CONTRIBUTING.md)
-- [Report a Bug](https://github.com/nelsonramosua/TSP/issues/new?template=bug_report.yml)
-- [Propose an Algorithm](https://github.com/nelsonramosua/TSP/issues/new?template=new_algorithm.yml)

@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <float.h> 
+#include <float.h>
 #include <limits.h>
 #include <string.h>
 #include <assert.h>
@@ -49,7 +49,7 @@ static void destroyTable(HeldKarpTable* table);
 
 Tour* HeldKarp_FindTour(const Graph* g) {
     unsigned int numVertices = GraphGetNumVertices(g);
-    if (numVertices < 2) return NULL; 
+    if (numVertices < 2) return NULL;
 
     if (numVertices >= (unsigned int)(sizeof(unsigned int) * 8)) return NULL;  // masks are 32-bit. It would cause memory corruption or buffer overruns
                                                           // ok, because we only test this up to 21 vertices...
@@ -62,19 +62,19 @@ Tour* HeldKarp_FindTour(const Graph* g) {
     unsigned int allVertsMask = (1U << numVertices) - 1;
 
     // mask for starting vert {0}
-    unsigned int maskZero = 1U << 0; 
+    unsigned int maskZero = 1U << 0;
 
     // base case (start at vert 0)
-    hkt->dp[maskZero][0] = 0.0; 
+    hkt->dp[maskZero][0] = 0.0;
 
     // DP calc.
     for (unsigned int m = 2; m <= numVertices; m++) {
         // iterate over subsetMask
         for (unsigned int subsetMask = 1; subsetMask < (1U << numVertices); subsetMask++) {
             // discard subsets without start vert (0) or without exact cur size 'm'
-            if (!(subsetMask & maskZero)) continue; 
-            // if (popCount(subsetMask) != m) continue; 
-            if (__builtin_popcount(subsetMask) != m) continue;
+            if (!(subsetMask & maskZero)) continue;
+            // if (popCount(subsetMask) != m) continue;
+            if ((unsigned int)__builtin_popcount(subsetMask) != m) continue;
 
             // calc min cost to reach v_j (j in subset & j != 0)
             for (unsigned int j = 1; j < numVertices; j++) {
@@ -87,7 +87,7 @@ Tour* HeldKarp_FindTour(const Graph* g) {
                 unsigned int bits = subsetMinusJ;
                 while (bits) {
                     // index of least-significant set bit
-                    // unsigned int k = ctz(bits); 
+                    // unsigned int k = ctz(bits);
                     unsigned int k = __builtin_ctz(bits);
 
                     bits &= (bits - 1);  // clear LSB (set)
@@ -140,16 +140,16 @@ Tour* HeldKarp_FindTour(const Graph* g) {
 
     // reconstruct path backwards w/ parent pointers
     unsigned int* pathIndices = bestTour->path; // path[0] to path[numVertices]
-    
+
     unsigned int currentVert = finalEndVert;
     unsigned int currentMask = allVertsMask;
-    
+
     // fill path arr backwards, from 2nd-to-last vert (path[numVertices-1]) down to path[1].
     for (unsigned int i = numVertices - 1; i > 0; i--) {
-        if (currentVert == UINT_MAX) { TourDestroy(&bestTour); destroyTable(hkt); return NULL; } 
+        if (currentVert == UINT_MAX) { TourDestroy(&bestTour); destroyTable(hkt); return NULL; }
 
         pathIndices[i] = currentVert;
-        
+
         unsigned int prevVert = hkt->parent[currentMask][currentVert];
         currentMask &= ~(1U << currentVert); // remove currentVert from mask
         currentVert = prevVert;
@@ -175,7 +175,7 @@ static HeldKarpTable* initializeTable(const Graph* g) {
     table->dp = (double**) calloc(numStates, sizeof(double*));
     table->parent = (unsigned int**) calloc(numStates, sizeof(unsigned int*));
     table->dists = (double**) calloc(numVertices, sizeof(double*));
-    
+
     if (!table->dp || !table->parent || !table->dists) {
         if (table->dp) free(table->dp);
         if (table->parent) free(table->parent);
@@ -198,15 +198,15 @@ static HeldKarpTable* initializeTable(const Graph* g) {
         table->dp[subsetMask] = (double*) malloc(numVertices * sizeof(double));
         table->parent[subsetMask] = (unsigned int*) malloc(numVertices * sizeof(unsigned int));
 
-        if (!table->dp[subsetMask] || !table->parent[subsetMask]) { destroyTable(table); return NULL; } 
-    
+        if (!table->dp[subsetMask] || !table->parent[subsetMask]) { destroyTable(table); return NULL; }
+
         // init path costs to DBL_MAX (unreached states)
         for (unsigned int j = 0; j < numVertices; j++) {
             table->dp[subsetMask][j] = DBL_MAX;
             table->parent[subsetMask][j] = UINT_MAX;
         }
     }
-    
+
     return table;
 }
 
