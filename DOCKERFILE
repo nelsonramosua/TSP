@@ -24,8 +24,7 @@ LABEL org.opencontainers.image.source="https://github.com/nelsonramosua/miniAI"
 
 # Install minimal runtime dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    libgomp1 && \
+    apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Create app directory
@@ -34,8 +33,8 @@ WORKDIR /app
 # Copy binary and required files from builder
 COPY --from=builder /src/TSP_COMPARISON .
 COPY --from=builder /src/graphs ./graphs
-COPY --from=builder /build/README.md .
-COPY --from=builder /build/LICENSE .
+COPY --from=builder /src/README.md .
+COPY --from=builder /src/LICENSE .
 
 # Set permissions
 RUN chmod +x TSP_COMPARISON
@@ -46,5 +45,5 @@ RUN useradd -m tspuser && \
 USER tspuser
 
 # Default: run all graphs. Override with: docker run tsp N=3
-ENTRYPOINT ["./miniAI"]
+ENTRYPOINT ["./TSP_COMPARISON"]
 CMD ["help"]

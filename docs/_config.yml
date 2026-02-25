@@ -26,3 +26,11 @@ nav:
     url: /CHANGELOG/
   - title: Contributing
     url: /CONTRIBUTING/
+
+include:
+  - README.md
+  - CONTRIBUTING.md
+  - ARCHITECTURE.md
+  - CHANGELOG.md
+
+markdown: kramdown

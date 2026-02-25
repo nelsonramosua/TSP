@@ -16,7 +16,7 @@ An educational implementation of **algorithms** to solve the Traveling Salesman 
 ## Links
 
 - [GitHub Repository](https://github.com/nelsonramosua/TSP)
-- [Architecture](README.md)
+- [Readme](README.md)
 - [Architecture](ARCHITECTURE.md)
 - [Changelog](CHANGELOG.md)
 - [Contributing Guide](CONTRIBUTING.md)
