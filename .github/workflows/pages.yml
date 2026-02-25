@@ -52,7 +52,7 @@ jobs:
 
         prepare_file "README.md" "Home"
         prepare_file "CHANGELOG.md" "Changelog"
-        prepare_file "ARCHITECTURE.md" "Architecture"
+        prepare_file "docs/ARCHITECTURE.md" "Architecture"
         prepare_file ".github/CONTRIBUTING.md" "Contributing"
 
     - name: Build Jekyll site
