@@ -37,6 +37,7 @@ jobs:
       run: |
         mkdir -p temp_processing
         mkdir -p docs
+        cp docs/*.png docs/ || true
         
         prepare_file() {
           local src_path=$1
@@ -44,8 +45,7 @@ jobs:
           local filename=$(basename "$src_path")
           local final_dest="docs/$filename"
           
-          echo "Checking $src_path..."
-          
+          # 1. Locate real source
           if [ -f "$src_path" ]; then
             REAL_SRC="$src_path"
           elif [ -f "docs/$filename" ]; then
@@ -55,20 +55,20 @@ jobs:
             return
           fi
 
-          TMP_FILE="temp_processing/$filename"
-          echo "---" > "$TMP_FILE"
-          echo "layout: default" >> "$TMP_FILE"
-          echo "title: $title" >> "$TMP_FILE"
+          # 2. Start writing to temp file
+          echo "---" > "temp_processing/$filename"
+          echo "layout: default" >> "temp_processing/$filename"
+          echo "title: $title" >> "temp_processing/$filename"
+          [[ "$filename" == "ARCHITECTURE.md" ] ] && echo "mermaid: true" >> "temp_processing/$filename"
+          echo "---" >> "temp_processing/$filename"
+          echo "" >> "temp_processing/$filename"
           
-          if [[ "$filename" == "ARCHITECTURE.md" ]]; then
-            echo "mermaid: true" >> "$TMP_FILE"
-          fi
+          # 3. Use SED to fix image paths (removes 'docs/' from image links)
+          # This looks for ![alt](docs/image.png) and changes it to ![alt](image.png)
+          sed 's|\](docs/|\](|g' "$REAL_SRC" >> "temp_processing/$filename"
           
-          echo "---" >> "$TMP_FILE"
-          echo "" >> "$TMP_FILE"
-          cat "$REAL_SRC" >> "$TMP_FILE"
-          
-          mv "$TMP_FILE" "$final_dest"
+          # 4. Move to final destination
+          mv "temp_processing/$filename" "$final_dest"
           echo "Successfully prepared $final_dest"
         }
 
