@@ -1,0 +1,68 @@
+name: New Graph / Dataset Request
+description: Request a new predefined graph or TSPLIB instance to be added to GraphFactory.
+title: "[Graph]: "
+labels: ["graph", "enhancement"]
+assignees: ["nelsonramosua"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Want a new graph added to the comparison driver? Fill in the details below.
+        Graphs are added via `GraphFactory.c` and registered in `TSPTest.c`.
+
+  - type: input
+    id: name
+    attributes:
+      label: Graph Name
+      placeholder: "e.g. CreateBerlin52Graph, CreatePortugal20CitiesGraph"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Graph Type
+      options:
+        - TSPLIB instance
+        - Real-world cities (named vertices)
+        - Synthetic / random Euclidean
+        - Custom matrix
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: n
+    attributes:
+      label: Number of Vertices (N)
+      placeholder: "e.g. 52"
+    validations:
+      required: true
+
+  - type: input
+    id: optimal
+    attributes:
+      label: Known Optimal Tour Cost (if available)
+      placeholder: "e.g. 7542.0 (Berlin52 TSPLIB optimal)"
+    validations:
+      required: false
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Data Source / Reference
+      description: Where does the graph data come from?
+      placeholder: |
+        e.g. TSPLIB: https://github.com/rhgrant10/tsplib95/tree/master/archives/problems
+        or: Based on real distances between Portuguese cities (Google Maps).
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any other context — e.g. why this graph is interesting, special properties.
+    validations:
+      required: false

@@ -1,0 +1,64 @@
+title: "Results: [graph name, e.g. Europe 12 Cities]"
+labels: ["results"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share your benchmark results for a specific graph — costs, error percentages, and any observations.
+        This builds a community picture of how each algorithm performs across different inputs and hardware.
+
+  - type: input
+    id: graph
+    attributes:
+      label: Graph Name
+      description: Which graph did you run?
+      placeholder: "e.g. CreateEurope12CitiesGraph (N=12), or my custom graph with N=30"
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      description: OS, CPU, and GCC version.
+      placeholder: "e.g. Ubuntu 24.04, Intel i7-12700K, GCC 13.2"
+    validations:
+      required: true
+
+  - type: input
+    id: optimal
+    attributes:
+      label: Known Optimal Tour Cost
+      placeholder: "e.g. 9057.46 km, or 'unknown'"
+    validations:
+      required: false
+
+  - type: textarea
+    id: results
+    attributes:
+      label: Results Table
+      description: Fill in tour costs (and optionally error % vs optimal) for each algorithm you ran.
+      value: |
+        | Algorithm                   | Tour Cost | Error % |
+        |-----------------------------|-----------|---------|
+        | Exhaustive Search           |           |         |
+        | Exhaustive Search w/Pruning |           |         |
+        | Held-Karp                   |           |         |
+        | Nearest Neighbour           |           |         |
+        | Greedy                      |           |         |
+        | Nearest Insertion           |           |         |
+        | Christofides                |           |         |
+        | 2-Opt on NN                 |           |         |
+        | Simulated Annealing         |           |         |
+        | Ant Colony                  |           |         |
+        | Genetic Algorithm           |           |         |
+    validations:
+      required: true
+
+  - type: textarea
+    id: observations
+    attributes:
+      label: Observations
+      description: Anything interesting — surprising results, slow algorithms, parameter sensitivity, etc.
+    validations:
+      required: false

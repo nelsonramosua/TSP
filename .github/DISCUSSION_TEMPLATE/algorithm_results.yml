@@ -1,0 +1,66 @@
+title: "Algorithm Comparison Results: [graph name]"
+labels: ["results"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share your benchmark results — algorithm costs and runtimes — for a specific graph.
+        This helps build a community picture of how the algorithms behave across different inputs.
+        
+  - type: input
+    id: graph
+    attributes:
+      label: "Graph"
+      description: "Name of the graph and number of nodes (N)."
+      placeholder: "e.g., ali535 (N=535)"
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: "Platform"
+      description: "OS, CPU, GCC/Compiler version used for testing."
+      placeholder: "e.g., Ubuntu 22.04, i7-12700K, GCC 11.4"
+    validations:
+      required: true
+
+  - type: textarea
+    id: results
+    attributes:
+      label: "Results"
+      description: "Fill in the benchmark results for the algorithms you tested. Leave blank the ones you didn't run."
+      value: |
+        | Algorithm | Tour Cost | Error % vs Optimal | Notes |
+        |---|---|---|---|
+        | Exhaustive Search | | | |
+        | Exhaustive Search w/ Pruning | | | |
+        | Held-Karp | | | |
+        | Nearest Neighbour | | | |
+        | Greedy | | | |
+        | Nearest Insertion | | | |
+        | Christofides | | | |
+        | 2-Opt on NN | | | |
+        | Simulated Annealing | | | |
+        | Ant Colony | | | |
+        | Genetic Algorithm | | | |
+    validations:
+      required: true
+
+  - type: input
+    id: optimal
+    attributes:
+      label: "Known optimal"
+      description: "If the exact optimal tour cost is known, provide it here."
+      placeholder: 'e.g., 9057.46, or "unknown"'
+    validations:
+      required: false
+
+  - type: textarea
+    id: observations
+    attributes:
+      label: "Additional observations"
+      description: "Anything interesting you noticed? (e.g., runtime anomalies, convergence speed, memory issues)."
+      placeholder: "I noticed that Simulated Annealing converged much faster on..."
+    validations:
+      required: false

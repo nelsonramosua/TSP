@@ -1,0 +1,115 @@
+# Labels for the TSP Solver repository.
+# Applied via the sync-labels workflow (.github/workflows/sync_labels.yml).
+# Edit here, then run the workflow manually to sync to GitHub.
+
+# ── Type ──────────────────────────────────────────────────────────────────────
+- name: bug
+  color: "d73a4a"
+  description: Something is wrong — crash, wrong tour, memory leak.
+
+- name: enhancement
+  color: "a2eeef"
+  description: Improvement to an existing feature.
+
+- name: question
+  color: "d876e3"
+  description: Request for clarification or explanation.
+
+# ── Content ───────────────────────────────────────────────────────────────────
+- name: new-algorithm
+  color: "0075ca"
+  description: Adds a new TSP algorithm.
+
+- name: graph
+  color: "e4e669"
+  description: Adds or changes a predefined graph or dataset.
+
+- name: exact-algorithm
+  color: "1d76db"
+  description: Relates to exact algorithms (ExhaustiveSearch, HeldKarp).
+
+- name: heuristic
+  color: "0e8a16"
+  description: Relates to constructive heuristics (Greedy, NN, NearestInsertion, Christofides).
+
+- name: metaheuristic
+  color: "006b75"
+  description: Relates to meta-heuristic algorithms (2-Opt, SA, ACO, GA).
+
+- name: lower-bounds
+  color: "bfd4f2"
+  description: Relates to lower bound utilities (MST, HeldKarp LR).
+
+- name: graph-utils
+  color: "e6f5d0"
+  description: Relates to Graph / NamedGraph / HashMap / SortedList ADTs.
+
+- name: tour-adt
+  color: "c5def5"
+  description: Relates to the Tour ADT (Tour.c).
+
+- name: graph-factory
+  color: "fef2c0"
+  description: Relates to GraphFactory.c or predefined graphs.
+
+- name: test-driver
+  color: "f9d0c4"
+  description: Relates to TSPTest.c or the comparison runner.
+
+- name: results
+  color: "e99695"
+  description: Benchmark results or performance comparison.
+
+- name: idea
+  color: "cccccc"
+  description: Informal suggestion, not yet ready for a formal issue.
+
+# ── Process ───────────────────────────────────────────────────────────────────
+- name: stale
+  color: "f9f9f9"
+  description: Inactive for over 60 days.
+
+- name: blocked
+  color: "ee0701"
+  description: Cannot proceed — waiting on something external.
+
+- name: pinned
+  color: "0052cc"
+  description: Important — exempt from stale bot.
+
+- name: good first issue
+  color: "7057ff"
+  description: Suitable for first-time contributors.
+
+- name: help wanted
+  color: "008672"
+  description: Maintainer is looking for help with this.
+
+- name: wontfix
+  color: "ffffff"
+  description: This will not be fixed or implemented.
+
+- name: duplicate
+  color: "cfd3d7"
+  description: This issue or PR already exists.
+
+- name: invalid
+  color: "e4e669"
+  description: This does not seem right or is out of scope.
+
+# ── Infrastructure ────────────────────────────────────────────────────────────
+- name: ci-cd
+  color: "5319e7"
+  description: Relates to GitHub Actions workflows or CI/CD.
+
+- name: documentation
+  color: "0075ca"
+  description: Improves or adds documentation, README, or CHANGELOG.
+
+- name: build
+  color: "f9d0c4"
+  description: Relates to the Makefile or build system.
+
+- name: security
+  color: "ee0701"
+  description: Security or memory-safety issue.

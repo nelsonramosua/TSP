@@ -1,5 +1,17 @@
+# Build artefacts
+builds/
 *.o
 TSP_COMPARISON
+
+# Generated graph outputs
 graphs/*.png
+
+# Editor and OS files
+# You can add yours here
 .vscode/
+
+# Valgrind outputs
+vgcore.*
+
+# Generated DOT files (optional — comment out if you want to track them)
 *.dot

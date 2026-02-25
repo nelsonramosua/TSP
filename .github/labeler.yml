@@ -1,0 +1,47 @@
+# Label configuration for auto-labeler
+# Maps labels to file path patterns.
+
+exact-algorithm:
+  - implementations/exact/**
+
+heuristic:
+  - implementations/heuristics/**
+
+metaheuristic:
+  - implementations/metaheuristics/**
+
+graph-utils:
+  - implementations/graph/**
+  - headers/Graph.h
+  - headers/NamedGraph.h
+  - headers/HashMap.h
+  - headers/SortedList.h
+
+lower-bounds:
+  - implementations/lowerBounds/**
+  - headers/LowerBounds.h
+
+mst:
+  - implementations/mst/**
+
+test-driver:
+  - TSPTest.c
+  - headers/TSPTest.h
+
+graph-factory:
+  - GraphFactory.c
+  - headers/GraphFactory.h
+
+tour:
+  - Tour.c
+
+build:
+  - Makefile
+
+documentation:
+  - README.md
+  - docs/**
+  - "*.md"
+
+ci-cd:
+  - .github/**

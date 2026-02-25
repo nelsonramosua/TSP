@@ -1,0 +1,85 @@
+name: New Algorithm Proposal
+description: Propose a new TSP algorithm to be implemented in this project.
+title: "[Algorithm]: "
+labels: ["new-algorithm", "enhancement"]
+assignees: ["nelsonramosua"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for a new algorithm to add to the solver? Great — the more the merrier.
+        Please provide as much detail as you can so the proposal can be properly evaluated.
+
+  - type: input
+    id: name
+    attributes:
+      label: Algorithm Name
+      placeholder: "e.g. Lin-Kernighan, Or-Opt, ISPO, Tabu Search, Branch & Bound..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Algorithm Type
+      options:
+        - Exact
+        - Heuristic (constructive)
+        - Heuristic (improvement / local search)
+        - Meta-heuristic
+        - Lower Bound / Utility
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Brief explanation of how the algorithm works and why it is interesting for TSP.
+      placeholder: |
+        e.g. Lin-Kernighan is an iterative local search that performs k-opt exchanges in a guided way.
+        It typically finds near-optimal solutions much faster than pure 2-opt or 3-opt.
+    validations:
+      required: true
+
+  - type: input
+    id: complexity
+    attributes:
+      label: Time Complexity (worst case)
+      placeholder: "e.g. O(N^3) per iteration, O(N^2 * iterations) overall"
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Links to papers, blog posts, or implementations that describe the algorithm.
+      placeholder: |
+        - Paper: https://...
+        - Wikipedia: https://...
+        - Reference implementation (C/C++): https://...
+        - Youtube Video: https://...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: willing_to_implement
+    attributes:
+      label: Are you willing to implement it?
+      options:
+        - "Yes — I'll open a PR"
+        - "Maybe — I'd need some guidance"
+        - "No — just suggesting"
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any other context — e.g. known caveats, dependencies, graph size constraints.
+    validations:
+      required: false

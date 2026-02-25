@@ -1,7 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g -Iheaders -O3 -march=native
-CFLAGS_VALGRIND = -Wall -Wextra -g -Iheaders -O3 # if you're using native linux OS, you can run valgrind with binary compiled with -march=native (add it back!)
-                                                 # if, however, you're using WSL, you have to run without march-native flag (it will be slower).
+CFLAGS_VALGRIND = -Wall -Wextra -g -Iheaders -O3
+# Note: add -march=native back to CFLAGS_VALGRIND if on native Linux (not WSL).
+
 LDFLAGS = -lm
 
 SRC_DIR = implementations
@@ -42,6 +43,8 @@ C_OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(C_SRCS))
 
 TSP_COMPARISON = TSP_COMPARISON
 
+# Build targets
+
 all: $(TSP_COMPARISON)
 
 $(TSP_COMPARISON): $(C_OBJS)
@@ -54,18 +57,48 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-.PHONY: run
+rebuild: clean all
+
+# Run targets
+
 run: $(TSP_COMPARISON)
 	./$(TSP_COMPARISON) $(N)
 
-.PHONY: runvc
 runvc: 
 	$(MAKE) clean
-	$(MAKE) CFLAGS="$(CFLAGS_VALGRIND)" $(TSP_COMPARISON)
-	$(eval TSP_COMPARISON := $(TSP_COMPARISON) $(N))
-	valgrind --leak-check=full --show-leak-kinds=all -s ./$(TSP_COMPARISON)
+	$(MAKE) CFLAGS="$(CFLAGS_VALGRIND)" $(TARGET)
+	valgrind --leak-check=full --show-leak-kinds=all -s ./$(TARGET) $(N)
 	$(MAKE) clean
 
-.PHONY: clean
+# Utility targets
+
 clean:
 	rm -rf $(BUILD_DIR) $(TSP_COMPARISON)
+
+loc:
+	@echo "Lines of code (C/H source files):"
+	@find . \( -name '*.c' -o -name '*.h' \) | grep -v builds | xargs wc -l | sort -rn | head -20
+
+help:
+	@echo ""
+	@echo "========================================"
+	@echo "  TSP Solver — Makefile Targets"
+	@echo "========================================"
+	@echo ""
+	@echo "Build targets:"
+	@echo "  make              - Build TSP_COMPARISON binary"
+	@echo "  make rebuild      - Clean then build"
+	@echo "  make clean        - Remove build directory and binary"
+	@echo ""
+	@echo "Run targets:"
+	@echo "  make run          - Build and run all graphs"
+	@echo "  make run N=3      - Build and run first 3 graphs"
+	@echo "  make runvc        - Build (no -march=native), run with Valgrind, clean"
+	@echo "  make runvc N=1    - Valgrind on 1 graph (fast, recommended)"
+	@echo ""
+	@echo "Info targets:"
+	@echo "  make loc          - Line count per source file"
+	@echo "  make help         - Show this message"
+	@echo ""
+
+.PHONY: all run runvc clean rebuild loc help

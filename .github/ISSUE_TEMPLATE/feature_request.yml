@@ -1,0 +1,56 @@
+name: Feature Request
+description: Suggest an improvement that is not a new algorithm or graph.
+title: "[Feature]: "
+labels: ["enhancement"]
+assignees: ["nelsonramosua"]
+
+body:
+  - type: markdownc
+    attributes:
+      value: |
+        Got an idea that isn't a new algorithm or graph? Use this template.
+        Examples: output format improvements, CLI arguments, visualisation tools, performance optimisations, refactors.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Output / Display
+        - Build system (Makefile)
+        - Memory management
+        - Graph ADT / Tour ADT
+        - Test driver (TSPTest.c)
+        - DOT/graph export
+        - Documentation
+        - CI/CD
+        - Performance (existing algorithm)
+        - Code quality / refactor
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the current limitation or pain point.
+      placeholder: "e.g. It is hard to compare two specific algorithms without running all of them..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution
+      description: What should the new behaviour look like?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any other approaches you considered?
+    validations:
+      required: false

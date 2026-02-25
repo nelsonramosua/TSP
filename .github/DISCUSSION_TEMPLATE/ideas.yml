@@ -1,0 +1,60 @@
+title: "Idea: "
+labels: ["idea"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share an idea for extending or improving the project — before it is ready to become a formal issue or PR.
+        Examples: new algorithms, new graphs, performance improvements, visualisation tools, refactors.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type of Idea
+      options:
+        - New algorithm
+        - New graph / dataset
+        - Performance improvement (existing algorithm)
+        - Better output / visualisation
+        - Refactor / code quality
+        - Documentation
+        - Build / CI
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: The Idea
+      description: What is it? Describe it concisely.
+      placeholder: "e.g. Implement Lin-Kernighan heuristic as a drop-in replacement for 2-Opt..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Why Would It Be Useful?
+      description: What problem does it solve, or what does it demonstrate?
+    validations:
+      required: false
+
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Rough Implementation Sketch (optional)
+      description: How might this be done? New file, changes to existing ADTs, etc.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: willing
+    attributes:
+      label: Would You Like to Implement It?
+      options:
+        - "Yes — I'd like to open a PR"
+        - "Maybe — I'd need some guidance"
+        - "No — just sharing the idea"
+    validations:
+      required: true

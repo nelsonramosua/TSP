@@ -1,0 +1,263 @@
+name: Release
+
+permissions:
+  contents: write
+  packages: write
+  security-events: write
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v0.1.0'
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  # 1. Build, test, create GitHub release + archive
+  build-release:
+    name: Build Release (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            cc: gcc
+            artifact: tsp-linux-x64
+          - os: macos-latest
+            platform: macos
+            cc: gcc
+            artifact: tsp-macos-x64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Install dependencies
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update
+          sudo apt-get install -y build-essential zip
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          brew install gcc make coreutils zip
+        fi
+
+    - name: Build release binary
+      run: make CFLAGS="-Wall -Wextra -O3 -Iheaders"
+
+    - name: Smoke test
+      run: ./TSP_COMPARISON 1  
+
+    - name: Create release package
+      run: |
+        mkdir -p release/tsp
+        cp TSP_COMPARISON release/tsp/
+        cp README.md LICENSE release/tsp/
+        cp -r graphs release/tsp/graphs
+        
+        cd release
+        zip -r ${{ matrix.artifact }}.zip tsp/
+        cd ..
+        mv release/${{ matrix.artifact }}.zip .
+    
+    - name: Generate checksums
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sha256sum ${{ matrix.artifact }}.zip > ${{ matrix.artifact }}.zip.sha256
+        else
+          shasum -a 256 ${{ matrix.artifact }}.zip > ${{ matrix.artifact }}.zip.sha256
+        fi
+    
+    - name: Upload release artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact }}
+        path: |
+          ${{ matrix.artifact }}.zip
+          ${{ matrix.artifact }}.zip.sha256
+        retention-days: 90
+
+  # Create GitHub Release
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Get version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+    
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        # Title with version
+        echo "# TSP ${{ steps.version.outputs.version }}" > release_notes.md
+        echo "" >> release_notes.md
+
+        # Static body from template file (ensure this file exists in your repo)
+        if [ -f .github/workflows/docs/release-notes-template.md ]; then
+          cat .github/workflows/docs/release-notes-template.md >> release_notes.md
+        fi
+
+        # Dynamic changelog appended at the end
+        if git describe --tags --abbrev=0 HEAD^ 2>/dev/null; then
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
+          echo "### Changes since ${PREV_TAG}" >> release_notes.md
+          echo '```text' >> release_notes.md
+          git log --oneline ${PREV_TAG}..HEAD >> release_notes.md
+          echo '```' >> release_notes.md
+        fi
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        name: TSP Solver ${{ steps.version.outputs.version }}
+        body_path: release_notes.md
+        draft: false
+        prerelease: false
+        files: |
+          tsp-linux-x64/tsp-linux-x64.zip
+          tsp-linux-x64/tsp-linux-x64.zip.sha256
+          tsp-macos-x64/tsp-macos-x64.zip
+          tsp-macos-x64/tsp-macos-x64.zip.sha256
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Release built
+      run: |
+        echo "# Release Created!" >> $GITHUB_STEP_SUMMARY
+
+  # 2. Docker image — Docker Hub + GHCR
+  docker-release:
+    name: Docker Release
+    runs-on: ubuntu-latest
+    needs: build-release
+
+    permissions:
+      contents: read
+      packages: write   # required for GHCR
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Extract version metadata
+      id: extract_version
+      run: |
+        TAG=${GITHUB_REF_NAME}              # e.g. v1.2.3
+        VERSION=${TAG#v}                    # e.g. 1.2.3
+        MAJOR=$(echo $VERSION | cut -d. -f1)
+        MINOR=$(echo $VERSION | cut -d. -f1-2)
+        echo "version=$VERSION"   >> $GITHUB_OUTPUT
+        echo "tag=$TAG"           >> $GITHUB_OUTPUT
+        echo "major=$MAJOR"       >> $GITHUB_OUTPUT
+        echo "minor=$MINOR"       >> $GITHUB_OUTPUT
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    # ── Docker Hub ──────────────────────────────
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # ── GitHub Container Registry ───────────────
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    # Generate image metadata (tags + labels)
+    - name: Extract Docker metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/tsp
+          ghcr.io/${{ github.repository }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=raw,value=latest
+        labels: |
+          org.opencontainers.image.title=TSP Solver
+          org.opencontainers.image.description=Traveling Salesman Problem solver in pure C — 11 algorithms
+          org.opencontainers.image.url=https://github.com/nelsonramosua/TSP
+          org.opencontainers.image.source=https://github.com/nelsonramosua/TSP
+          org.opencontainers.image.version=${{ steps.extract_version.outputs.version }}
+          org.opencontainers.image.licenses=MIT
+
+    # Build and push to both registries in one step
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Docker publish summary
+      run: |
+        VERSION="${{ steps.extract_version.outputs.version }}"
+        DOCKERHUB_USER="${{ secrets.DOCKERHUB_USERNAME }}"
+        
+        echo "# Docker Image Published!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Published to Docker Hub" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+        echo "docker pull ${DOCKERHUB_USER}/tsp:${VERSION}" >> $GITHUB_STEP_SUMMARY
+        echo "docker pull ${DOCKERHUB_USER}/tsp:latest" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Published to GitHub Container Registry" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+        echo "docker pull ghcr.io/${{ github.repository }}:${VERSION}" >> $GITHUB_STEP_SUMMARY
+        echo "docker pull ghcr.io/${{ github.repository }}:latest" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Run TSP with Docker" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+        echo "docker run --rm ${DOCKERHUB_USER}/tsp help" >> $GITHUB_STEP_SUMMARY
+        echo "docker run --rm ${DOCKERHUB_USER}/tsp 1" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

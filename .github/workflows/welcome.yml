@@ -1,0 +1,42 @@
+name: Welcome First-Time Contributors
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  welcome:
+    name: Welcome Message
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+        issue-message: |
+          Welcome, and thanks for opening your first issue on the TSP Solver!
+
+          To help resolve it faster, please make sure your report includes:
+          - The graph you were running (or the value of `N` passed to `./TSP_COMPARISON`)
+          - The compiler version (`gcc --version`)
+          - The operating system
+          - Any relevant output or error messages
+
+          If you're reporting a memory issue, please run `make runvc N=1` and include the Valgrind output.
+
+        pr-message: |
+          Welcome, and thanks for your first pull request to the TSP Solver!
+
+          A few things to check before review:
+          - **Builds cleanly**: `make CFLAGS="-Wall -Wextra -Werror -O3 -Iheaders"` passes with no errors.
+          - **Valgrind**: `make runvc N=1` shows no leaks.
+          - **New algorithm**: if you added one, it appears in the README algorithm table and is registered in `TSPTest.c`.
+          - **No new TODOs**: resolve any `TODO`/`FIXME` you introduced.
+
+          The automated CI will run all checks. Thanks for contributing!

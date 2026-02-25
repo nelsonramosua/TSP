@@ -1,0 +1,12 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: TSP Wikipedia Overview
+    url: https://en.wikipedia.org/wiki/Travelling_salesman_problem
+    about: General background on the Travelling Salesman Problem.
+  - name: TSPLIB Benchmark Instances
+    url: https://github.com/rhgrant10/tsplib95/tree/master/archives/problems
+    about: Standard benchmark instances used in this project (Eil51, Oliver30, Swiss42, Bays29, A280).
+  - name: Project Architecture
+    url: https://github.com/nelsonramosua/TSP/blob/main/docs/ARCHITECTURE.md
+    about: Module structure and data flow documentation.

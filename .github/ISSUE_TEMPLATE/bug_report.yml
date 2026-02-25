@@ -1,0 +1,123 @@
+name: Bug Report
+description: Something is crashing, producing a wrong tour, or leaking memory.
+title: "[Bug]: "
+labels: ["bug"]
+assignees: ["nelsonramosua"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please fill in as much detail as you can — the more context you provide, the faster it gets fixed.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Bug Category
+      description: Which part of the project is affected?
+      options:
+        - Wrong / suboptimal tour produced
+        - Crash / segmentation fault
+        - Memory leak (Valgrind)
+        - Build / compilation error
+        - DOT graph output incorrect
+        - Incorrect lower bound value
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: algorithm
+    attributes:
+      label: Affected Algorithm(s)
+      description: Which algorithm(s) trigger the bug? Select all that apply.
+      multiple: true
+      options:
+        - Exhaustive Search
+        - Exhaustive Search with Pruning
+        - Held-Karp (exact)
+        - Nearest Neighbour
+        - Greedy
+        - Nearest Insertion
+        - Christofides
+        - 2-Opt
+        - Simulated Annealing
+        - Ant Colony Optimization
+        - Genetic Algorithm
+        - Lower Bound MST
+        - Lower Bound Held-Karp
+        - Graph / Tour ADT
+        - GraphFactory
+        - Not sure / All of them
+    validations:
+      required: true
+
+  - type: textarea
+    id: graph
+    attributes:
+      label: Graph Details
+      description: Which graph triggers the bug? Include N (number of vertices) and which predefined graph, if applicable.
+      placeholder: |
+        e.g. CreateEurope12CitiesGraph (N=12)
+        or: Custom graph with N=8, fully connected, integer weights.
+        or: ./TSP_COMPARISON 3 (fails on 3rd graph)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What goes wrong? What did you expect to happen?
+      placeholder: |
+        e.g. Christofides returns a tour of cost 12000, but Held-Karp gives 9057 for the same graph.
+        or: Segmentation fault on NearestInsertion when N > 20.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Exact commands to reproduce the issue.
+      placeholder: |
+        1. make
+        2. ./TSP_COMPARISON 5
+        3. See crash on graph 5 (CreateEil51Graph)
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Terminal Output / Error Message
+      description: Paste the relevant output, including any crash messages or Valgrind output.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: valgrind
+    attributes:
+      label: Valgrind Output (if memory issue)
+      description: If this is a memory/leak issue, run `make runvc N=1` and paste the output.
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: "e.g. Ubuntu 24.04, macOS Sequoia 15.2, WSL2 (Ubuntu 22.04)"
+    validations:
+      required: true
+
+  - type: input
+    id: compiler
+    attributes:
+      label: Compiler Version
+      placeholder: "gcc --version output"
+    validations:
+      required: true

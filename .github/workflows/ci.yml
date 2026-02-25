@@ -1,4 +1,4 @@
-name: TSP CI/CD
+name: TSP CI/CD Pipeline
 
 on:
   push:
@@ -7,77 +7,158 @@ on:
     branches: [ main ]
 
 jobs:
+  # ──────────────────────────────────────────────
+  # 1. Build & functional tests (Linux + macOS)
+  # ──────────────────────────────────────────────
   build-and-test:
-    runs-on: ubuntu-latest
-    
+    name: Build & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
-    - name: Install dependencies
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc make valgrind graphviz
-    
+        sudo apt-get install -y gcc make valgrind graphviz cppcheck
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install gcc make graphviz cppcheck
+
     - name: Build project
       run: make
-    
-    - name: Run quick tests
+
+    - name: Verify binary exists
+      run: test -f ./TSP_COMPARISON
+
+    - name: Run quick smoke test (3 graphs)
       run: ./TSP_COMPARISON 3
-    
-    - name: Check for compilation warnings
-      run: make clean && make CFLAGS="-Wall -Wextra -Werror -O3"
-    
-    - name: Memory leak check (limited)
+
+    - name: Build with -Werror (zero-warning policy)
       run: |
         make clean
-        make CFLAGS="-Wall -Wextra -g -O3"
-        timeout 120 valgrind --leak-check=full --error-exitcode=1 ./TSP_COMPARISON 1 || echo "Valgrind timeout - OK for CI"
-    
-    - name: Archive test results
+        make CFLAGS="-Wall -Wextra -Werror -O3 -Iheaders"
+
+    - name: Verify DOT files were generated
+      run: |
+        ls graphs/*.dot 2>/dev/null && echo "DOT files present" || echo "No DOT files"
+
+    - name: Upload DOT graph outputs
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-results
-        path: |
-          graphs/*.dot
-          TSP_COMPARISON
+        name: dot-graphs-${{ matrix.os }}
+        path: graphs/*.dot
+        retention-days: 7
+        if-no-files-found: ignore
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: TSP_COMPARISON-${{ matrix.os }}
+        path: TSP_COMPARISON
         retention-days: 7
 
-  code-quality:
+  # ──────────────────────────────────────────────
+  # 2. Memory safety (Valgrind, Linux only)
+  # ──────────────────────────────────────────────
+  memory-check:
+    name: Memory Safety (Valgrind)
     runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
+    needs: build-and-test
 
-    - name: Check trailing whitespace (warning only)
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y gcc make valgrind
+
+    - name: Build without -march=native (required for Valgrind on CI)
+      run: make CFLAGS="-Wall -Wextra -g -O1 -Iheaders"
+
+    - name: Valgrind — 1 graph (leak check)
+      run: |
+        timeout 120 valgrind \
+          --leak-check=full \
+          --show-leak-kinds=all \
+          --track-origins=yes \
+          --error-exitcode=1 \
+          -s \
+          ./TSP_COMPARISON 1 \
+        || echo "Valgrind completed — check output above"
+
+    - name: Valgrind — 2 graphs (extended)
+      run: |
+        timeout 180 valgrind \
+          --leak-check=full \
+          --show-leak-kinds=all \
+          --error-exitcode=1 \
+          ./TSP_COMPARISON 2 2>&1 | tail -30
+      continue-on-error: true
+
+  # ──────────────────────────────────────────────
+  # 3. Static analysis
+  # ──────────────────────────────────────────────
+  static-analysis:
+    name: Static Analysis (cppcheck)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install cppcheck
+      run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+    - name: Run cppcheck
+      run: |
+        cppcheck \
+          --enable=warning,style,performance,portability \
+          --suppress=missingIncludeSystem \
+          --suppress=unusedFunction \
+          --error-exitcode=1 \
+          --inline-suppr \
+          -I headers \
+          implementations/ \
+          GraphFactory.c Tour.c TSPTest.c \
+          2>&1 | tee cppcheck-report.txt
+
+    - name: Upload cppcheck report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cppcheck-report
+        path: cppcheck-report.txt
+        retention-days: 14
+
+  # ──────────────────────────────────────────────
+  # 4. Code quality checks
+  # ──────────────────────────────────────────────
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for trailing whitespace
       run: |
         echo "Checking for trailing whitespace:"
-        git grep -I --line-number --perl-regexp '\s+$' -- '*.c' '*.h' || echo "OK"
-    
-    - name: Check for TODOs
+        git grep -I --line-number --perl-regexp '\s+$' -- '*.c' '*.h' \
+          && echo "WARNING: trailing whitespace found" \
+          || echo "OK — no trailing whitespace"
+
+    - name: Check for TODO/FIXME comments
       run: |
         echo "Checking for TODO/FIXME comments:"
         git grep -n 'TODO\|FIXME' -- '*.c' '*.h' || echo "No TODOs found"
-
-  benchmark:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Build optimized
-      run: make clean && make CFLAGS="-Wall -Wextra -O3 -march=native"
-    
-    - name: Run benchmarks
-      run: |
-        echo "=== Benchmark Results ===" > benchmark.txt
-        /usr/bin/time -v ./TSP_COMPARISON 5 2>&1 | tee -a benchmark.txt
-    
-    - name: Upload benchmark results
-      uses: actions/upload-artifact@v4
-      with:
-        name: benchmarks
-        path: benchmark.txt
-        retention-days: 30

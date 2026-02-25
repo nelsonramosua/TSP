@@ -1,0 +1,121 @@
+name: Nightly Full Suite
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 02:00 UTC every night
+  workflow_dispatch:        # manual trigger
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Run all graphs + full Valgrind
+  # ──────────────────────────────────────────────
+  full-test-suite:
+    name: Full Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y gcc make valgrind graphviz
+
+    - name: Build optimized
+      run: make CFLAGS="-Wall -Wextra -O3 -march=native -Iheaders"
+
+    - name: Run all graphs
+      run: |
+        echo "=== Full Test Run ===" > full-results.txt
+        date >> full-results.txt
+        timeout 3600 ./TSP_COMPARISON 2>&1 | tee -a full-results.txt || echo "Timed out after 1h"
+
+    - name: Upload full results
+      uses: actions/upload-artifact@v4
+      with:
+        name: nightly-full-results
+        path: full-results.txt
+        retention-days: 30
+
+    - name: Upload all DOT graphs
+      uses: actions/upload-artifact@v4
+      with:
+        name: nightly-dot-graphs
+        path: graphs/*.dot
+        retention-days: 30
+        if-no-files-found: ignore
+
+  # ──────────────────────────────────────────────
+  # Full Valgrind on all safe graphs
+  # ──────────────────────────────────────────────
+  nightly-valgrind:
+    name: Nightly Valgrind (3 graphs)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y gcc make valgrind
+
+    - name: Build (no -march=native for Valgrind)
+      run: make CFLAGS="-Wall -Wextra -g -O1 -Iheaders"
+
+    - name: Valgrind — 3 graphs
+      run: |
+        timeout 300 valgrind \
+          --leak-check=full \
+          --show-leak-kinds=all \
+          --track-origins=yes \
+          --error-exitcode=1 \
+          -s \
+          ./TSP_COMPARISON 3 2>&1 | tee valgrind-nightly.txt \
+        || true
+
+    - name: Upload Valgrind report
+      uses: actions/upload-artifact@v4
+      with:
+        name: nightly-valgrind-report
+        path: valgrind-nightly.txt
+        retention-days: 30
+
+  # ──────────────────────────────────────────────
+  # Benchmark: time each graph individually
+  # ──────────────────────────────────────────────
+  benchmark:
+    name: Algorithm Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y gcc make time
+
+    - name: Build optimized
+      run: make CFLAGS="-Wall -Wextra -O3 -march=native -Iheaders"
+
+    - name: Benchmark — 1 graph
+      run: |
+        echo "=== Benchmark: 1 graph ===" > benchmark.txt
+        /usr/bin/time -v ./TSP_COMPARISON 1 2>&1 | tee -a benchmark.txt
+
+    - name: Benchmark — 3 graphs
+      run: |
+        echo "=== Benchmark: 3 graphs ===" >> benchmark.txt
+        /usr/bin/time -v ./TSP_COMPARISON 3 2>&1 | tee -a benchmark.txt
+      continue-on-error: true
+
+    - name: Benchmark — 5 graphs
+      run: |
+        echo "=== Benchmark: 5 graphs ===" >> benchmark.txt
+        timeout 300 /usr/bin/time -v ./TSP_COMPARISON 5 2>&1 | tee -a benchmark.txt
+      continue-on-error: true
+
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v4
+      with:
+        name: nightly-benchmark
+        path: benchmark.txt
+        retention-days: 30

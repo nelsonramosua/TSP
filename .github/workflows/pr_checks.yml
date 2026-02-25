@@ -1,0 +1,91 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main ]
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Quick build check — runs first, fast feedback
+  # ──────────────────────────────────────────────
+  build-check:
+    name: Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install GCC
+      run: sudo apt-get update && sudo apt-get install -y gcc make
+
+    - name: Build
+      run: make
+
+    - name: Smoke test (1 graph)
+      run: timeout 60 ./TSP_COMPARISON 1
+
+  # ──────────────────────────────────────────────
+  # Size check — warn if binary grew a lot
+  # ──────────────────────────────────────────────
+  size-check:
+    name: Binary Size Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build
+      run: make CFLAGS="-Wall -Wextra -O3 -Iheaders"
+
+    - name: Report binary size
+      run: |
+        SIZE=$(stat -c%s TSP_COMPARISON 2>/dev/null || stat -f%z TSP_COMPARISON)
+        echo "TSP_COMPARISON binary size: ${SIZE} bytes"
+        if [ "$SIZE" -gt 5242880 ]; then
+          echo "WARNING: Binary exceeds 5 MB"
+        fi
+
+  # ──────────────────────────────────────────────
+  # Welcome comment on first-time PR
+  # ──────────────────────────────────────────────
+  pr-comment:
+    name: PR Welcome Comment
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    permissions:
+      pull-requests: write
+
+    steps:
+    - name: Post automated review comment
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const body = `## Automated PR Review
+
+          Thanks for contributing to the TSP Solver!
+
+          **Automated checks running:**
+          - Build on Linux & macOS
+          - Zero-warning compilation (\`-Werror\`)
+          - Smoke test (3 graphs)
+          - Memory check (Valgrind, 1 graph)
+          - Static analysis (cppcheck)
+          - CodeQL security scan
+
+          **Before merging, please confirm:**
+          - [ ] New algorithm (if any) is listed in the algorithm table in README.md.
+          - [ ] Tested with Valgrind locally (pex: \`make runvc N=1\`).
+          - [ ] No new TODO/FIXME left in code.
+          - [ ] If adding a new graph, it is registered in \`GraphFactory.c\` and \`TSPTest.c\` (see \`GraphFactory.c\` for detail).
+
+          _This comment is posted automatically. It will not be repeated on subsequent pushes._`;
+
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body
+          });

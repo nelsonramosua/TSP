@@ -1,0 +1,28 @@
+title: "TSP Solver"
+description: "Traveling Salesman Problem — Algorithms Comparison"
+url: "https://nelsonramosua.github.io"
+baseurl: "/TSP"
+
+author:
+  name: Nelson Ramos
+  url: https://github.com/nelsonramosua
+
+theme: jekyll-theme-cayman
+
+show_downloads: false
+
+plugins:
+  - jekyll-seo-tag
+
+# Navigation order (maps to files in docs/)
+nav:
+  - title: Home
+    url: /
+  - title: Readme
+    url: /README/
+  - title: Architecture
+    url: /ARCHITECTURE/
+  - title: Changelog
+    url: /CHANGELOG/
+  - title: Contributing
+    url: /CONTRIBUTING/

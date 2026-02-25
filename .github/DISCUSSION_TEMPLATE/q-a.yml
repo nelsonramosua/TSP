@@ -1,0 +1,54 @@
+title: "Question: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask anything about the TSP Solver — algorithm details, design decisions, how to extend the project, or why something behaves a certain way.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: What part of the project is your question about?
+      options:
+        - Exact algorithms (ExhaustiveSearch, HeldKarp)
+        - Heuristics (Greedy, NearestNeighbour, NearestInsertion, Christofides)
+        - Meta-heuristics (2-Opt, SA, ACO, GA)
+        - Lower Bounds (MST, Held-Karp LR)
+        - Graph / NamedGraph / Tour ADT
+        - GraphFactory / adding graphs
+        - Build system (Makefile)
+        - Valgrind / memory
+        - Contributing / extending the project
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What do you want to understand? Be specific.
+      placeholder: |
+        e.g. "How does the Blossom wrapper interface with Christofides? Which part of the algorithm does it handle?"
+        e.g. "Why does Simulated Annealing need an initial tour? Can I pass NULL?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: What Have You Already Tried or Read?
+      description: Relevant files, README sections, or experiments you have already looked at.
+      placeholder: "e.g. Read Christofides.c and BlossomWrapper.h but the interface isn't clear to me."
+    validations:
+      required: false
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Relevant Code Snippet (if applicable)
+      render: c
+    validations:
+      required: false
