@@ -48,22 +48,26 @@ jobs:
           if [ -f "$src_path" ]; then
             REAL_SRC="$src_path"
           elif [ -f "docs/$filename" ]; then
-            REAL_SRC="docs/$filename"
+            cp "docs/$filename" "temp_processing/${filename}.raw"
+            REAL_SRC="temp_processing/${filename}.raw"
           else
             echo "Warning: $filename not found. Skipping."
             return
           fi
 
           # 2. Start writing to temp file
-          echo "---" > "temp_processing/$filename"
-          echo "layout: default" >> "temp_processing/$filename"
-          echo "title: $title" >> "temp_processing/$filename"
-          [[ "$filename" == "ARCHITECTURE.md" ] ] && echo "mermaid: true" >> "temp_processing/$filename"
-          echo "---" >> "temp_processing/$filename"
-          echo "" >> "temp_processing/$filename"
+          {
+            echo "---"
+            echo "layout: default"
+            echo "title: $title"
+            if [[ "$filename" == "ARCHITECTURE.md" ]]; then
+              echo "mermaid: true"
+            fi
+            echo "---"
+            echo ""
+          } > "temp_processing/$filename"
           
           # 3. Use SED to fix image paths (removes 'docs/' from image links)
-          # This looks for ![alt](docs/image.png) and changes it to ![alt](image.png)
           sed 's|\](docs/|\](|g' "$REAL_SRC" >> "temp_processing/$filename"
           
           # 4. Move to final destination
