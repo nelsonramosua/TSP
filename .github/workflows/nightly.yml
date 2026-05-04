@@ -30,14 +30,14 @@ jobs:
         timeout 3600 ./TSP_COMPARISON 2>&1 | tee -a full-results.txt || echo "Timed out after 1h"
 
     - name: Upload full results
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: nightly-full-results
         path: full-results.txt
         retention-days: 30
 
     - name: Upload all DOT graphs
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: nightly-dot-graphs
         path: graphs/*.dot
@@ -73,7 +73,7 @@ jobs:
         || true
 
     - name: Upload Valgrind report
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: nightly-valgrind-report
         path: valgrind-nightly.txt
@@ -114,7 +114,7 @@ jobs:
       continue-on-error: true
 
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: nightly-benchmark
         path: benchmark.txt
