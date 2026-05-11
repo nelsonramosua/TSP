@@ -15,7 +15,7 @@ RUN make clean && \
     strip TSP_COMPARISON
 
 # Stage 2: Runtime
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 LABEL org.opencontainers.image.title="TSP Solver"
 LABEL org.opencontainers.image.description="Exact, heuristic, and meta-heuristic algorithms for the TSP, implemented in pure C."
