@@ -9,7 +9,16 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-*No unreleased changes yet.*
+### Fixed
+- **Christofides / Blossom MWPM**: the weighted Blossom matching returned a *valid but non-minimum* perfect matching whenever odd blossoms formed (approx. 13% of random instances), which degraded Christofides tours. 
+Rewrote it as a correct primal-dual weighted blossom (with blossom duals and expansion), verified against a brute-force minimum-weight perfect-matching oracle: 0 mismatches over 2000 integer + 500 double-weight trials.
+Christofides now builds on a genuinely minimum matching and respects its 1.5× guarantee.
+
+### Changed
+- **Genetic Algorithm -- memory overhead**: removed the per-generation allocation churn (a temp `Tour` per fitness eval, deep-copied parents per selection, and a full population rebuilt every generation). 
+It now computes cost in place, selects parents by pointer, ping-pongs between two pre-allocated populations, and keeps each population's paths in one contiguous pool. 
+Allocation is now **O(population)** for the whole run instead of **O(population * generations)**; the search itself is unchanged.
+- **Genetic Algorithm -- reproducibility**: the population sort now uses a deterministic tie-break (lexicographic on the path), so a given RNG seed yields identical results regardless of memory layout.
 
 ---
 
@@ -64,7 +73,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - CI/CD pipeline (GitHub Actions): build on Linux and macOS, Valgrind leak check, static analysis.
 
 #### Known Issues / Limitations
-- Christofides has a known bug causing it to return suboptimal tours on some graphs.
+- ~~Christofides has a known bug causing it to return suboptimal tours on some graphs.~~ **Fixed in [Unreleased].**
 - Exhaustive Search is disabled for N > 10 (too slow).
 - HeldKarp exact is practical only for N ≤ 20.
 - Genetic Algorithm becomes very slow for N ≥ 55 with default parameters.

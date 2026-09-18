@@ -246,7 +246,10 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended and will provide good approximations.
 * For large graphs ($N > 100$), meta-heuristics like Simulated Annealing and Ant Colony Optimization provide the best **approximations**.
 * Use 2-Opt Improvement as a post-processing step to refine heuristic solutions. At the moment, that's only being done for the Nearest Neighbour Heuristic.
-* Genetic Algorithm performance is highly dependent on parameters (the other metaheuristic algorithms are as well, but, because in these specific implementations, GA allocates and deallocates the most memory (creation and destruction of Populations and Individuals across the number of Generations defined), it will be the slowest (this can be shown further by running with valgrind); the others (SA and ACO) used `unsigned int*` to describe paths, which is more memory efficient, despite not being as descriptive (and that would take us into analyzing Space Complexity as well... but that was not done here)).
+* Genetic Algorithm performance is highly dependent on parameters (the other metaheuristic algorithms are as well). 
+It *used* to be by far the heaviest allocator -- it created and destroyed whole Populations and Individuals every generation -- but that was reworked (see `GeneticAlgorithm.c`): it now reuses two pre-allocated populations across all generations, keeps each population's paths in one contiguous pool, and selects parents by pointer. 
+Allocation is now O(population) for the whole run instead of O(population × generations), and results are reproducible for a fixed RNG seed. 
+It can still be comparatively slow because of the population-wide crossover/fitness/sort work done each generation.
 
 ---
 

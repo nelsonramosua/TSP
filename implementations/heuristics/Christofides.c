@@ -5,7 +5,7 @@
 // Nelson Ramos, 124921.
 //
 // November, 2025.
-// 
+//
 // You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // Resources used:
@@ -15,6 +15,7 @@
 // https://github.com/suddhabrato/edmonds-blossom-algorithm
 
 // I could not for the life of me get this to work well... must have some bug in here.
+// Update 09/26: fixed the Blossom Wrapper. Now works rather well.
 
 #include "../../TravelingSalesmanProblem.h"
 #include "blossom/BlossomWrapper.h"
@@ -72,7 +73,7 @@ Tour* Christofides_FindTour(const Graph* g) {
     }
 
     // add matching edges
-    if (matching) 
+    if (matching)
         for (unsigned int u = 0; u < numVertices; u++) {
             unsigned int* adj = GraphGetAdjacentsTo(matching, u);
             for (unsigned int k = 1; k <= adj[0]; k++) {
@@ -113,14 +114,14 @@ unsigned int* findOddVertices(const Graph* g, unsigned int* count) {
         unsigned int* adj = GraphGetAdjacentsTo(g, v);
         unsigned int deg = adj[0];
         free(adj); // is doing it this way stupid? maybe we should alter Graph.h. maybe too tired.
-        
+
         if (deg % 2 == 1) odd[(*count)++] = v;
     }
 
     if (*count == 0) { free(odd); return NULL; }
     // resize array to fit (exactly) count elems.
     unsigned int* finalOdd = realloc(odd, (*count) * sizeof(unsigned int));
-    return finalOdd ? finalOdd : odd; 
+    return finalOdd ? finalOdd : odd;
 }
 
 Graph* computeExactMwpm(const Graph* g, unsigned int* odd, unsigned int oddCount) {
@@ -135,7 +136,7 @@ Graph* computeExactMwpm(const Graph* g, unsigned int* odd, unsigned int oddCount
     int edgeIndex = 0;
 
     // build complete graph on odd verts
-    for (unsigned int i = 0; i < oddCount; i++) 
+    for (unsigned int i = 0; i < oddCount; i++)
         for (unsigned int j = i + 1; j < oddCount; j++) {
             // u and v inds refer to odd arr inds (0 - oddCount-1)
             u[edgeIndex] = i; v[edgeIndex] = j;
@@ -175,9 +176,9 @@ unsigned int* findEulerianTourFromEdgeCounts(const int *edgeCntIn, unsigned int 
     // number of edges
     unsigned int totalEdges = 0;
     for (unsigned int i = 0; i < numVertices * numVertices; ++i) totalEdges += (unsigned int)edgeCnt[i];
-    
+
     // max size of Tour is totalEdges + 1 (close loop)
-    unsigned int maxSize = totalEdges + 1; 
+    unsigned int maxSize = totalEdges + 1;
     unsigned int *stack = malloc(maxSize * sizeof(unsigned int)); // we could use a separate adt for this stack but it's not worth it.
     unsigned int *tour = malloc(maxSize * sizeof(unsigned int));
     if (!stack || !tour) { free(edgeCnt); free(stack); free(tour); *tourSize = 0; return NULL; }
@@ -187,16 +188,16 @@ unsigned int* findEulerianTourFromEdgeCounts(const int *edgeCntIn, unsigned int 
 
     while (stackPtr > 0) {
         unsigned int u = stack[stackPtr - 1];
-        
+
         // find neighbor v with remaining edge (u, v)
         unsigned int vFound = numVertices; // N = not found
         for (unsigned int v = 0; v < numVertices; ++v) {
             if (v == u) continue;
-            
+
             // calc unique storage index (a < b)
             unsigned int a = u < v ? u : v;
             unsigned int b = u < v ? v : u;
-            
+
             if (edgeCnt[a * numVertices + b] > 0) { vFound = v; break; }
         }
 
@@ -204,7 +205,7 @@ unsigned int* findEulerianTourFromEdgeCounts(const int *edgeCntIn, unsigned int 
             unsigned int v = vFound;
             unsigned int a = u < v ? u : v;
             unsigned int b = u < v ? v : u;
-            
+
             // consume parallel edge
             edgeCnt[a * numVertices + b]--;
             // push new vertex into stack
@@ -225,7 +226,7 @@ double shortcutEuler(const Graph* g, unsigned int* euler, unsigned int size, uns
     int* visited = calloc(numVertices, sizeof(int));
     unsigned int pos = 0;
     double cost = 0.0;
-    
+
     // start with first vertex of Euler
     unsigned int last = euler[0];
     hamilton[pos++] = last;
@@ -234,7 +235,7 @@ double shortcutEuler(const Graph* g, unsigned int* euler, unsigned int size, uns
     // traverse rest of Euler
     for (unsigned int i = 1; i < size; i++) {
         unsigned int cur = euler[i];
-        
+
         // if cur vert not visited yet, include
         if (!visited[cur]) {
             cost += GetEdgeWeight(g, last, cur);
@@ -243,11 +244,11 @@ double shortcutEuler(const Graph* g, unsigned int* euler, unsigned int size, uns
             last = cur;
         }
     }
-    
+
     // close cycle
     cost += GetEdgeWeight(g, last, hamilton[0]);
-    hamilton[pos] = hamilton[0]; 
-    
+    hamilton[pos] = hamilton[0];
+
     free(visited);
     return cost;
 }
