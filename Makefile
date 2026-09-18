@@ -1,4 +1,4 @@
-CC = gcc
+CC = /usr/bin/gcc
 CFLAGS = -Wall -Wextra -g -Iheaders -O3 -march=native
 CFLAGS_VALGRIND = -Wall -Wextra -g -Iheaders -O3
 # Note: add -march=native back to CFLAGS_VALGRIND if on native Linux (not WSL).
@@ -30,9 +30,13 @@ C_SRCS = $(GRAPH_DIR)/Graph.c \
          $(HEUR_DIR)/NearestNeighbour.c \
          $(HEUR_DIR)/Greedy.c \
          $(HEUR_DIR)/NearestInsertion.c \
+         $(HEUR_DIR)/FarthestInsertion.c \
+         $(HEUR_DIR)/ClarkeWright.c \
          $(HEUR_DIR)/Christofides.c \
          $(HEUR_DIR)/blossom/BlossomWrapper.c \
          $(META_DIR)/TwoOpt.c \
+         $(META_DIR)/OrOpt.c \
+         $(META_DIR)/ThreeOpt.c \
          $(META_DIR)/SimulatedAnnealing.c \
          $(META_DIR)/AntColony.c \
          $(META_DIR)/GeneticAlgorithm.c \

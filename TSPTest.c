@@ -11,7 +11,7 @@
 #include "headers/TSPTest.h"
 
 int main(int argc, char* argv[]) {
-    srand(time(NULL)); 
+    srand(time(NULL));
 
     GraphTestCase tests[] = {
         {CreateGraphAula, "Graph Aula", -1},
@@ -64,7 +64,7 @@ static void testRunNamedGraph(GraphTestCase testCase) {
     }
 
     runTSPAlgorithms(namedGraph, testCase.name, actualBestCost, heldKarpTour);
-    
+
     if (heldKarpTour) TourDestroy(&heldKarpTour);
     NamedGraphDestroy(&namedGraph);
 }
@@ -114,6 +114,20 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
             .tspFun = TwoOpt_Adapter, .name = "2-Opt Improvement", .maxVertices = 0, .extra = twoOptTour });
     }
 
+    // 3.1. Or-Opt Improvement (based on Nearest Neighbour)
+    if (nearestNeighbourTour) {
+        Tour* orOptTour = TourDeepCopy(nearestNeighbourTour);
+        executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+            .tspFun = OrOpt_Adapter, .name = "Or-Opt Improvement", .maxVertices = 0, .extra = orOptTour });
+    }
+
+    // 3.2. 3-Opt Improvement (based on Nearest Neighbour)
+    if (nearestNeighbourTour) {
+        Tour* threeOptTour = TourDeepCopy(nearestNeighbourTour);
+        executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+            .tspFun = ThreeOpt_Adapter, .name = "3-Opt Improvement", .maxVertices = 0, .extra = threeOptTour });
+    }
+
     // 4. Greedy
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
         .tspFun = Greedy_Adapter, .name = "Greedy Heuristic", .maxVertices = 0, .extra = NULL });
@@ -121,6 +135,14 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
     // 5. Nearest Insertion
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
         .tspFun = NearestInsertion_Adapter, .name = "Nearest Insertion Heuristic", .maxVertices = 0, .extra = NULL });
+
+    // 5.1. Farthest Insertion
+    executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+        .tspFun = FarthestInsertion_Adapter, .name = "Farthest Insertion Heuristic", .maxVertices = 0, .extra = NULL });
+
+    // 5.2. Clarke-Wright Savings
+    executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+        .tspFun = ClarkeWright_Adapter, .name = "Clarke-Wright Savings Heuristic", .maxVertices = 0, .extra = NULL });
 
     // 6. Christofides
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
@@ -145,7 +167,7 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
     // 9. Genetic Algorithm
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
         .tspFun = GeneticAlgorithm_Adapter, .name = "Genetic Algorithm Optimization", .maxVertices = 55, .extra = NULL });
-    
+
     printf("TESTING COMPLETE: %s\n", graphName);
 }
 

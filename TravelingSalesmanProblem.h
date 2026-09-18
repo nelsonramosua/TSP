@@ -25,11 +25,11 @@
 
 typedef struct _Tour {
     unsigned int* path;         // Array of vertices in the tour (V1, V2, ..., VN, V1)
-    unsigned int numVertices;   // Number of vertices in the path 
+    unsigned int numVertices;   // Number of vertices in the path
     double cost;                // Total cost of the tour
 
     char** cityNames;           // Optional city names for display
-} Tour; 
+} Tour;
 
 // Function prototypes for Tour ADT (Implemented in Tour.c)
 Tour* TourCreate(unsigned int numVertices);
@@ -55,10 +55,14 @@ Tour* HeldKarp_FindTour(const Graph* g);
 Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex);
 Tour* Greedy_FindTour(const Graph* g);
 Tour* NearestInsertion_FindTour(const Graph* g);
+Tour* FarthestInsertion_FindTour(const Graph* g);
+Tour* ClarkeWright_FindTour(const Graph* g);
 Tour* Christofides_FindTour(const Graph* g);
 
-// Improvement (Implemented in TwoOpt.c)
+// Improvement (Implemented in TwoOpt.c, OrOpt.c, ThreeOpt.c)
 Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour);
+Tour* OrOpt_ImproveTour(const Graph* g, Tour* initialTour);
+Tour* ThreeOpt_ImproveTour(const Graph* g, Tour* initialTour);
 
 // Metaheuristics (Implemented in their respective .c files)
 Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour);

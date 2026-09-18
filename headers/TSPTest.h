@@ -21,7 +21,7 @@ typedef struct {
     Tour* (*tspFun)(const Graph*, void*);  // generic function pointer to TSP implementation
     const char* name;                      // Name for display
     unsigned int maxVertices;              // Limit for slow algorithms
-    
+
     void* extra;                           // Generic extra argument (Tour* or unsigned int* or NULL)
 } TSPAlgorithm;
 
@@ -43,6 +43,24 @@ static Tour* ExhaustiveSearchPruning_Adapter(const Graph* g, void* unused) {
 
 static Tour* TwoOpt_Adapter(const Graph* g, void* extra) {
     return TwoOpt_ImproveTour((Graph*)g, (Tour*)extra);
+}
+
+static Tour* OrOpt_Adapter(const Graph* g, void* extra) {
+    return OrOpt_ImproveTour((Graph*)g, (Tour*)extra);
+}
+
+static Tour* ThreeOpt_Adapter(const Graph* g, void* extra) {
+    return ThreeOpt_ImproveTour((Graph*)g, (Tour*)extra);
+}
+
+static Tour* FarthestInsertion_Adapter(const Graph* g, void* unused) {
+    (void)unused;
+    return FarthestInsertion_FindTour((Graph*)g);
+}
+
+static Tour* ClarkeWright_Adapter(const Graph* g, void* unused) {
+    (void)unused;
+    return ClarkeWright_FindTour((Graph*)g);
 }
 
 static Tour* SimAnnealing_Adapter(const Graph* g, void* extra) {
