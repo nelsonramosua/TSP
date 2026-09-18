@@ -9,6 +9,10 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **PriorityQueue ADT** (`headers/PriorityQueue.h`, `implementations/graph/PriorityQueue.c`): an indexed binary min-heap over integer items with O(log n) insert / extract-min / decrease-key and O(1) contains (ties broken by item id for determinism). 
+This is the auxiliary ADT the README/Greedy/Prim notes kept pointing at.
+
 ### Fixed
 - **Christofides / Blossom MWPM**: the weighted Blossom matching returned a *valid but non-minimum* perfect matching whenever odd blossoms formed (approx. 13% of random instances), which degraded Christofides tours. 
 Rewrote it as a correct primal-dual weighted blossom (with blossom duals and expansion), verified against a brute-force minimum-weight perfect-matching oracle: 0 mismatches over 2000 integer + 500 double-weight trials.
@@ -19,6 +23,11 @@ Christofides now builds on a genuinely minimum matching and respects its 1.5× g
 It now computes cost in place, selects parents by pointer, ping-pongs between two pre-allocated populations, and keeps each population's paths in one contiguous pool. 
 Allocation is now **O(population)** for the whole run instead of **O(population * generations)**; the search itself is unchanged.
 - **Genetic Algorithm -- reproducibility**: the population sort now uses a deterministic tie-break (lexicographic on the path), so a given RNG seed yields identical results regardless of memory layout.
+- **Greedy**: now uses the PriorityQueue to drive cheapest-insertion, dropping it from **O(N³)** to **O(N² * log N)** (each unvisited vertex keeps its cheapest insertion cost in the heap; only the two new edges are updated per insertion, via decrease-key). 
+Output is byte-for-byte identical to the previous O(N³) version.
+- **Complexity notes corrected** (`README.md`, `Greedy.c`, `Prim_MST.c`): a min-heap helps Greedy, but is a *pessimization* for Prim/MST on the complete graphs used here -- heap-based Prim would be O(N² * log N), worse than the dense O(N²) array form.
+Nearest Neighbour and Nearest Insertion are noted as similar (array beats heap). 
+The old README claim that a PQ would speed up MST is thus retracted.
 
 ---
 

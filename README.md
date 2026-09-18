@@ -46,6 +46,7 @@ TSP/
 │   ├── LowerBounds.h
 │   ├── Metaheuristics.h
 │   ├── NamedGraph.h            # Abstraction layer for graphs with names as vertices.
+│   ├── PriorityQueue.h         # Indexed min-heap ADT (used by Greedy).
 │   ├── TSPTest.h               # Test driver header
 │   └── SortedList.h
 ├── implementations/
@@ -123,7 +124,7 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 | **Exhaustive Search with Pruning** | Exact           | $O(N!)$                                | Optimized exhaustive search that prunes branches based on cost bounds. Still infeasible for $N \ge 12$.|
 | **Held-Karp Algorithm**            | Exact           | $O(N^2 \times 2^N)$                    | Dynamic programming approach; finds the optimal solution for small graphs. Too slow for $N \ge 20$.|
 | **Nearest Neighbour**      | Heuristic       | $O(N^2)$                               | Fast, but solution quality may vary; starting point affects the tour. |
-| **Greedy Heuristic**      | Heuristic       | $O(N^3)$                        | Builds a tour by repeatedly selecting the shortest available edge.   |
+| **Greedy Heuristic**      | Heuristic       | $O(N^2 \times \log N)$                        | Cheapest-insertion construction; each step inserts the vertex with the cheapest insertion cost (kept in a min-heap -- see `PriorityQueue.h`). |
 | **Nearest Insertion** | Heuristic | $O(N^3)$ | Constructive method: selects the unvisited node closest to any edge in the current partial tour. |
 | **Christofides Algorithm**| Heuristic       | $O(N^3)$                               | Guarantees a tour $\le 1.5\times$ optimal for metric TSP. Uses Blossom algorithm. |
 | **2-Opt Improvement**     | Meta-heuristic  | $O(N^3)$      | Local search to improve an existing tour; often used after other algorithms. |
@@ -136,7 +137,12 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 **Notes**: 
 Time complexity does not tell the whole story... even more so for small $N$ (numVertices). 
 Meta-heuristic algorithms are more computationaly heavy than Christofides, being guided by their parameters/configuration, even though Christofides' algorithm has the worst, worst-case time complexity, $O(N^3)$. \
-Some of these (pex: MST Lower Bound & Greedy) could be improved if an auxiliary ADT, min-heap / priority queue, had been introduced and used. They would then have complexities, respectively, $O(E \times log N)$ and $O(N^2 \times log N)$. For simplicity purposes, it wasn't. **Go ahead and try! :)**
+A min-heap / priority queue ADT (`headers/PriorityQueue.h`) is now used by **Greedy**, dropping it from $O(N^3)$ to $O(N^2 \times \log N)$ (it keeps each vertex's cheapest insertion in the heap instead of rescanning every (vertex, edge) pair each step). \
+**A caveat worth knowing**: the same heap does *not* help **MST / Prim** here, even though it is the textbook improvement ($O(E \times \log N)$). 
+These are **complete** metric graphs ($E = \Theta(N^2)$), so a binary-heap Prim would be $O(N^2 \times \log N)$ — *strictly worse* than the dense $O(N^2)$ array version (a Fibonacci heap only ties it). 
+The array scan is already optimal for dense graphs; the PQ is a pessimization there. 
+See the note in `Prim_MST.c`. 
+The same reasoning applies to Nearest Neighbour and Nearest Insertion (their "min over vertices" is best kept in a Prim-style array, not a heap).
 
 ---
 

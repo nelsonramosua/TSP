@@ -20,6 +20,7 @@ C_SRCS = $(GRAPH_DIR)/Graph.c \
          $(GRAPH_DIR)/SortedList.c \
          $(GRAPH_DIR)/NamedGraph.c \
          $(GRAPH_DIR)/HashMap.c \
+         $(GRAPH_DIR)/PriorityQueue.c \
          $(MST_DIR)/Prim_MST.c \
          $(LOWER_BOUNDS_DIR)/LowerBound_MST.c \
          $(LOWER_BOUNDS_DIR)/LowerBound_HeldKarp.c \

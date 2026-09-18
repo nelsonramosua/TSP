@@ -8,7 +8,10 @@
 //
 // You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
-// This could be improved for O(E * log N) if a priority queue / min-heap was used... For simplicty purposes, it wasn't. Try!
+// Note on the priority queue: a heap-based Prim runs in O(E * log N), which is the classic "improvement" -- but only for SPARSE graphs.
+// TSP instances here are complete metric graphs (E = Theta(N^2)), so a binary heap would make this O(N^2 * log N), i.e. STRICTLY WORSE than the dense O(N^2) array version below (a Fibonacci heap only ties it at O(N^2)).
+// SO, we deliberately keep the array scan here; the PriorityQueue ADT is used where it actually helps (Greedy).
+// This is the trap my old README note fell into.
 
 #include "../../TravelingSalesmanProblem.h"
 
