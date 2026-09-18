@@ -18,7 +18,7 @@ This project was done for academic, experimentation and fun purposes, and thus s
 
 ## Key Features
 
-- **11 Algorithms** - From brute-force to the genetic algorithm.
+- **15 Algorithms** - From brute-force to the genetic algorithm.
 - **Built-in Benchmarks** - TSPLIB instances.
 - **Real-world Graphs** - Portuguese and European cities.
 - **Named Vertices** - City names support.
@@ -63,6 +63,8 @@ TSP/
 │   │   ├── Greedy.c
 │   │   ├── NearestNeighbour.c
 │   │   ├── NearestInsertion.c
+│   │   ├── FarthestInsertion.c
+│   │   ├── ClarkeWright.c      # Savings construction heuristic.
 │   │   ├── Christofides.c
 │   │   └── blossom/            # Blossom algorithm for MWPM
 │   ├── lowerBounds/            # Lower Bound algorithms
@@ -70,6 +72,8 @@ TSP/
 │   │   └── LowerBound_MST.c
 │   ├── metaheuristics/         # Meta-heuristics
 │   │   ├── TwoOpt.c
+│   │   ├── OrOpt.c
+│   │   ├── ThreeOpt.c
 │   │   ├── SimulatedAnnealing.c
 │   │   ├── GeneticAlgorithm.c
 │   │   └── AntColony.c
@@ -126,8 +130,12 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 | **Nearest Neighbour**      | Heuristic       | $O(N^2)$                               | Fast, but solution quality may vary; starting point affects the tour. |
 | **Greedy Heuristic**      | Heuristic       | $O(N^2 \times \log N)$                        | Cheapest-insertion construction; each step inserts the vertex with the cheapest insertion cost (kept in a min-heap -- see `PriorityQueue.h`). |
 | **Nearest Insertion** | Heuristic | $O(N^3)$ | Constructive method: selects the unvisited node closest to any edge in the current partial tour. |
+| **Farthest Insertion** | Heuristic | $O(N^3)$ | Constructive; inserts the node *farthest* from the current tour (cheapest position). Usually beats Nearest Insertion. |
+| **Clarke-Wright Savings** | Heuristic | $O(N^2 \times \log N)$ | Constructive; merges chains by decreasing "savings" $d(0,i)+d(0,j)-d(i,j)$ around a depot. |
 | **Christofides Algorithm**| Heuristic       | $O(N^3)$                               | Guarantees a tour $\le 1.5\times$ optimal for metric TSP. Uses Blossom algorithm. |
 | **2-Opt Improvement**     | Meta-heuristic  | $O(N^3)$      | Local search to improve an existing tour; often used after other algorithms. |
+| **Or-Opt Improvement**    | Meta-heuristic  | $O(N^3)$      | Local search that relocates chains of 1–3 cities (optionally reversed); complements 2-Opt. |
+| **3-Opt Improvement**     | Meta-heuristic  | $O(N^3)$      | Local search removing 3 edges and trying all 7 reconnections; stronger neighbourhood than 2-Opt. |
 | **Simulated Annealing**   | Meta-heuristic  | $O(N^2 \times \text{Iterations}) = O(N^3 \times \text{SA-MULTIPLIER})$      | Probabilistic improvement using 2-opt swaps. |
 | **Ant Colony Optimization** | Meta-heuristic | $O(N^2 \times \text{Iterations} \times \text{Ants}) = O(N^3 \times \text{Iterations})$ | Probabilistic search guided by pheromone trails; computationally heavier but can yield high-quality solutions. |
 | **Genetic Algorithm (GA)** | Meta-heuristic | $O(N^2 \times \text{Generations} \times \text{Population})$ | Population-based search simulating evolution (selection, crossover, mutation). Depending on the # Generations, it can be very slow. For the current parameters, that's for around $N \ge 55$.|
@@ -213,8 +221,12 @@ Furthermore, you can pass, through terminal, the **number of tests you want to r
 | Held-Karp (exact) | 9057.46 | 0% |
 | Nearest-Neighbour | 10942.56 | 20.8% |
 | 2-opt on NN | 9982.25 | 10.2% |
+| Or-opt on NN | 9057.46 | 0% |
+| 3-opt on NN | 9057.46 | 0% |
 | Greedy | 9668.3 | 6.7% |
 | Nearest-Insertion | 9668.3 | 6.7% |
+| Farthest-Insertion | 9057.46 | 0% |
+| Clarke-Wright Savings | 9057.46 | 0% |
 | Christofides | 10027.97 | 10.7% |
 | Simulated Annealing | 9057.46 | 0% |
 | Ant Colony | 9057.46 | 0% |
@@ -251,7 +263,9 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * For small graphs ($N \le 12$), Exhaustive Search guarantees optimal results. However, it is disabled. Uncomment to enable.
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended and will provide good approximations.
 * For large graphs ($N > 100$), meta-heuristics like Simulated Annealing and Ant Colony Optimization provide the best **approximations**.
-* Use 2-Opt Improvement as a post-processing step to refine heuristic solutions. At the moment, that's only being done for the Nearest Neighbour Heuristic.
+* Use the local-search improvements (2-Opt, Or-Opt, 3-Opt) as a post-processing step to refine heuristic solutions. 
+At the moment, they are each applied to the Nearest Neighbour tour (3-Opt gives the strongest refinement, at higher cost). 
+They could just as well be chained (e.g. 2-Opt then Or-Opt) or run on any other construction heuristic... Try variations. :)
 * Genetic Algorithm performance is highly dependent on parameters (the other metaheuristic algorithms are as well). 
 It *used* to be by far the heaviest allocator -- it created and destroyed whole Populations and Individuals every generation -- but that was reworked (see `GeneticAlgorithm.c`): it now reuses two pre-allocated populations across all generations, keeps each population's paths in one contiguous pool, and selects parents by pointer. 
 Allocation is now O(population) for the whole run instead of O(population × generations), and results are reproducible for a fixed RNG seed. 

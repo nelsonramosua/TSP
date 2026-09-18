@@ -63,8 +63,8 @@ static double Prim_Internal(const Graph* g, int* parentOut /* may be NULL */) {
     int* parent = NULL;
 
     if (!key || !inMST) {
-        if (key) free(key);
-        if (inMST) free(inMST);
+        free(key);   // free(NULL) is a no-op
+        free(inMST);
         return -1.0;
     }
 

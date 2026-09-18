@@ -59,7 +59,7 @@ Tour* Christofides_FindTour(const Graph* g) {
     Graph* matching = NULL;
     if (oddCount > 0) matching = computeExactMwpm(g, odd, oddCount);
 
-    int* multi = calloc(numVertices * numVertices, sizeof(int));
+    int* multi = calloc((size_t)numVertices * numVertices, sizeof(int));
     if (!multi) { free(odd); GraphDestroy(&mst); GraphDestroy(&matching); return tour; }
 
     // add MST edges
@@ -169,9 +169,9 @@ Graph* computeExactMwpm(const Graph* g, unsigned int* odd, unsigned int oddCount
 
 unsigned int* findEulerianTourFromEdgeCounts(const int *edgeCntIn, unsigned int numVertices, unsigned int *tourSize) {
     // copy counts (Hierholzer's consumes edges)
-    int *edgeCnt = malloc(numVertices * numVertices * sizeof(int));
+    int *edgeCnt = malloc((size_t)numVertices * numVertices * sizeof(int));
     if (!edgeCnt) { *tourSize = 0; return NULL; }
-    memcpy(edgeCnt, edgeCntIn, numVertices * numVertices * sizeof(int));
+    memcpy(edgeCnt, edgeCntIn, (size_t)numVertices * numVertices * sizeof(int));
 
     // number of edges
     unsigned int totalEdges = 0;

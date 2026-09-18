@@ -12,6 +12,14 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - **PriorityQueue ADT** (`headers/PriorityQueue.h`, `implementations/graph/PriorityQueue.c`): an indexed binary min-heap over integer items with O(log n) insert / extract-min / decrease-key and O(1) contains (ties broken by item id for determinism). 
 This is the auxiliary ADT the README/Greedy/Prim notes kept pointing at.
+- **Farthest Insertion** (`implementations/heuristics/FarthestInsertion.c`): constructive heuristic that inserts the vertex farthest from the current tour at its cheapest position; typically beats Nearest Insertion. 
+(No separate "Cheapest Insertion" — Greedy already is cheapest insertion.)
+- **Clarke-Wright Savings** (`implementations/heuristics/ClarkeWright.c`): a new *class* of construction heuristic -- merges chains by decreasing savings around a depot, guarded by union-find; O(N² * log N).
+- **Or-opt** (`implementations/metaheuristics/OrOpt.c`): local search that relocates chains of 1–3 consecutive cities (optionally reversed), complementing 2-Opt.
+- **3-opt** (`implementations/metaheuristics/ThreeOpt.c`): local search removing three edges and trying all 7 reconnections; a strictly larger neighbourhood than 2-Opt. 
+Reaches the known optimum on several TSPLIB/known instances.
+- All four verified: tours pass `TourInvariant`, tracked cost equals a fresh recomputation (so the Or-opt/3-opt incremental deltas are exact), improvements never worsen their seed, and valgrind reports no leaks. 
+Wired into the comparison driver (Or-Opt/3-Opt refine the Nearest Neighbour tour).
 
 ### Fixed
 - **Christofides / Blossom MWPM**: the weighted Blossom matching returned a *valid but non-minimum* perfect matching whenever odd blossoms formed (approx. 13% of random instances), which degraded Christofides tours. 

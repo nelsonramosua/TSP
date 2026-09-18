@@ -73,7 +73,6 @@ Tour* HeldKarp_FindTour(const Graph* g) {
         for (unsigned int subsetMask = 1; subsetMask < (1U << numVertices); subsetMask++) {
             // discard subsets without start vert (0) or without exact cur size 'm'
             if (!(subsetMask & maskZero)) continue;
-            // if (popCount(subsetMask) != m) continue;
             if ((unsigned int)__builtin_popcount(subsetMask) != m) continue;
 
             // calc min cost to reach v_j (j in subset & j != 0)
@@ -177,9 +176,9 @@ static HeldKarpTable* initializeTable(const Graph* g) {
     table->dists = (double**) calloc(numVertices, sizeof(double*));
 
     if (!table->dp || !table->parent || !table->dists) {
-        if (table->dp) free(table->dp);
-        if (table->parent) free(table->parent);
-        if (table->dists) free(table->dists);
+        free(table->dp);   // free(NULL) is a no-op
+        free(table->parent);
+        free(table->dists);
         free(table);
         return NULL;
     }
@@ -233,26 +232,4 @@ static void destroyTable(HeldKarpTable* table) {
     free(table);
 }
 
-/*
-// helper to count set bits in mask. gcc has a builtin function for this, which was used.
-static inline unsigned int popCount(unsigned int n) {
-    unsigned int count = 0;
-    while (n > 0) {
-        n &= (n - 1); // clear set lsb
-        count++;
-    }
-    return count;
-}
-
-// helper to count trailing 0 #. gcc has a builtin function for this, which was used.
-static inline int ctz(unsigned int v) {
-    if (v == 0) return 0;
-
-    int c = 0;
-    while ((v & 1) == 0) {
-        v >>= 1;
-        c++;
-    }
-    return c;
-}
-*/
+// Note: popCount / ctz helpers were removed -- the GCC builtins __builtin_popcount and __builtin_ctz are used directly instead.

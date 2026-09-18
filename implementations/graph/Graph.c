@@ -6,8 +6,11 @@
 // Graph - Using a list of adjacency lists representation
 //
 
-// I added 2 functions at EOF. 
+// I added 2 functions at EOF.
 // Nelson Ramos.
+//
+// Nelson Ramos, September 2026: aside from those additions, the ONLY changes made to this (otherwise reused) file were to silence CodeQL findings -- checking malloc/fscanf return values, creating the DOT file with non-world-writable (0644) permissions, and renaming a few shadowed loop variables.
+// No algorithm or logic was altered!!
 
 #include "../../TravelingSalesmanProblem.h"
 
@@ -17,8 +20,11 @@
 #include <float.h>
 #include <string.h>
 
+#include <fcntl.h>   // open (DOT file created with explicit 0644 permissions)
+#include <unistd.h>  // close
+
 // GLOBAL COUNTER FOR UNIQUE EDGE IDs
-static unsigned int _EdgeNextID = 0; 
+static unsigned int _EdgeNextID = 0;
 
 struct _Vertex {
   unsigned int id;
@@ -65,7 +71,7 @@ int graphEdgesComparator(const void* p1, const void* p2) {
   if (d == 0) {
     unsigned int id1 = ((struct _Edge*)p1)->uniqueId;
     unsigned int id2 = ((struct _Edge*)p2)->uniqueId;
-    d = id1 - id2; 
+    d = id1 - id2;
   }
   return (d > 0) - (d < 0);
 }
@@ -153,9 +159,9 @@ void GraphDestroy(Graph** p) {
 
       List* edges = v->edgesList;
       if (ListIsEmpty(edges) == 0) {
-        int i = 0;
+        int j = 0; // renamed from 'i' to avoid shadowing -- CodeQL cpp/declaration-hides-variable
         ListMoveToHead(edges);
-        for (; i < ListGetSize(edges); ListMoveToNext(edges), i++) {
+        for (; j < ListGetSize(edges); ListMoveToNext(edges), j++) {
           struct _Edge* e = ListGetCurrentItem(edges);
           free(e);
         }
@@ -214,11 +220,13 @@ Graph* GraphFromFile(FILE* f) {
   unsigned int v, w;
   double weight;
 
-  while (isWeighted ? fscanf(f, "%u %u %lf", &v, &w, &weight) == 3
-                     : fscanf(f, "%u %u", &v, &w) == 2) {
+  // read edges; check the fscanf return count before using the values (CodeQL cpp/missing-check-scanf)
+  while (1) {
     if (isWeighted) {
+      if (fscanf(f, "%u %u %lf", &v, &w, &weight) != 3) break;
       GraphAddWeightedEdge(g, v, w, weight);
     } else {
+      if (fscanf(f, "%u %u", &v, &w) != 2) break;
       GraphAddEdge(g, v, w);
     }
   }
@@ -383,6 +391,7 @@ unsigned int GraphGetVertexInDegree(Graph* g, unsigned int v) {
 static int _addEdge(Graph* g, unsigned int v, unsigned int w, double weight) {
   // Insert edge (v,w)
   struct _Edge* edge_v_w = (struct _Edge*)malloc(sizeof(struct _Edge));
+  if (edge_v_w == NULL) return 0; // CodeQL cpp/inconsistent-null-check
   edge_v_w->adjVertex = w;
   edge_v_w->weight = weight;
   edge_v_w->uniqueId = _EdgeNextID++; // ADDED: Assign unique ID
@@ -412,6 +421,14 @@ static int _addEdge(Graph* g, unsigned int v, unsigned int w, double weight) {
   if (g->isDigraph == 0) {
     // It is a BIDIRECTIONAL EDGE --- Insert edge (w,v)
     struct _Edge* edge_w_v = (struct _Edge*)malloc(sizeof(struct _Edge));
+    if (edge_w_v == NULL) {
+      // CodeQL cpp/inconsistent-null-check: undo the (v,w) edge inserted above
+      ListSearch(vertex_v->edgesList, (void*)edge_v_w);
+      ListRemoveCurrent(vertex_v->edgesList);
+      g->numEdges--;
+      vertex_v->outDegree--;
+      return 0;
+    }
     edge_w_v->adjVertex = v;
     edge_w_v->weight = weight;
     edge_w_v->uniqueId = _EdgeNextID++; // ADDED: Assign unique ID
@@ -429,7 +446,7 @@ static int _addEdge(Graph* g, unsigned int v, unsigned int w, double weight) {
       // UNDO the updates
       g->numEdges--;
       vertex_v->outDegree--;
-      
+
       // We must correctly decrement the outDegree of vertex w
       // since the ListInsert for (w,v) failed.
       // This part of the code was technically missing a decrement if ListInsert failed,
@@ -501,9 +518,9 @@ int GraphRemoveEdge(Graph* g, unsigned int v, unsigned int w) {
     // Same issue here: temporary edge for search only matches by vertex ID
     struct _Edge edge_w_v = {v, 0, 0};
     if (ListSearch(vertex_w->edgesList, &edge_w_v) == 1) {
-      struct _Edge* edgeToRemove = ListGetCurrentItem(vertex_w->edgesList);
+      struct _Edge* edgeToRemoveW = ListGetCurrentItem(vertex_w->edgesList); // renamed to avoid shadowing -- CodeQL cpp/declaration-hides-variable
       ListRemoveCurrent(vertex_w->edgesList);
-      free(edgeToRemove);
+      free(edgeToRemoveW);
 
       vertex_w->outDegree--;
     }
@@ -579,9 +596,9 @@ void GraphDisplay(const Graph* g) {
       printf("\n");
     } else {
       List* edges = v->edgesList;
-      int i = 0;
+      int j = 0; // renamed from 'i' to avoid shadowing -- CodeQL cpp/declaration-hides-variable
       ListMoveToHead(edges);
-      for (; i < ListGetSize(edges); ListMoveToNext(edges), i++) {
+      for (; j < ListGetSize(edges); ListMoveToNext(edges), j++) {
         struct _Edge* e = ListGetCurrentItem(edges);
         if (g->isWeighted) {
           printf("  %2d(%4.2f)", e->adjVertex, e->weight);
@@ -666,8 +683,15 @@ int GraphWriteDOT(const Graph* g, const char* filename, char** vertexNames) {
     assert(g != NULL);
     assert(filename != NULL);
 
-    FILE* f = fopen(filename, "w");
+    // create with explicit 0644 (not world-writable) -- CodeQL cpp/world-writable-file-creation
+    int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd < 0) {
+        fprintf(stderr, "Error: Could not open file '%s' for writing.\n", filename);
+        return 0;
+    }
+    FILE* f = fdopen(fd, "w");
     if (!f) {
+        close(fd);
         fprintf(stderr, "Error: Could not open file '%s' for writing.\n", filename);
         return 0;
     }
@@ -692,7 +716,7 @@ int GraphWriteDOT(const Graph* g, const char* filename, char** vertexNames) {
     ListMoveToHead(vertices);
     for (unsigned int i = 0; i < g->numVertices; ListMoveToNext(vertices), i++) {
         struct _Vertex* v = ListGetCurrentItem(vertices);
-        
+
         const char* label = NULL;
         if (vertexNames && vertexNames[i] && strlen(vertexNames[i]) > 0) {
             label = vertexNames[i];
@@ -727,14 +751,14 @@ double GetEdgeWeight(const Graph* g, unsigned int v, unsigned int w) {
     if (v == w) return 0.0; // should not happen
 
     unsigned int* adj = GraphGetAdjacentsTo(g, v);
-    double* dist = GraphGetDistancesToAdjacents(g, v); 
+    double* dist = GraphGetDistancesToAdjacents(g, v);
 
     unsigned int num_adj = (unsigned int)dist[0]; // 1st element of arr is number of adj vertices
     double weight = DBL_MAX; // preset (vertex dne)
 
     for (unsigned int i = 1; i <= num_adj; i++) {
         if (adj[i] == w) {
-            weight = dist[i]; 
+            weight = dist[i];
             break;
         }
     }

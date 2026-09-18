@@ -1,11 +1,11 @@
 // SimulatedAnnealing.c - Implements the Simulated Annealing (SA) metaheuristic for TSP.
-// 
+//
 // O(N^2 * iterations) = O(N^3 * SA_MULTIPLIER).
 //
 // Nelson Ramos, 124921.
 //
 // November, 2025.
-// 
+//
 // You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // Resources used:
@@ -21,7 +21,7 @@
 #include <math.h>
 #include <time.h>
 #include <float.h>
-#include <string.h> 
+#include <string.h>
 
 static void swap(unsigned int* a, unsigned int* b);
 static void twoOptSwap(unsigned int* tour, unsigned int i, unsigned int j);
@@ -36,11 +36,11 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
 
     unsigned int* current = malloc(numVertices * sizeof(unsigned int));
     unsigned int* bestTour = malloc(numVertices * sizeof(unsigned int));
-    if (!current || !bestTour) { 
-        if (current) free(current);
-        if (bestTour) free(bestTour); 
+    if (!current || !bestTour) {
+        free(current);   // free(NULL) is a no-op
+        free(bestTour);
         TourDestroy(&tour);
-        return NULL; 
+        return NULL;
     }
 
     memcpy(current, initialTour, numVertices * sizeof(unsigned int));
@@ -58,7 +58,7 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
 
     double T = currentCost / 10.0; // start T is the init "heat" of the system
     if (T < 100.0) T = 100.0;     // ensure min starting T
-    
+
     double Tmin = SA_MIN_TEMP; // when is the system frozen? (stop crit.)
     double alpha = SA_COOLING_RATE; // cooling rate
     unsigned int iterations = SA_MULTIPLIER * numVertices; // swap num at each temperature
@@ -66,7 +66,7 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
     while (T > Tmin) {
         for (unsigned int k = 0; k < iterations; k++) {
             unsigned int i, j;
-            
+
             // gen 2 distinct inds.
             do {
                 i = rand() % numVertices;
@@ -75,12 +75,12 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
             } while (i == j || i == (j+1)%numVertices || j == (i+1)%numVertices); // make sure of non-adjacent edges
 
             if (i > j) swap(&i, &j); // make sure i < j for simpler segment reversal
-            
+
             unsigned int a = current[i];                     // left node of first removed edge (a)
             unsigned int b = current[(i + 1) % numVertices]; // right node of first removed edge (b)
             unsigned int c = current[j];                     // left node of second removed edge (C)
             unsigned int d = current[(j + 1) % numVertices]; // right node of second removed edge (D)
-            
+
             // removed edges: (A, B) and (C, D)
             double weightAB = GetEdgeWeight(g, a, b);
             double weightCD = GetEdgeWeight(g, c, d);
@@ -97,7 +97,7 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
                 // 2-opt swap on segment [i+1, j]
                 unsigned int segmentStart = (i + 1) % numVertices;
                 unsigned int segmentEnd = j;
-                
+
                 twoOptSwap(current, segmentStart, segmentEnd);
 
                 currentCost += delta;
