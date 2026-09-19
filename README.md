@@ -31,7 +31,7 @@ This project was done for academic, experimentation and fun purposes, and thus s
 
 ## System Overview
 
-![System Overview](docs/systemOverview.png)
+![System Overview](https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/systemOverview.png)
 
 ---
 
@@ -105,13 +105,13 @@ Here, that local search is a memetic 2-Opt descent applied to every particle, wh
 
 ### Module Dependencies
 
-![Module Dependencies](docs/moduleDependencies.png)
+![Module Dependencies](https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/moduleDependencies.png)
 
 --- 
 
 ## Data Flow
 
-![Data Flow](docs/dataFlowDiagram.png)
+![Data Flow](https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/dataFlowDiagram.png)
 
 ---
 
@@ -133,22 +133,22 @@ See [`tools/`](tools/).
 
 <table>
 <tr>
-<td align="center"><img src="docs/gifs/nn.gif" width="240"><br><sub><b>Nearest Neighbour</b><br>greedy walk; last edges forced long</sub></td>
-<td align="center"><img src="docs/gifs/farthest.gif" width="240"><br><sub><b>Farthest Insertion</b><br>outliers first sketch the outline</sub></td>
-<td align="center"><img src="docs/gifs/christofides.gif" width="240"><br><sub><b>Christofides</b><br>Euler tour shortcut into a cycle</sub></td>
+<td align="center"><img src="https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/gifs/nn.gif" width="240"><br><sub><b>Nearest Neighbour</b><br>greedy walk; last edges forced long</sub></td>
+<td align="center"><img src="https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/gifs/farthest.gif" width="240"><br><sub><b>Farthest Insertion</b><br>outliers first sketch the outline</sub></td>
+<td align="center"><img src="https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/gifs/christofides.gif" width="240"><br><sub><b>Christofides</b><br>Euler tour shortcut into a cycle</sub></td>
 </tr>
 <tr>
-<td align="center"><img src="docs/gifs/2opt.gif" width="240"><br><sub><b>2-Opt</b><br>each move uncrosses two edges</sub></td>
-<td align="center"><img src="docs/gifs/lk.gif" width="240"><br><sub><b>Lin-Kernighan</b><br>variable-depth edge exchanges</sub></td>
+<td align="center"><img src="https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/gifs/2opt.gif" width="240"><br><sub><b>2-Opt</b><br>each move uncrosses two edges</sub></td>
+<td align="center"><img src="https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/gifs/lk.gif" width="240"><br><sub><b>Lin-Kernighan</b><br>variable-depth edge exchanges</sub></td>
 <td align="center"><sub>Or-Opt and 3-Opt animate almost identically to 2-Opt (edges uncrossing), so only 2-Opt and the stronger Lin-Kernighan are shown.</sub></td>
 </tr>
 <tr>
-<td align="center"><img src="docs/gifs/sa.gif" width="240"><br><sub><b>Simulated Annealing</b><br>jitter that cools into a tour</sub></td>
-<td align="center"><img src="docs/gifs/aco.gif" width="240"><br><sub><b>Ant Colony</b><br>best-so-far as pheromone builds</sub></td>
-<td align="center"><img src="docs/gifs/ga.gif" width="240"><br><sub><b>Genetic Algorithm</b><br>best-so-far across generations</sub></td>
+<td align="center"><img src="https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/gifs/sa.gif" width="240"><br><sub><b>Simulated Annealing</b><br>jitter that cools into a tour</sub></td>
+<td align="center"><img src="https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/gifs/aco.gif" width="240"><br><sub><b>Ant Colony</b><br>best-so-far as pheromone builds</sub></td>
+<td align="center"><img src="https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/gifs/ga.gif" width="240"><br><sub><b>Genetic Algorithm</b><br>best-so-far across generations</sub></td>
 </tr>
 <tr>
-<td align="center"><img src="docs/gifs/grasp.gif" width="240"><br><sub><b>GRASP</b><br>each restart's local optimum</sub></td>
+<td align="center"><img src="https://raw.githubusercontent.com/nelsonramosua/TSP/main/docs/gifs/grasp.gif" width="240"><br><sub><b>GRASP</b><br>each restart's local optimum</sub></td>
 <td colspan="2" align="center"><sub>Frames are emitted at each algorithm's natural step (a city added, a move applied, a new best); the title shows the current tour cost.</sub></td>
 </tr>
 </table>

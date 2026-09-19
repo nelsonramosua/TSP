@@ -9,6 +9,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.0] — 2026-09-19
+
 ### Added
 - **Branch & Bound** (`implementations/exact/BranchAndBound.c`): exact DFS with an admissible lower bound (each vertex still needing an outgoing edge contributes at least its cheapest incident edge), seeded with a Nearest Neighbour incumbent and expanding children nearest-first. 
 Prunes far more than the cost-only pruned brute force; verified to match Held-Karp's optimum on every gated instance, valgrind-clean. 
@@ -140,5 +142,6 @@ The old README claim that a PQ would speed up MST is thus retracted.
 
 ---
 
-[Unreleased]: https://github.com/nelsonramosua/TSP/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/nelsonramosua/TSP/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/nelsonramosua/TSP/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/nelsonramosua/TSP/releases/tag/v1.0.0
