@@ -13,5 +13,9 @@ graphs/*.png
 # Valgrind outputs
 vgcore.*
 
+# CodeQL local analysis (make codeql)
+.codeql-db/
+codeql-results.sarif
+
 # Generated DOT files (optional — comment out if you want to track them)
 *.dot

@@ -30,11 +30,11 @@
 
 - name: heuristic
   color: "0e8a16"
-  description: Relates to constructive heuristics (Greedy, NN, NearestInsertion, Christofides).
+  description: Relates to constructive heuristics (Greedy, NN, NearestInsertion, FarthestInsertion, ClarkeWright, Christofides).
 
 - name: metaheuristic
   color: "006b75"
-  description: Relates to meta-heuristic algorithms (2-Opt, SA, ACO, GA).
+  description: Relates to meta-heuristic algorithms (2-Opt, Or-Opt, 3-Opt, SA, ACO, GA).
 
 - name: lower-bounds
   color: "bfd4f2"

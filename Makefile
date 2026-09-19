@@ -77,8 +77,38 @@ runvc:
 
 # Utility targets
 
+# Local CodeQL (local static analysis) run. 
+# Override CODEQL if the CLI is not on your PATH, e.g.: make codeql CODEQL=/path/to/codeql-bundle/codeql/codeql
+CODEQL = codeql
+CODEQL_DB = .codeql-db
+CODEQL_SUITE = cpp-security-and-quality.qls
+CODEQL_SARIF = codeql-results.sarif
+
+# First checks the CLI is installed (else prints how to get it), then builds a database by tracing a clean build and analyses it with the security-and-quality suite. 
+# Needs the CodeQL CLI *bundle* (ships the C/C++ query packs).
+codeql:
+	@command -v $(CODEQL) >/dev/null 2>&1 || { \
+		echo "CodeQL CLI not found (tried '$(CODEQL)')."; \
+		echo "Install the bundle (includes the query packs) from:"; \
+		echo "  https://github.com/github/codeql-action/releases  (codeql-bundle-<os>.tar.gz)"; \
+		echo "then add its 'codeql/' directory to PATH, or point this target at it:"; \
+		echo "  make codeql CODEQL=/path/to/codeql-bundle/codeql/codeql"; \
+		exit 1; \
+	}
+	@echo "Using $$($(CODEQL) version | head -n 1)"
+	$(CODEQL) database create $(CODEQL_DB) --language=cpp --overwrite --command="$(MAKE) rebuild"
+	$(CODEQL) database analyze $(CODEQL_DB) $(CODEQL_SUITE) --format=sarif-latest --output=$(CODEQL_SARIF) --threads=0
+	@echo ""
+	@echo "SARIF written to $(CODEQL_SARIF)."
+	@if command -v jq >/dev/null 2>&1; then \
+		echo "Findings: $$(jq '[.runs[].results[]] | length' $(CODEQL_SARIF))"; \
+		jq -r '.runs[].results[] | "  \(.rule.id)\t\(.locations[0].physicalLocation.artifactLocation.uri):\(.locations[0].physicalLocation.region.startLine)"' $(CODEQL_SARIF); \
+	else \
+		echo "(install 'jq' to print a findings summary here, or open the SARIF in your editor.)"; \
+	fi
+
 clean:
-	rm -rf $(BUILD_DIR) $(TSP_COMPARISON)
+	rm -rf $(BUILD_DIR) $(TSP_COMPARISON) $(CODEQL_DB) $(CODEQL_SARIF)
 
 loc:
 	@echo "Lines of code (C/H source files):"
@@ -101,9 +131,16 @@ help:
 	@echo "  make runvc        - Build (no -march=native), run with Valgrind, clean"
 	@echo "  make runvc N=1    - Valgrind on 1 graph (fast, recommended)"
 	@echo ""
+	@echo "Analysis targets:"
+	@echo "  make codeql       - Check CodeQL CLI, build a DB and run security-and-quality"
+	@echo "  make codeql CODEQL=/path/to/codeql - Use a CodeQL CLI not on PATH"
+	@echo ""
 	@echo "Info targets:"
 	@echo "  make loc          - Line count per source file"
 	@echo "  make help         - Show this message"
 	@echo ""
+	@echo "Cleaning:"
+	@echo "  make clean        - Remove build directory, the binary and the local CodeQL database and SARIF"
+	@echo ""
 
-.PHONY: all run runvc clean rebuild loc help
+.PHONY: all run runvc clean rebuild loc help codeql

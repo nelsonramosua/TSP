@@ -13,8 +13,8 @@ body:
       description: What part of the project is your question about?
       options:
         - Exact algorithms (ExhaustiveSearch, HeldKarp)
-        - Heuristics (Greedy, NearestNeighbour, NearestInsertion, Christofides)
-        - Meta-heuristics (2-Opt, SA, ACO, GA)
+        - Heuristics (Greedy, NearestNeighbour, NearestInsertion, FarthestInsertion, ClarkeWright, Christofides)
+        - Meta-heuristics (2-Opt, Or-Opt, 3-Opt, SA, ACO, GA)
         - Lower Bounds (MST, Held-Karp LR)
         - Graph / NamedGraph / Tour ADT
         - GraphFactory / adding graphs

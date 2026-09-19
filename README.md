@@ -162,6 +162,7 @@ The same reasoning applies to Nearest Neighbour and Nearest Insertion (their "mi
 - POSIX system (Linux, macOS, WSL).
 - Standard math library (`libm`).
 - Python 3 (for PNG generation scripts).
+- (Optional) Valgrind for memory checks; the [CodeQL CLI](https://github.com/github/codeql-action/releases) bundle for `make codeql`.
 
 ---
 
@@ -206,7 +207,27 @@ The same reasoning applies to Nearest Neighbour and Nearest Insertion (their "mi
 **Note**: you can also run `` make run `` to compile and run automatically, and even ``make runvc`` to compile, run with valgrind and then clean, automatically.\
 However, I caution you to not run past the first test graph with valgring, ad it will incredibly slow (test it!).\
 Furthermore, you can pass, through terminal, the **number of tests you want to run**, pex: `` make run N=3 ``.\
-**See Makefile for more info on this**.
+**See Makefile for more info on this** (or run `` make help ``).
+
+---
+
+### Static Analysis (CodeQL)
+
+The same CodeQL security-and-quality analysis that runs in CI can be run locally:
+
+```bash
+make codeql
+```
+
+It first checks that the CodeQL CLI is installed (printing install instructions if not), then builds a database by tracing a clean build and analyses it, writing `codeql-results.sarif` and a findings summary. 
+If the CLI is not on your `PATH`, point the target at it:
+
+```bash
+make codeql CODEQL=/path/to/codeql-bundle/codeql/codeql
+```
+
+Install the CLI from the [CodeQL bundle releases](https://github.com/github/codeql-action/releases) (`codeql-bundle-<os>.tar.gz`, which ships the C/C++ query packs). 
+`make clean` removes the local database and SARIF.
 
 ---
 

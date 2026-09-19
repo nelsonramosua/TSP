@@ -39,8 +39,12 @@ body:
         - Nearest Neighbour
         - Greedy
         - Nearest Insertion
+        - Farthest Insertion
+        - Clarke-Wright Savings
         - Christofides
         - 2-Opt
+        - Or-Opt
+        - 3-Opt
         - Simulated Annealing
         - Ant Colony Optimization
         - Genetic Algorithm

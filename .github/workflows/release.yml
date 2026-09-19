@@ -42,7 +42,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Get version
       id: version
@@ -105,7 +105,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
     
@@ -143,7 +143,7 @@ jobs:
         fi
     
     - name: Create Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ steps.version.outputs.version }}
         name: TSP Solver ${{ steps.version.outputs.version }}
@@ -174,7 +174,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Extract version metadata
       id: extract_version
@@ -189,18 +189,18 @@ jobs:
         echo "minor=$MINOR"       >> $GITHUB_OUTPUT
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@v4
 
     # ── Docker Hub ──────────────────────────────
     - name: Log in to Docker Hub
-      uses: docker/login-action@v3
+      uses: docker/login-action@v4
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     # ── GitHub Container Registry ───────────────
     - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v3
+      uses: docker/login-action@v4
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
@@ -209,7 +209,7 @@ jobs:
     # Generate image metadata (tags + labels)
     - name: Extract Docker metadata
       id: meta
-      uses: docker/metadata-action@v5
+      uses: docker/metadata-action@v6
       with:
         images: |
           ${{ secrets.DOCKERHUB_USERNAME }}/tsp
@@ -220,7 +220,7 @@ jobs:
           type=raw,value=latest
         labels: |
           org.opencontainers.image.title=TSP Solver
-          org.opencontainers.image.description=Traveling Salesman Problem solver in pure C — 11 algorithms
+          org.opencontainers.image.description=Traveling Salesman Problem solver in pure C — 15 algorithms
           org.opencontainers.image.url=https://github.com/nelsonramosua/TSP
           org.opencontainers.image.source=https://github.com/nelsonramosua/TSP
           org.opencontainers.image.version=${{ steps.extract_version.outputs.version }}
@@ -228,11 +228,11 @@ jobs:
 
     # Build and push to both registries in one step
     - name: Build and push Docker image
-      uses: docker/build-push-action@v6
+      uses: docker/build-push-action@v7
       with:
         context: .
         push: true
-        file: Dockerfile  # <-- ADICIONA ISTO
+        file: Dockerfile
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha

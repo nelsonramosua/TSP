@@ -58,9 +58,9 @@ TSP/
 ├── headers/                    # Public interfaces (.h)
 ├── implementations/
 │   ├── exact/                  # Exact algorithms (ExhaustiveSearch, HeldKarp)
-│   ├── heuristics/             # Constructive heuristics (Greedy, NearestNeighbour, ...)
-│   ├── metaheuristics/         # Meta-heuristics (SA, ACO, GA, 2-Opt)
-│   ├── graph/                  # Graph ADT, NamedGraph, HashMap, SortedList
+│   ├── heuristics/             # Constructive heuristics (Greedy, NearestNeighbour, NearestInsertion, FarthestInsertion, ClarkeWright, Christofides)
+│   ├── metaheuristics/         # Meta-heuristics (2-Opt, Or-Opt, 3-Opt, SA, ACO, GA)
+│   ├── graph/                  # Graph ADT, NamedGraph, HashMap, SortedList, PriorityQueue
 │   ├── lowerBounds/            # Lower bound utilities (MST, HeldKarp)
 │   └── mst/                    # Prim MST (shared utility)
 ├── GraphFactory.c              # Predefined graph constructors
@@ -89,10 +89,11 @@ Use the [New Algorithm](.github/ISSUE_TEMPLATE/new_algorithm.yml) issue template
 
 Good candidates (not yet implemented):
 - Lin-Kernighan heuristic.
-- Or-Opt improvement.
 - Branch & Bound (exact).
 - ISPO (as mentioned in the README).
 - Tabu Search.
+
+(Already implemented, for reference: Or-Opt and 3-Opt local search, Farthest Insertion, and Clarke-Wright Savings.)
 
 ### Adding a New Graph
 
@@ -336,6 +337,7 @@ static GraphTestCase testCases[] = {
 | Zero-warning build | `make CFLAGS="-Wall -Wextra -Werror -O3 -Iheaders"` |
 | Smoke test | `./TSP_COMPARISON 3` |
 | Valgrind (1 graph) | `make runvc N=1` |
+| CodeQL (security & quality) | `make codeql` (needs the CodeQL CLI bundle) |
 | Run all graphs | `./TSP_COMPARISON` |
 
 There is no formal unit test binary for this project (TSPTest.c is the integration test driver). When adding a new algorithm, verify manually that:
@@ -369,7 +371,8 @@ Before submitting a PR, confirm:
 - [ ] `make CFLAGS="-Wall -Wextra -Werror -O3 -Iheaders"` passes with no errors.
 - [ ] `./TSP_COMPARISON 3` runs and produces reasonable output.
 - [ ] `make runvc N=1` — Valgrind reports no leaks.
-- [ ] New algorithm added to `TravelingSalesmanProblem.h`, `Makefile`, and `TSPTest.c`.
+- [ ] `make codeql` — no new CodeQL findings (if you have the CLI installed).
+- [ ] New algorithm registered in `TravelingSalesmanProblem.h` (prototype), `headers/TSPTest.h` (adapter), `TSPTest.c` (driver call), and `Makefile` (source).
 - [ ] Algorithm table in `README.md` updated.
 - [ ] `CHANGELOG.md` updated under `[Unreleased]`.
 - [ ] No `TODO` / `FIXME` left in the code you added.

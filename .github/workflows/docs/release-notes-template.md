@@ -7,8 +7,8 @@ See [CHANGELOG.md](https://github.com/nelsonramosua/TSP/blob/main/CHANGELOG.md) 
 | Category | Algorithms |
 |---|---|
 | Exact | Exhaustive Search, Exhaustive Search w/ Pruning, Held-Karp |
-| Heuristic | Nearest Neighbour, Greedy, Nearest Insertion, Christofides |
-| Meta-heuristic | 2-Opt, Simulated Annealing, Ant Colony, Genetic Algorithm |
+| Heuristic | Nearest Neighbour, Greedy, Nearest Insertion, Farthest Insertion, Clarke-Wright Savings, Christofides |
+| Meta-heuristic | 2-Opt, Or-Opt, 3-Opt, Simulated Annealing, Ant Colony, Genetic Algorithm |
 | Lower Bounds | MST, Held-Karp Lagrangian Relaxation |
 
 ## Usage

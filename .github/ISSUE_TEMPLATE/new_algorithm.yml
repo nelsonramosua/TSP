@@ -15,7 +15,7 @@ body:
     id: name
     attributes:
       label: Algorithm Name
-      placeholder: "e.g. Lin-Kernighan, Or-Opt, ISPO, Tabu Search, Branch & Bound..."
+      placeholder: "e.g. Lin-Kernighan, ISPO, Tabu Search, Branch & Bound..."
     validations:
       required: true
 

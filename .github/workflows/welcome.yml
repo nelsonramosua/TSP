@@ -17,9 +17,9 @@ jobs:
     steps:
     - uses: actions/first-interaction@v3
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
 
-        issue-message: |
+        issue_message: |
           Welcome, and thanks for opening your first issue on the TSP Solver!
 
           To help resolve it faster, please make sure your report includes:
@@ -30,7 +30,7 @@ jobs:
 
           If you're reporting a memory issue, please run `make runvc N=1` and include the Valgrind output.
 
-        pr-message: |
+        pr_message: |
           Welcome, and thanks for your first pull request to the TSP Solver!
 
           A few things to check before review:

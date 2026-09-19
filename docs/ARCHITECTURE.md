@@ -12,6 +12,7 @@ graph TB
         C[Graph ADT]
         D[NamedGraph]
         E[HashMap]
+        L[PriorityQueue]
     end
     
     subgraph "Algorithms"
@@ -38,6 +39,7 @@ graph TB
     H --> C
     
     G --> J
+    G --> L
     I --> C
 ```
 
@@ -72,6 +74,7 @@ graph LR
     
     Christofides[Christofides] --> Blossom[Blossom]
     Christofides[Christofides] --> Graph
+    Greedy[Greedy] --> PriorityQueue[PriorityQueue.c]
     Bounds[LowerBounds/*] --> Prim[Prim_MST]
     
     Test[TSPTest.c] --> Factory[GraphFactory.c]

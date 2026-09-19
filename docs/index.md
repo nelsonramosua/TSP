@@ -33,10 +33,14 @@ An educational implementation of **algorithms** to solve the Traveling Salesman 
 | Exhaustive Search with Pruning | Exact | O(N!) |
 | Held-Karp | Exact | O(N² × 2^N) |
 | Nearest Neighbour | Heuristic | O(N²) |
-| Greedy | Heuristic | O(N³) |
+| Greedy | Heuristic | O(N² × log N) |
 | Nearest Insertion | Heuristic | O(N³) |
+| Farthest Insertion | Heuristic | O(N³) |
+| Clarke-Wright Savings | Heuristic | O(N² × log N) |
 | Christofides | Heuristic | O(N³) |
 | 2-Opt Improvement | Meta-heuristic | O(N³) |
+| Or-Opt Improvement | Meta-heuristic | O(N³) |
+| 3-Opt Improvement | Meta-heuristic | O(N³) |
 | Simulated Annealing | Meta-heuristic | O(N³ × multiplier) |
 | Ant Colony Optimization | Meta-heuristic | O(N³ × iterations) |
 | Genetic Algorithm | Meta-heuristic | O(N² × gen × pop) |
@@ -74,6 +78,10 @@ Actual optimal: **9057.46 km**
 | Simulated Annealing | 9057.46 | 0% |
 | Ant Colony | 9057.46 | 0% |
 | Genetic Algorithm | 9057.46 | 0% |
+| Farthest Insertion | 9057.46 | 0% |
+| Clarke-Wright Savings | 9057.46 | 0% |
+| Or-opt on NN | 9057.46 | 0% |
+| 3-opt on NN | 9057.46 | 0% |
 | Greedy | 9668.3 | 6.7% |
 | Nearest Insertion | 9668.3 | 6.7% |
 | Christofides | 10027.97 | 10.7% |

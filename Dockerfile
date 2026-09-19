@@ -2,25 +2,25 @@
 # Multi-stage build for minimal final image
 
 # Stage 1: Build
-FROM gcc:15 AS builder
+FROM gcc:16 AS builder
 
 WORKDIR /src
 
 # Copy source files
 COPY . .
 
-# Build miniAI with optimizations
+# Build the TSP solver with optimizations
 RUN make clean && \
     make && \
     strip TSP_COMPARISON
 
 # Stage 2: Runtime
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 LABEL org.opencontainers.image.title="TSP Solver"
 LABEL org.opencontainers.image.description="Exact, heuristic, and meta-heuristic algorithms for the TSP, implemented in pure C."
 LABEL org.opencontainers.image.authors="Nelson Ramos"
-LABEL org.opencontainers.image.source="https://github.com/nelsonramosua/miniAI"
+LABEL org.opencontainers.image.source="https://github.com/nelsonramosua/TSP"
 
 # Install minimal runtime dependencies
 RUN apt-get update && \
