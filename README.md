@@ -270,6 +270,23 @@ Install the CLI from the [CodeQL bundle releases](https://github.com/github/code
 | Tabu Search | 9057.46 | 0% |
 | GRASP | 9057.46 | 0% |
 
+**Graph: TSPLIB kroA100** (Actual optimal: 21 282) -- a mid-size instance filling the gap between Eil51 and A280.
+
+| Algorithm | Cost | Error % |
+|-----------|------|---------|
+| Nearest-Neighbour | 27 807 | 30.7% |
+| 2-opt on NN | 22 148 | 4.1% |
+| Or-opt on NN | 23 131 | 8.7% |
+| Lin-Kernighan on NN | 22 260 | 4.6% |
+| Greedy | 21 668 | 1.8% |
+| Christofides | 24 023 | 12.9% |
+| Simulated Annealing | ~21 900 | ~2.9% |
+| GRASP | 21 379 | 0.5% |
+| 3-opt / Ant Colony / Tabu / Genetic | disabled ($N > 60$) | n/a |
+
+GRASP gets within **0.5%** of the optimum here. 
+The $O(N^3)$-per-pass 3-Opt and the population/colony methods are gated off (they take 10--16 s each at $N=100$ for worse results than GRASP gives in a fraction of a second).
+
 **Graph: TSPLIB A280** (Actual optimal: 2579) -- the largest instance, showing which methods scale.
 
 | Algorithm | Cost | Error % |
@@ -285,10 +302,10 @@ Install the CLI from the [CodeQL bundle releases](https://github.com/github/code
 | Christofides | 2891 | 12.1% |
 | Simulated Annealing | 2839 | 10.1% |
 | GRASP | 2708 | 5.0% |
-| 3-opt / Ant Colony / Tabu / Genetic | disabled ($N > 100$) | n/a |
+| 3-opt / Ant Colony / Tabu / Genetic | disabled ($N > 60$) | n/a |
 
 The candidate-list local searches (2-Opt, Or-Opt, Lin-Kernighan), Simulated Annealing and GRASP all finish A280 in a few seconds or less (GRASP -- best here at 2708 -- runs 50 restarts sharing one candidate list and distance matrix).
-The $O(N^3)$-per-pass 3-Opt and the population/colony methods (Ant Colony, Tabu, Genetic) are gated off for $N > 100$ in the driver.
+The $O(N^3)$-per-pass 3-Opt and the population/colony methods (Ant Colony, Tabu, Genetic) are gated off for $N > 60$ in the driver (Genetic at $N > 55$).
 
 ---
 
@@ -301,7 +318,9 @@ The project includes, out-of-the-box:
 * Another **real-world Graph**, based on **European cities**, `CreateEurope12CitiesGraph`, corroborating the results of this paper: https://www.researchgate.net/publication/362233733_Determining_Best_Travelling_Salesman_Route_of_12_Cities_of_Europe.
 * **Predefined Matrix Graphs:** `CreateMatrixGraph15` and `CreateMatrixGraph20`.
 * **Fixed Euclidean Graph:** `CreateEuclideanGraph15`.
-* **TSPLIB Graphs**: `CreateEil51Graph`, `CreateOliver30Graph`, `CreateSwiss42Graph`, `CreateBays29Graph` and `CreateA280Graph` (for which ACTUAL best tour costs are presented).
+* **Tiny boundary graphs:** `CreateTriangleGraph3` (the single-tour base case) and `CreateSquareGraph4` (smallest graph where a 2-Opt move helps) -- for exercising edge cases.
+* **A non-metric graph:** `CreateNonMetricGraph8`, where the triangle inequality is deliberately violated; christofides' 1.5x guarantee does **not** hold here (it lands ~30% over the optimum) and the MST/HK-Lagrangian bounds loosen -- but Held-Karp still gives the exact optimum, so you can see the difference.
+* **TSPLIB Graphs**: `CreateEil51Graph`, `CreateOliver30Graph`, `CreateSwiss42Graph`, `CreateBays29Graph`, `CreateKroA100Graph` and `CreateA280Graph` (for which ACTUAL best tour costs are presented).
 
 For $N \le 20$, Held-Karp provides ACTUAL best tour costs for the other algorithms (non-TSPLIB). For $N$ over that it would be infeasible to run that algorithm. So, unless you KNOW the actual best tour cost for your algorithm, you won't have any guarantee, because for $N \ge 20$ the exact algorithms do not have runtime to proceed (testing would be too slow)... \
 **Read `GraphFactory.c`** for more info on how you can pass the actualBestTourCost parameter to the Test Driver functions.
@@ -320,8 +339,8 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * Some of these will fail for very sparse graphs... Test it and try. That's connected to how TSP is defined.
 * For small graphs ($N \le 12$), Exhaustive Search guarantees optimal results. However, it is disabled. Uncomment to enable.
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended and will provide good approximations.
-* For large graphs ($N > 100$), the methods that scale are the candidate-list local searches (2-Opt, Or-Opt, Lin-Kernighan) and Simulated Annealing; these run on A280 ($N=280$) in well under a second each. 
-The $O(N^3)$-per-pass 3-Opt and the population/colony methods (Ant Colony, Tabu, Genetic) are gated off for very large $N$ in the driver.
+* For large graphs ($N > 100$), the methods that scale are the candidate-list local searches (2-Opt, Or-Opt, Lin-Kernighan), Simulated Annealing and GRASP; these run on A280 ($N=280$) in a few seconds or less. 
+The $O(N^3)$-per-pass 3-Opt and the population/colony methods (Ant Colony, Tabu, Genetic) are gated off for larger $N$ in the driver ($N > 60$; Genetic $N > 55$) -- on kroA100 they take 10--16 s each for worse results than GRASP gives in a fraction of a second.
 * Use the local-search improvements (2-Opt, Or-Opt, 3-Opt, Lin-Kernighan) as a post-processing step to refine heuristic solutions. 
 At the moment, they are each applied to the Nearest Neighbour tour (Lin-Kernighan is the strongest, and scales best thanks to its candidate lists). 
 They could just as well be chained (e.g. 2-Opt then Or-Opt) or run on any other construction heuristic... Try variations. :)

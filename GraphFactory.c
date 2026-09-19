@@ -1,6 +1,6 @@
 // GraphFactory.c - Creates some test graphs.
 //
-// Nelson Ramos, 124921. 
+// Nelson Ramos, 124921.
 //
 // November, 2025.
 //
@@ -15,19 +15,19 @@
 I suggest you add your own test graphs! To that effect, here's how you do it in this code base:
 1) Firstly, you define a function in the header, GraphFactory.h. pex: NamedGraph* CreateGraphTest(void);
 2) Then, you have to implement that function here. To that effect, you have two options:
-    i) If you want the graph to have named vertices (pex, Cities (see CreateGraphAula() )), 
+    i) If you want the graph to have named vertices (pex, Cities (see CreateGraphAula() )),
         you use GraphFactory_AddEdgeByCityNames(NamedGraph* namedGraph, const char* nameA, const char* nameB, double weight);
         pex: GraphFactory_AddEdgeByCityNames(namedGraph, "A", "B", 20); this defines an edge between vertice A and vertice B w/ weight 20.
         TourDisplay will then print the path with the named vertices (pex: A -> B -> C -> D -> A).
     ii) Otherwise, if you just want a simpler Graph with indices as verticeNames (see, pex, CreateMatrixGraph15() )
-        you simply use GraphAddWeightedEdge(namedGraph->g, vert1, vert2, weight); 
+        you simply use GraphAddWeightedEdge(namedGraph->g, vert1, vert2, weight);
         pex: GraphAddWeightedEdge(namedGraph->g, 0, 1, 20); this defines an edge between vertice of index 0 and vertice of index 1 w/ weight 20.
         TourDisplay will then print the path with vertices' indices (pex: 0 -> 1 -> 2 -> 3 -> 0). (mapping equivalent to A -> B -> C -> D -> A).
 3) Finally, you call this creatorFun in the testDriver, TSPTest.c, in main().
     pex, with the this example, testRunNamedGraph(CreateGraphTest, "NAME (you put nane here)", -1);
-    Now, about that last value (-1): if you KNOW (well-known example, pex TSPLIB) the bestCost, you put it there, 
-    however, if you want Held-Karp DP to try to find the real bestCost, you leave it at -1. 
-    Just beware that I've defined it so Held-Karp only runs for numVertices <= 20. 
+    Now, about that last value (-1): if you KNOW (well-known example, pex TSPLIB) the bestCost, you put it there,
+    however, if you want Held-Karp DP to try to find the real bestCost, you leave it at -1.
+    Just beware that I've defined it so Held-Karp only runs for numVertices <= 20.
     So, for N>20, you will have no realBestCost (no exact algorithm has runtime for determining it).
     In any case, you still have the two lower bound !estimations! (MST (by Prim) and Held-Karp Lagrangian Relaxation (not to be confused with Held-Karp DP!)).
     which will be lower but let you have some idea of the bestTourCost.
@@ -54,7 +54,7 @@ static void GraphFactory_AddEdgeByCityNames(NamedGraph* namedGraph, const char* 
     if (indexA == -1) return;
     int indexB = NamedGraphGetOrAssignIndex(namedGraph, nameB);
     if (indexB == -1) return;
-    
+
     GraphAddWeightedEdge(namedGraph->g, (unsigned int)indexA, (unsigned int)indexB, weight);
 }
 
@@ -63,13 +63,13 @@ NamedGraph* CreateGraphAula(void) {
     NamedGraph* namedGraph = NamedGraphCreate(numVertices);
     if (!namedGraph) return NULL;
 
-    GraphFactory_AddEdgeByCityNames(namedGraph, "A", "B", 20); 
-    GraphFactory_AddEdgeByCityNames(namedGraph, "A", "C", 42); 
-    GraphFactory_AddEdgeByCityNames(namedGraph, "A", "D", 35); 
+    GraphFactory_AddEdgeByCityNames(namedGraph, "A", "B", 20);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "A", "C", 42);
+    GraphFactory_AddEdgeByCityNames(namedGraph, "A", "D", 35);
     GraphFactory_AddEdgeByCityNames(namedGraph, "B", "D", 34);
     GraphFactory_AddEdgeByCityNames(namedGraph, "B", "C", 30);
     GraphFactory_AddEdgeByCityNames(namedGraph, "C", "D", 12);
-    
+
     _writeDOT(namedGraph, "GraphAula");
 
     return namedGraph;
@@ -89,28 +89,28 @@ NamedGraph* CreateAveiroCitiesGraph(void) {
     GraphFactory_AddEdgeByCityNames(namedGraph, "Oliveira do Bairro", "Arouca", 78);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Oliveira do Bairro", "Sever do Vouga", 40);
 
-    
+
     GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Águeda", 19);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Ílhavo", 32);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Vagos", 32);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Arouca", 90);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Anadia", "Sever do Vouga", 46);
-    
+
     GraphFactory_AddEdgeByCityNames(namedGraph, "Águeda", "Ílhavo", 25);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Águeda", "Vagos", 25);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Águeda", "Arouca", 71);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Águeda", "Sever do Vouga", 31);
 
-    
+
     GraphFactory_AddEdgeByCityNames(namedGraph, "Ílhavo", "Vagos", 6.5);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Ílhavo", "Arouca", 77);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Ílhavo", "Sever do Vouga", 45);
-    
+
     GraphFactory_AddEdgeByCityNames(namedGraph, "Vagos", "Arouca", 82);
     GraphFactory_AddEdgeByCityNames(namedGraph, "Vagos", "Sever do Vouga", 50);
 
     GraphFactory_AddEdgeByCityNames(namedGraph, "Arouca", "Sever do Vouga", 38);
-    
+
     _writeDOT(namedGraph, "AveiroCitiesGraph");
 
     return namedGraph;
@@ -121,80 +121,80 @@ NamedGraph* CreatePortugal12CitiesGraph(void) {
     NamedGraph* ng = NamedGraphCreate(numVertices);
     if (!ng) return NULL;
 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Porto", 313); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Coimbra", 196); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Braga", 366); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Aveiro", 244); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Faro", 299); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Leiria", 129); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Santarém", 78); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Setúbal", 48); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Viseu", 292); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Évora", 150); 
-    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Guimarães", 395); 
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Porto", 313);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Coimbra", 196);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Braga", 366);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Aveiro", 244);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Faro", 299);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Leiria", 129);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Santarém", 78);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Setúbal", 48);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Viseu", 292);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Évora", 150);
+    GraphFactory_AddEdgeByCityNames(ng, "Lisboa", "Guimarães", 395);
 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Coimbra", 117); 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Braga", 53); 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Aveiro", 68); 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Faro", 570); 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Leiria", 184); 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Santarém", 254); 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Setúbal", 308); 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Viseu", 133); 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Évora", 620); 
-    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Guimarães", 55); 
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Coimbra", 117);
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Braga", 53);
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Aveiro", 68);
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Faro", 570);
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Leiria", 184);
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Santarém", 254);
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Setúbal", 308);
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Viseu", 133);
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Évora", 620);
+    GraphFactory_AddEdgeByCityNames(ng, "Porto", "Guimarães", 55);
 
-    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Braga", 100); 
-    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Aveiro", 60); 
-    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Faro", 500); 
-    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Leiria", 130); 
-    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Santarém", 165); 
-    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Setúbal", 200); 
-    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Viseu", 75); 
-    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Évora", 360); 
-    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Guimarães", 140); 
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Braga", 100);
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Aveiro", 60);
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Faro", 500);
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Leiria", 130);
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Santarém", 165);
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Setúbal", 200);
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Viseu", 75);
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Évora", 360);
+    GraphFactory_AddEdgeByCityNames(ng, "Coimbra", "Guimarães", 140);
 
-    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Aveiro", 135); 
-    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Faro", 580); 
-    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Leiria", 210); 
-    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Santarém", 320); 
-    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Setúbal", 350); 
-    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Viseu", 150); 
-    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Évora", 600); 
-    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Guimarães", 22); 
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Aveiro", 135);
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Faro", 580);
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Leiria", 210);
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Santarém", 320);
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Setúbal", 350);
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Viseu", 150);
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Évora", 600);
+    GraphFactory_AddEdgeByCityNames(ng, "Braga", "Guimarães", 22);
 
-    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Faro", 500); 
-    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Leiria", 100); 
-    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Santarém", 180); 
-    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Setúbal", 200); 
-    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Viseu", 100); 
-    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Évora", 400); 
-    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Guimarães", 110); 
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Faro", 500);
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Leiria", 100);
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Santarém", 180);
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Setúbal", 200);
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Viseu", 100);
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Évora", 400);
+    GraphFactory_AddEdgeByCityNames(ng, "Aveiro", "Guimarães", 110);
 
-    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Leiria", 450); 
-    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Santarém", 380); 
-    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Setúbal", 250); 
-    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Viseu", 500); 
-    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Évora", 250); 
-    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Guimarães", 580); 
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Leiria", 450);
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Santarém", 380);
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Setúbal", 250);
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Viseu", 500);
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Évora", 250);
+    GraphFactory_AddEdgeByCityNames(ng, "Faro", "Guimarães", 580);
 
-    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Santarém", 70); 
-    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Setúbal", 100); 
-    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Viseu", 180); 
-    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Évora", 260); 
-    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Guimarães", 210); 
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Santarém", 70);
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Setúbal", 100);
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Viseu", 180);
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Évora", 260);
+    GraphFactory_AddEdgeByCityNames(ng, "Leiria", "Guimarães", 210);
 
-    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Setúbal", 45); 
-    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Viseu", 230); 
-    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Évora", 150); 
-    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Guimarães", 300); 
+    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Setúbal", 45);
+    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Viseu", 230);
+    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Évora", 150);
+    GraphFactory_AddEdgeByCityNames(ng, "Santarém", "Guimarães", 300);
 
-    GraphFactory_AddEdgeByCityNames(ng, "Setúbal", "Viseu", 310); 
-    GraphFactory_AddEdgeByCityNames(ng, "Setúbal", "Évora", 90); 
-    GraphFactory_AddEdgeByCityNames(ng, "Setúbal", "Guimarães", 360); 
+    GraphFactory_AddEdgeByCityNames(ng, "Setúbal", "Viseu", 310);
+    GraphFactory_AddEdgeByCityNames(ng, "Setúbal", "Évora", 90);
+    GraphFactory_AddEdgeByCityNames(ng, "Setúbal", "Guimarães", 360);
 
-    GraphFactory_AddEdgeByCityNames(ng, "Viseu", "Évora", 400); 
-    GraphFactory_AddEdgeByCityNames(ng, "Viseu", "Guimarães", 130); 
+    GraphFactory_AddEdgeByCityNames(ng, "Viseu", "Évora", 400);
+    GraphFactory_AddEdgeByCityNames(ng, "Viseu", "Guimarães", 130);
 
     GraphFactory_AddEdgeByCityNames(ng, "Évora", "Guimarães", 600);
 
@@ -316,7 +316,7 @@ NamedGraph* CreateMatrixGraph15(void) {
     for (unsigned int vert1 = 0; vert1 < numVertices; vert1++)
         for (unsigned int vert2 = vert1 + 1; vert2 < numVertices; vert2++)
             GraphAddWeightedEdge(namedGraph->g, vert1, vert2, w[vert1][vert2]);
-    
+
     _writeDOT(namedGraph, "MatrixGraph15");
 
     return namedGraph;
@@ -355,6 +355,69 @@ NamedGraph* CreateMatrixGraph20(void) {
             GraphAddWeightedEdge(namedGraph->g, i, j, w[i][j]);
 
     _writeDOT(namedGraph, "MatrixGraph20");
+
+    return namedGraph;
+}
+
+// Smallest non-trivial TSP: a triangle.
+// Only one tour exists (0-1-2-0), so every algorithm must agree; exercises the base cases (closing edge, no legal 2-Opt move).
+NamedGraph* CreateTriangleGraph3(void) {
+    unsigned int numVertices = 3;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
+
+    GraphAddWeightedEdge(namedGraph->g, 0, 1, 3);
+    GraphAddWeightedEdge(namedGraph->g, 0, 2, 4);
+    GraphAddWeightedEdge(namedGraph->g, 1, 2, 5);
+
+    _writeDOT(namedGraph, "TriangleGraph3");
+
+    return namedGraph;
+}
+
+// A unit square with its diagonals.
+// The optimal tour follows the four sides (cost 4); a "crossed" tour uses two diagonals (cost 6), so this is the smallest graph where a 2-Opt move actually helps.
+NamedGraph* CreateSquareGraph4(void) {
+    unsigned int numVertices = 4;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
+
+    // sides (weight 1) around the square 0-1-2-3, plus the two diagonals (weight 2)
+    GraphAddWeightedEdge(namedGraph->g, 0, 1, 1);
+    GraphAddWeightedEdge(namedGraph->g, 1, 2, 1);
+    GraphAddWeightedEdge(namedGraph->g, 2, 3, 1);
+    GraphAddWeightedEdge(namedGraph->g, 3, 0, 1);
+    GraphAddWeightedEdge(namedGraph->g, 0, 2, 2); // diagonal
+    GraphAddWeightedEdge(namedGraph->g, 1, 3, 2); // diagonal
+
+    _writeDOT(namedGraph, "SquareGraph4");
+
+    return namedGraph;
+}
+
+// A deliberately NON-metric graph: several direct edges are far longer than a two-hop detour (e.g. w(1,4)=30 but w(1,3)+w(3,4)=2+5=7), so the triangle inequality is violated.
+// Christofides' 1.5x guarantee assumes a metric, so it does NOT hold here (the tour may exceed 1.5x the optimum), and the MST / Held-Karp-Lagrangian bounds are looser than usual -- but Held-Karp DP (N <= 20) still returns the true optimum, so the comparison stays honest.
+NamedGraph* CreateNonMetricGraph8(void) {
+    unsigned int numVertices = 8;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
+
+    double w[8][8] = {
+        { 0, 10,  3, 20,  7, 15,  4, 25},
+        {10,  0,  8,  2, 30,  6, 18,  5},
+        { 3,  8,  0, 12,  9, 22,  1, 14},
+        {20,  2, 12,  0,  5, 17, 11,  3},
+        { 7, 30,  9,  5,  0,  2, 16,  8},
+        {15,  6, 22, 17,  2,  0,  9, 13},
+        { 4, 18,  1, 11, 16,  9,  0,  6},
+        {25,  5, 14,  3,  8, 13,  6,  0}
+    };
+
+    for (unsigned int i = 0; i < numVertices; i++)
+        for (unsigned int j = i + 1; j < numVertices; j++)
+            GraphAddWeightedEdge(namedGraph->g, i, j, w[i][j]);
+
+    _writeDOT(namedGraph, "NonMetricGraph8");
 
     return namedGraph;
 }
@@ -429,7 +492,7 @@ NamedGraph* CreateEil51Graph(void) {
         {30, 40}
     };
 
-    for (unsigned int i = 0; i < numVertices; i++) 
+    for (unsigned int i = 0; i < numVertices; i++)
         for (unsigned int j = i + 1; j < numVertices; j++) {
             double dist = _euclideanDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
             GraphAddWeightedEdge(namedGraph->g, i, j, dist);
@@ -456,7 +519,7 @@ NamedGraph* CreateOliver30Graph(void) {
         {83, 69}, {87, 76}, {74, 78}, {71, 71}, {58, 69}
     };
 
-    for (unsigned int i = 0; i < numVertices; i++) 
+    for (unsigned int i = 0; i < numVertices; i++)
         for (unsigned int j = i + 1; j < numVertices; j++) {
             double dist = _euclideanDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
             GraphAddWeightedEdge(namedGraph->g, i, j, dist);
@@ -518,11 +581,11 @@ NamedGraph* CreateSwiss42Graph(void) {
         {124, 122, 94, 101, 95, 115, 111, 153, 35, 38, 37, 62, 64, 135, 171, 179, 178, 191, 80, 147, 184, 75, 103, 19, 124, 34, 101, 97, 90, 74, 95, 190, 132, 194, 170, 246, 253, 187, 137, 80, 81, 0}
     };
 
-    for (unsigned int i = 0; i < numVertices; i++) 
+    for (unsigned int i = 0; i < numVertices; i++)
         for (unsigned int j = i + 1; j < numVertices; j++) {
             GraphAddWeightedEdge(namedGraph->g, i, j, w[i][j]);
         }
-    
+
     _writeDOT(namedGraph, "Swiss42Graph");
 
     return namedGraph;
@@ -566,11 +629,51 @@ NamedGraph* CreateBays29Graph(void) {
         {167,  79,  77, 205,  97, 185, 435, 243, 111, 163, 322, 238, 206, 288, 243, 275, 319, 253, 281, 135, 108, 332, 342, 218, 350,  39, 263, 199,   0}
     };
 
-    for (unsigned int i = 0; i < numVertices; i++) 
-        for (unsigned int j = i + 1; j < numVertices; j++) 
+    for (unsigned int i = 0; i < numVertices; i++)
+        for (unsigned int j = i + 1; j < numVertices; j++)
             GraphAddWeightedEdge(namedGraph->g, i, j, w[i][j]);
 
     _writeDOT(namedGraph, "Bays29Graph");
+
+    return namedGraph;
+}
+
+// tsplib graph: kroA100. Best solution: 21282
+NamedGraph* CreateKroA100Graph(void) {
+    const unsigned int numVertices = 100;
+    NamedGraph* namedGraph = NamedGraphCreate(numVertices);
+    if (!namedGraph) return NULL;
+
+    double coords[100][2] = {
+        {1380,  939}, {2848,   96}, {3510, 1671}, { 457,  334}, {3888,  666},
+        { 984,  965}, {2721, 1482}, {1286,  525}, {2716, 1432}, { 738, 1325},
+        {1251, 1832}, {2728, 1698}, {3815,  169}, {3683, 1533}, {1247, 1945},
+        { 123,  862}, {1234, 1946}, { 252, 1240}, { 611,  673}, {2576, 1676},
+        { 928, 1700}, {  53,  857}, {1807, 1711}, { 274, 1420}, {2574,  946},
+        { 178,   24}, {2678, 1825}, {1795,  962}, {3384, 1498}, {3520, 1079},
+        {1256,   61}, {1424, 1728}, {3913,  192}, {3085, 1528}, {2573, 1969},
+        { 463, 1670}, {3875,  598}, { 298, 1513}, {3479,  821}, {2542,  236},
+        {3955, 1743}, {1323,  280}, {3447, 1830}, {2936,  337}, {1621, 1830},
+        {3373, 1646}, {1393, 1368}, {3874, 1318}, { 938,  955}, {3022,  474},
+        {2482, 1183}, {3854,  923}, { 376,  825}, {2519,  135}, {2945, 1622},
+        { 953,  268}, {2628, 1479}, {2097,  981}, { 890, 1846}, {2139, 1806},
+        {2421, 1007}, {2290, 1810}, {1115, 1052}, {2588,  302}, { 327,  265},
+        { 241,  341}, {1917,  687}, {2991,  792}, {2573,  599}, {  19,  674},
+        {3911, 1673}, { 872, 1559}, {2863,  558}, { 929, 1766}, { 839,  620},
+        {3893,  102}, {2178, 1619}, {3822,  899}, { 378, 1048}, {1178,  100},
+        {2599,  901}, {3416,  143}, {2961, 1605}, { 611, 1384}, {3113,  885},
+        {2597, 1830}, {2586, 1286}, { 161,  906}, {1429,  134}, { 742, 1025},
+        {1625, 1651}, {1187,  706}, {1787, 1009}, {  22,  987}, {3640,   43},
+        {3756,  882}, { 776,  392}, {1724, 1642}, { 198, 1810}, {3950, 1558}
+    };
+
+    for (unsigned int i = 0; i < numVertices; i++)
+        for (unsigned int j = i + 1; j < numVertices; j++) {
+            double dist = _euclideanDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
+            GraphAddWeightedEdge(namedGraph->g, i, j, dist);
+        }
+
+    _writeDOT(namedGraph, "KroA100Graph");
 
     return namedGraph;
 }
@@ -583,49 +686,49 @@ NamedGraph* CreateA280Graph(void) {
     if (!namedGraph) return NULL;
 
     double coords[280][2] = {
-        {288, 149}, {288, 129}, {270, 133}, {256, 141}, {256, 157}, {246, 157}, {236, 169}, 
-        {228, 169}, {228, 161}, {220, 169}, {212, 169}, {204, 169}, {196, 169}, {188, 169}, 
-        {196, 161}, {188, 145}, {172, 145}, {164, 145}, {156, 145}, {148, 145}, {140, 145}, 
-        {148, 169}, {164, 169}, {172, 169}, {156, 169}, {140, 169}, {132, 169}, {124, 169}, 
-        {116, 161}, {104, 153}, {104, 161}, {104, 169}, {90, 165}, {80, 157}, {64, 157}, 
-        {64, 165}, {56, 169}, {56, 161}, {56, 153}, {56, 145}, {56, 137}, {56, 129}, 
-        {56, 121}, {40, 121}, {40, 129}, {40, 137}, {40, 145}, {40, 153}, {40, 161}, 
-        {40, 169}, {32, 169}, {32, 161}, {32, 153}, {32, 145}, {32, 137}, {32, 129}, 
-        {32, 121}, {32, 113}, {40, 113}, {56, 113}, {56, 105}, {48, 99}, {40, 99}, 
-        {32, 97}, {32, 89}, {24, 89}, {16, 97}, {16, 109}, {8, 109}, {8, 97}, 
-        {8, 89}, {8, 81}, {8, 73}, {8, 65}, {8, 57}, {16, 57}, {8, 49}, 
-        {8, 41}, {24, 45}, {32, 41}, {32, 49}, {32, 57}, {32, 65}, {32, 73}, 
-        {32, 81}, {40, 83}, {40, 73}, {40, 63}, {40, 51}, {44, 43}, {44, 35}, 
-        {44, 27}, {32, 25}, {24, 25}, {16, 25}, {16, 17}, {24, 17}, {32, 17}, 
-        {44, 11}, {56, 9}, {56, 17}, {56, 25}, {56, 33}, {56, 41}, {64, 41}, 
-        {72, 41}, {72, 49}, {56, 49}, {48, 51}, {56, 57}, {56, 65}, {48, 63}, 
-        {48, 73}, {56, 73}, {56, 81}, {48, 83}, {56, 89}, {56, 97}, {104, 97}, 
-        {104, 105}, {104, 113}, {104, 121}, {104, 129}, {104, 137}, {104, 145}, {116, 145}, 
-        {124, 145}, {132, 145}, {132, 137}, {140, 137}, {148, 137}, {156, 137}, {164, 137}, 
-        {172, 125}, {172, 117}, {172, 109}, {172, 101}, {172, 93}, {172, 85}, {180, 85}, 
-        {180, 77}, {180, 69}, {180, 61}, {180, 53}, {172, 53}, {172, 61}, {172, 69}, 
-        {172, 77}, {164, 81}, {148, 85}, {124, 85}, {124, 93}, {124, 109}, {124, 125}, 
-        {124, 117}, {124, 101}, {104, 89}, {104, 81}, {104, 73}, {104, 65}, {104, 49}, 
-        {104, 41}, {104, 33}, {104, 25}, {104, 17}, {92, 9}, {80, 9}, {72, 9}, 
-        {64, 21}, {72, 25}, {80, 25}, {80, 25}, {80, 41}, {88, 49}, {104, 57}, 
-        {124, 69}, {124, 77}, {132, 81}, {140, 65}, {132, 61}, {124, 61}, {124, 53}, 
-        {124, 45}, {124, 37}, {124, 29}, {132, 21}, {124, 21}, {120, 9}, {128, 9}, 
-        {136, 9}, {148, 9}, {162, 9}, {156, 25}, {172, 21}, {180, 21}, {180, 29}, 
-        {172, 29}, {172, 37}, {172, 45}, {180, 45}, {180, 37}, {188, 41}, {196, 49}, 
-        {204, 57}, {212, 65}, {220, 73}, {228, 69}, {228, 77}, {236, 77}, {236, 69}, 
-        {236, 61}, {228, 61}, {228, 53}, {236, 53}, {236, 45}, {228, 45}, {228, 37}, 
-        {236, 37}, {236, 29}, {228, 29}, {228, 21}, {236, 21}, {252, 21}, {260, 29}, 
-        {260, 37}, {260, 45}, {260, 53}, {260, 61}, {260, 69}, {260, 77}, {276, 77}, 
-        {276, 69}, {276, 61}, {276, 53}, {284, 53}, {284, 61}, {284, 69}, {284, 77}, 
-        {284, 85}, {284, 93}, {284, 101}, {288, 109}, {280, 109}, {276, 101}, {276, 93}, 
-        {276, 85}, {268, 97}, {260, 109}, {252, 101}, {260, 93}, {260, 85}, {236, 85}, 
-        {228, 85}, {228, 93}, {236, 93}, {236, 101}, {228, 101}, {228, 109}, {228, 117}, 
-        {228, 125}, {220, 125}, {212, 117}, {204, 109}, {196, 101}, {188, 93}, {180, 93}, 
-        {180, 101}, {180, 109}, {180, 117}, {180, 125}, {196, 145}, {204, 145}, {212, 145}, 
+        {288, 149}, {288, 129}, {270, 133}, {256, 141}, {256, 157}, {246, 157}, {236, 169},
+        {228, 169}, {228, 161}, {220, 169}, {212, 169}, {204, 169}, {196, 169}, {188, 169},
+        {196, 161}, {188, 145}, {172, 145}, {164, 145}, {156, 145}, {148, 145}, {140, 145},
+        {148, 169}, {164, 169}, {172, 169}, {156, 169}, {140, 169}, {132, 169}, {124, 169},
+        {116, 161}, {104, 153}, {104, 161}, {104, 169}, {90, 165}, {80, 157}, {64, 157},
+        {64, 165}, {56, 169}, {56, 161}, {56, 153}, {56, 145}, {56, 137}, {56, 129},
+        {56, 121}, {40, 121}, {40, 129}, {40, 137}, {40, 145}, {40, 153}, {40, 161},
+        {40, 169}, {32, 169}, {32, 161}, {32, 153}, {32, 145}, {32, 137}, {32, 129},
+        {32, 121}, {32, 113}, {40, 113}, {56, 113}, {56, 105}, {48, 99}, {40, 99},
+        {32, 97}, {32, 89}, {24, 89}, {16, 97}, {16, 109}, {8, 109}, {8, 97},
+        {8, 89}, {8, 81}, {8, 73}, {8, 65}, {8, 57}, {16, 57}, {8, 49},
+        {8, 41}, {24, 45}, {32, 41}, {32, 49}, {32, 57}, {32, 65}, {32, 73},
+        {32, 81}, {40, 83}, {40, 73}, {40, 63}, {40, 51}, {44, 43}, {44, 35},
+        {44, 27}, {32, 25}, {24, 25}, {16, 25}, {16, 17}, {24, 17}, {32, 17},
+        {44, 11}, {56, 9}, {56, 17}, {56, 25}, {56, 33}, {56, 41}, {64, 41},
+        {72, 41}, {72, 49}, {56, 49}, {48, 51}, {56, 57}, {56, 65}, {48, 63},
+        {48, 73}, {56, 73}, {56, 81}, {48, 83}, {56, 89}, {56, 97}, {104, 97},
+        {104, 105}, {104, 113}, {104, 121}, {104, 129}, {104, 137}, {104, 145}, {116, 145},
+        {124, 145}, {132, 145}, {132, 137}, {140, 137}, {148, 137}, {156, 137}, {164, 137},
+        {172, 125}, {172, 117}, {172, 109}, {172, 101}, {172, 93}, {172, 85}, {180, 85},
+        {180, 77}, {180, 69}, {180, 61}, {180, 53}, {172, 53}, {172, 61}, {172, 69},
+        {172, 77}, {164, 81}, {148, 85}, {124, 85}, {124, 93}, {124, 109}, {124, 125},
+        {124, 117}, {124, 101}, {104, 89}, {104, 81}, {104, 73}, {104, 65}, {104, 49},
+        {104, 41}, {104, 33}, {104, 25}, {104, 17}, {92, 9}, {80, 9}, {72, 9},
+        {64, 21}, {72, 25}, {80, 25}, {80, 25}, {80, 41}, {88, 49}, {104, 57},
+        {124, 69}, {124, 77}, {132, 81}, {140, 65}, {132, 61}, {124, 61}, {124, 53},
+        {124, 45}, {124, 37}, {124, 29}, {132, 21}, {124, 21}, {120, 9}, {128, 9},
+        {136, 9}, {148, 9}, {162, 9}, {156, 25}, {172, 21}, {180, 21}, {180, 29},
+        {172, 29}, {172, 37}, {172, 45}, {180, 45}, {180, 37}, {188, 41}, {196, 49},
+        {204, 57}, {212, 65}, {220, 73}, {228, 69}, {228, 77}, {236, 77}, {236, 69},
+        {236, 61}, {228, 61}, {228, 53}, {236, 53}, {236, 45}, {228, 45}, {228, 37},
+        {236, 37}, {236, 29}, {228, 29}, {228, 21}, {236, 21}, {252, 21}, {260, 29},
+        {260, 37}, {260, 45}, {260, 53}, {260, 61}, {260, 69}, {260, 77}, {276, 77},
+        {276, 69}, {276, 61}, {276, 53}, {284, 53}, {284, 61}, {284, 69}, {284, 77},
+        {284, 85}, {284, 93}, {284, 101}, {288, 109}, {280, 109}, {276, 101}, {276, 93},
+        {276, 85}, {268, 97}, {260, 109}, {252, 101}, {260, 93}, {260, 85}, {236, 85},
+        {228, 85}, {228, 93}, {236, 93}, {236, 101}, {228, 101}, {228, 109}, {228, 117},
+        {228, 125}, {220, 125}, {212, 117}, {204, 109}, {196, 101}, {188, 93}, {180, 93},
+        {180, 101}, {180, 109}, {180, 117}, {180, 125}, {196, 145}, {204, 145}, {212, 145},
         {220, 145}, {228, 145}, {236, 145}, {246, 141}, {252, 125}, {260, 129}, {280, 133}
     };
 
-    for (unsigned int i = 0; i < numVertices; i++) 
+    for (unsigned int i = 0; i < numVertices; i++)
         for (unsigned int j = i + 1; j < numVertices; j++) {
             double dist = _euclideanDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
             GraphAddWeightedEdge(namedGraph->g, i, j, dist);

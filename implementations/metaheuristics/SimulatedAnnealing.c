@@ -66,7 +66,9 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
     double alpha = SA_COOLING_RATE; // cooling rate
     unsigned int iterations = SA_MULTIPLIER * numVertices; // swap num at each temperature
 
-    while (T > Tmin) {
+    // A 2-opt move needs two non-adjacent edges, which only exist for N >= 4.
+    // For N < 4 there is a single tour, so skip annealing (otherwise the "pick two non-adjacent edges" loop below spins forever).
+    while (numVertices >= 4 && T > Tmin) {
         for (unsigned int k = 0; k < iterations; k++) {
             unsigned int i, j;
 

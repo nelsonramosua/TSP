@@ -3,7 +3,7 @@
 // Nelson Ramos, 124921.
 //
 // November, 2025.
-// 
+//
 // You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 #ifndef GRAPH_FACTORY_H
@@ -22,12 +22,20 @@ NamedGraph* CreateEuclideanGraph15(void);
 
 NamedGraph* CreateRandomEuclideanGraph(unsigned int N, double maxX, double maxY); // not being tested atm. do it!
 
+// Small boundary/robustness graphs (exercise base cases: single tour, first real 2-Opt choice).
+NamedGraph* CreateTriangleGraph3(void);
+NamedGraph* CreateSquareGraph4(void);
+
+// A deliberately NON-metric graph (triangle inequality violated): Christofides loses its 1.5x guarantee here, and the MST/HK-Lagrangian bounds loosen -- Held-Karp still gives the exact optimum.
+NamedGraph* CreateNonMetricGraph8(void);
+
 // TSPLIB graphs
 // see here: https://github.com/mastqe/tsplib/
 NamedGraph* CreateEil51Graph(void);
 NamedGraph* CreateOliver30Graph(void);
 NamedGraph* CreateSwiss42Graph(void);
 NamedGraph* CreateBays29Graph(void);
+NamedGraph* CreateKroA100Graph(void);
 NamedGraph* CreateA280Graph(void);
 
 // Add your own! See implementation for details!

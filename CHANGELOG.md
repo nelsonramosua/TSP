@@ -37,8 +37,13 @@ Reaches the optimum on Swiss42/Bays29/Oliver30 and is A280's best result here (2
 Reaches the known optimum on several TSPLIB/known instances.
 - All four verified: tours pass `TourInvariant`, tracked cost equals a fresh recomputation (so the Or-opt/3-opt incremental deltas are exact), improvements never worsen their seed, and valgrind reports no leaks. 
 Wired into the comparison driver (Or-Opt/3-Opt refine the Nearest Neighbour tour).
+- **Test graphs** (`GraphFactory.c`): four new instances in the default benchmark -- `CreateKroA100Graph` (TSPLIB kroA100, opt 21 282) fills the size gap between Eil51 and A280; `CreateNonMetricGraph8` deliberately violates the triangle inequality (Christofides lands ~30% over the HK optimum here, showing its metric-only guarantee); and `CreateTriangleGraph3` / `CreateSquareGraph4` cover the boundary cases (single tour; first graph where a 2-Opt move helps). 
+All produce valid tours across every algorithm, valgrind-clean.
 
 ### Fixed
+- **Simulated Annealing -- infinite loop on N < 4**: the "pick two non-adjacent edges" `do/while` never terminated for N < 4 (a triangle has no non-adjacent edge pair, so no 2-Opt move exists). 
+SA now skips annealing for N < 4 and returns the trivial tour. 
+Surfaced by the new `CreateTriangleGraph3` instance.
 - **Christofides / Blossom MWPM**: the weighted Blossom matching returned a *valid but non-minimum* perfect matching whenever odd blossoms formed (approx. 13% of random instances), which degraded Christofides tours. 
 Rewrote it as a correct primal-dual weighted blossom (with blossom duals and expansion), verified against a brute-force minimum-weight perfect-matching oracle: 0 mismatches over 2000 integer + 500 double-weight trials.
 Christofides now builds on a genuinely minimum matching and respects its 1.5× guarantee.
@@ -58,7 +63,7 @@ This lets SA run on A280 (previously > 45 s, effectively unusable). Same search,
 They are now heap buffers allocated **once** (ant tours share one contiguous pool). 
 The RNG call order is unchanged, so results are identical.
 - **Comparison driver -- A280 enabled**: `CreateA280Graph` ($N=280$) is now part of the default benchmark. 
-The methods that do not scale (3-Opt, Tabu Search, Ant Colony) are gated to $N \le 100$, joining the Genetic Algorithm's existing $N \le 55$ gate.
+The methods that do not scale (3-Opt, Tabu Search, Ant Colony) are gated to $N \le 60$, joining the Genetic Algorithm's existing $N \le 55$ gate (the gate was tightened from 100 to 60 once kroA100 showed those methods take 10--16 s each at $N=100$ for worse results than GRASP's sub-second answer).
 - **Genetic Algorithm -- memory overhead**: removed the per-generation allocation churn (a temp `Tour` per fitness eval, deep-copied parents per selection, and a full population rebuilt every generation). 
 It now computes cost in place, selects parents by pointer, ping-pongs between two pre-allocated populations, and keeps each population's paths in one contiguous pool. 
 Allocation is now **O(population)** for the whole run instead of **O(population * generations)**; the search itself is unchanged.
