@@ -13,6 +13,7 @@ graph TB
         D[NamedGraph]
         E[HashMap]
         L[PriorityQueue]
+        M[NeighbourList]
     end
     
     subgraph "Algorithms"
@@ -40,6 +41,8 @@ graph TB
     
     G --> J
     G --> L
+    H --> M
+    M --> L
     I --> C
 ```
 
@@ -75,6 +78,8 @@ graph LR
     Christofides[Christofides] --> Blossom[Blossom]
     Christofides[Christofides] --> Graph
     Greedy[Greedy] --> PriorityQueue[PriorityQueue.c]
+    LinKernighan[Lin-Kernighan] --> NeighbourList[NeighbourList.c]
+    NeighbourList --> PriorityQueue
     Bounds[LowerBounds/*] --> Prim[Prim_MST]
     
     Test[TSPTest.c] --> Factory[GraphFactory.c]

@@ -30,7 +30,7 @@
 
 - name: heuristic
   color: "0e8a16"
-  description: Relates to constructive heuristics (Greedy, NN, NearestInsertion, FarthestInsertion, ClarkeWright, Christofides).
+  description: Constructive heuristics (Greedy, NN, Nearest/Farthest Insertion, Clarke-Wright, Christofides).
 
 - name: metaheuristic
   color: "006b75"

@@ -12,9 +12,17 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - **PriorityQueue ADT** (`headers/PriorityQueue.h`, `implementations/graph/PriorityQueue.c`): an indexed binary min-heap over integer items with O(log n) insert / extract-min / decrease-key and O(1) contains (ties broken by item id for determinism). 
 This is the auxiliary ADT the README/Greedy/Prim notes kept pointing at.
+- **NeighbourList ADT** (`headers/NeighbourList.h`, `implementations/graph/NeighbourList.c`): per-vertex k-nearest-neighbour candidate lists, built with the PriorityQueue; used by Lin-Kernighan to restrict moves to promising partners.
+- **Lin-Kernighan** (`implementations/metaheuristics/LinKernighan.c`): variable-depth local search (chained edge exchanges via the gain criterion, realised as 2-Opt reversals, keeping the best-improving prefix) using the candidate lists. 
+The strongest local search in the project; verified tour-valid with tracked cost == recomputed cost, never worsens its seed, valgrind-clean. 
+Reaches the known optimum on several instances (e.g. Bays29, Swiss42) and is competitive with 3-Opt on the rest.
 - **Farthest Insertion** (`implementations/heuristics/FarthestInsertion.c`): constructive heuristic that inserts the vertex farthest from the current tour at its cheapest position; typically beats Nearest Insertion. 
 (No separate "Cheapest Insertion" — Greedy already is cheapest insertion.)
 - **Clarke-Wright Savings** (`implementations/heuristics/ClarkeWright.c`): a new *class* of construction heuristic -- merges chains by decreasing savings around a depot, guarded by union-find; O(N² * log N).
+- **Tabu Search** (`implementations/metaheuristics/TabuSearch.c`): best-improvement 2-Opt search with a tabu list (recently-added edges protected) and an aspiration criterion; accepts worsening moves to escape local optima. 
+Rounds out the metaheuristic family (SA/ACO/GA). 
+Verified tour-valid, best cost == recomputed, valgrind-clean.
+Reaches the known optimum on several instances (e.g. Bays29, Matrix20).
 - **Or-opt** (`implementations/metaheuristics/OrOpt.c`): local search that relocates chains of 1–3 consecutive cities (optionally reversed), complementing 2-Opt.
 - **3-opt** (`implementations/metaheuristics/ThreeOpt.c`): local search removing three edges and trying all 7 reconnections; a strictly larger neighbourhood than 2-Opt. 
 Reaches the known optimum on several TSPLIB/known instances.

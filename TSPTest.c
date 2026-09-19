@@ -128,6 +128,13 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
             .tspFun = ThreeOpt_Adapter, .name = "3-Opt Improvement", .maxVertices = 0, .extra = threeOptTour });
     }
 
+    // 3.3. Lin-Kernighan Improvement (based on Nearest Neighbour)
+    if (nearestNeighbourTour) {
+        Tour* lkTour = TourDeepCopy(nearestNeighbourTour);
+        executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+            .tspFun = LinKernighan_Adapter, .name = "Lin-Kernighan Improvement", .maxVertices = 0, .extra = lkTour });
+    }
+
     // 4. Greedy
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
         .tspFun = Greedy_Adapter, .name = "Greedy Heuristic", .maxVertices = 0, .extra = NULL });
@@ -163,6 +170,10 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
     // 8. Ant Colony
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
         .tspFun = AntColony_Adapter, .name = "Ant Colony Optimization", .maxVertices = 0, .extra = NULL });
+
+    // 8.5. Tabu Search
+    executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+        .tspFun = TabuSearch_Adapter, .name = "Tabu Search", .maxVertices = 0, .extra = NULL });
 
     // 9. Genetic Algorithm
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){

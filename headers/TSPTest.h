@@ -53,6 +53,10 @@ static Tour* ThreeOpt_Adapter(const Graph* g, void* extra) {
     return ThreeOpt_ImproveTour((Graph*)g, (Tour*)extra);
 }
 
+static Tour* LinKernighan_Adapter(const Graph* g, void* extra) {
+    return LinKernighan_ImproveTour((Graph*)g, (Tour*)extra);
+}
+
 static Tour* FarthestInsertion_Adapter(const Graph* g, void* unused) {
     (void)unused;
     return FarthestInsertion_FindTour((Graph*)g);
@@ -85,6 +89,11 @@ static Tour* Christofides_Adapter(const Graph* g, void* unused) {
 static Tour* AntColony_Adapter(const Graph* g, void* unused) {
     (void)unused;
     return AntColony_FindTour((Graph*)g);
+}
+
+static Tour* TabuSearch_Adapter(const Graph* g, void* unused) {
+    (void)unused;
+    return TabuSearch_FindTour((Graph*)g);
 }
 
 static Tour* GeneticAlgorithm_Adapter(const Graph* g, void* unused) {

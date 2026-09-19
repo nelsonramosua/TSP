@@ -18,7 +18,7 @@ This project was done for academic, experimentation and fun purposes, and thus s
 
 ## Key Features
 
-- **15 Algorithms** - From brute-force to the genetic algorithm.
+- **17 Algorithms** - From brute-force to Lin-Kernighan, Tabu Search and the genetic algorithm.
 - **Built-in Benchmarks** - TSPLIB instances.
 - **Real-world Graphs** - Portuguese and European cities.
 - **Named Vertices** - City names support.
@@ -46,7 +46,8 @@ TSP/
 │   ├── LowerBounds.h
 │   ├── Metaheuristics.h
 │   ├── NamedGraph.h            # Abstraction layer for graphs with names as vertices.
-│   ├── PriorityQueue.h         # Indexed min-heap ADT (used by Greedy).
+│   ├── NeighbourList.h         # k-nearest-neighbour candidate lists (used by Lin-Kernighan).
+│   ├── PriorityQueue.h         # Indexed min-heap ADT (used by Greedy & NeighbourList).
 │   ├── TSPTest.h               # Test driver header
 │   └── SortedList.h
 ├── implementations/
@@ -58,6 +59,8 @@ TSP/
 │   │   ├── Graph.c
 │   │   ├── HashMap.c           # !SIMPLE! AuxiliaryADT used in NamedGraph to keep mapping (vertexId, cityName).
 │   │   ├── NamedGraph.c        # Abstraction layer for graphs with names as vertices.
+│   │   ├── PriorityQueue.c     # Indexed min-heap ADT.
+│   │   ├── NeighbourList.c     # k-nearest-neighbour candidate lists.
 │   │   └── SortedList.c
 │   ├── heuristics/             # Heuristic algorithms
 │   │   ├── Greedy.c
@@ -74,6 +77,7 @@ TSP/
 │   │   ├── TwoOpt.c
 │   │   ├── OrOpt.c
 │   │   ├── ThreeOpt.c
+│   │   ├── LinKernighan.c
 │   │   ├── SimulatedAnnealing.c
 │   │   ├── GeneticAlgorithm.c
 │   │   └── AntColony.c
@@ -136,9 +140,11 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 | **2-Opt Improvement**     | Meta-heuristic  | $O(N^3)$      | Local search to improve an existing tour; often used after other algorithms. |
 | **Or-Opt Improvement**    | Meta-heuristic  | $O(N^3)$      | Local search that relocates chains of 1–3 cities (optionally reversed); complements 2-Opt. |
 | **3-Opt Improvement**     | Meta-heuristic  | $O(N^3)$      | Local search removing 3 edges and trying all 7 reconnections; stronger neighbourhood than 2-Opt. |
+| **Lin-Kernighan**         | Meta-heuristic  | $O(N^2)$ per pass | Variable-depth local search (chained edge exchanges) with nearest-neighbour candidate lists; the strongest local search here. |
 | **Simulated Annealing**   | Meta-heuristic  | $O(N^2 \times \text{Iterations}) = O(N^3 \times \text{SA-MULTIPLIER})$      | Probabilistic improvement using 2-opt swaps. |
 | **Ant Colony Optimization** | Meta-heuristic | $O(N^2 \times \text{Iterations} \times \text{Ants}) = O(N^3 \times \text{Iterations})$ | Probabilistic search guided by pheromone trails; computationally heavier but can yield high-quality solutions. |
 | **Genetic Algorithm (GA)** | Meta-heuristic | $O(N^2 \times \text{Generations} \times \text{Population})$ | Population-based search simulating evolution (selection, crossover, mutation). Depending on the # Generations, it can be very slow. For the current parameters, that's for around $N \ge 55$.|
+| **Tabu Search** | Meta-heuristic | $O(N^2 \times \text{Iterations}) = O(N^3 \times \text{TABU-MULTIPLIER})$ | Best-improvement 2-Opt search with a tabu list (recently-added edges are protected) plus an aspiration criterion; accepts worsening moves to escape local optima. |
 | **Lower Bound MST**     | Utility         | $O(N^2)$                          | Provides a minimum cost estimate using a **Minimum Spanning Tree**. |
 | **Lower Bound Held-Karp Lagrangian Relaxation**     | Utility         | $O(N^2)$                          | Provides a minimum cost estimate using a **Held-Karp Lagrangian Relaxation**. |
 
@@ -244,6 +250,7 @@ Install the CLI from the [CodeQL bundle releases](https://github.com/github/code
 | 2-opt on NN | 9982.25 | 10.2% |
 | Or-opt on NN | 9057.46 | 0% |
 | 3-opt on NN | 9057.46 | 0% |
+| Lin-Kernighan on NN | 9057.46 | 0% |
 | Greedy | 9668.3 | 6.7% |
 | Nearest-Insertion | 9668.3 | 6.7% |
 | Farthest-Insertion | 9057.46 | 0% |
@@ -252,6 +259,7 @@ Install the CLI from the [CodeQL bundle releases](https://github.com/github/code
 | Simulated Annealing | 9057.46 | 0% |
 | Ant Colony | 9057.46 | 0% |
 | Genetic Algorithm | 9057.46 | 0% |
+| Tabu Search | 9057.46 | 0% |
 
 ---
 
@@ -284,8 +292,8 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * For small graphs ($N \le 12$), Exhaustive Search guarantees optimal results. However, it is disabled. Uncomment to enable.
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended and will provide good approximations.
 * For large graphs ($N > 100$), meta-heuristics like Simulated Annealing and Ant Colony Optimization provide the best **approximations**.
-* Use the local-search improvements (2-Opt, Or-Opt, 3-Opt) as a post-processing step to refine heuristic solutions. 
-At the moment, they are each applied to the Nearest Neighbour tour (3-Opt gives the strongest refinement, at higher cost). 
+* Use the local-search improvements (2-Opt, Or-Opt, 3-Opt, Lin-Kernighan) as a post-processing step to refine heuristic solutions. 
+At the moment, they are each applied to the Nearest Neighbour tour (Lin-Kernighan is the strongest, and scales best thanks to its candidate lists). 
 They could just as well be chained (e.g. 2-Opt then Or-Opt) or run on any other construction heuristic... Try variations. :)
 * Genetic Algorithm performance is highly dependent on parameters (the other metaheuristic algorithms are as well). 
 It *used* to be by far the heaviest allocator -- it created and destroyed whole Populations and Individuals every generation -- but that was reworked (see `GeneticAlgorithm.c`): it now reuses two pre-allocated populations across all generations, keeps each population's paths in one contiguous pool, and selects parents by pointer. 

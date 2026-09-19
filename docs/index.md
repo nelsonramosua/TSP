@@ -41,9 +41,11 @@ An educational implementation of **algorithms** to solve the Traveling Salesman 
 | 2-Opt Improvement | Meta-heuristic | O(N³) |
 | Or-Opt Improvement | Meta-heuristic | O(N³) |
 | 3-Opt Improvement | Meta-heuristic | O(N³) |
+| Lin-Kernighan | Meta-heuristic | O(N²) per pass |
 | Simulated Annealing | Meta-heuristic | O(N³ × multiplier) |
 | Ant Colony Optimization | Meta-heuristic | O(N³ × iterations) |
 | Genetic Algorithm | Meta-heuristic | O(N² × gen × pop) |
+| Tabu Search | Meta-heuristic | O(N² × iterations) |
 
 Plus two lower bound utilities: **MST Lower Bound** and **Held-Karp Lagrangian Relaxation**.
 
@@ -78,10 +80,12 @@ Actual optimal: **9057.46 km**
 | Simulated Annealing | 9057.46 | 0% |
 | Ant Colony | 9057.46 | 0% |
 | Genetic Algorithm | 9057.46 | 0% |
+| Tabu Search | 9057.46 | 0% |
 | Farthest Insertion | 9057.46 | 0% |
 | Clarke-Wright Savings | 9057.46 | 0% |
 | Or-opt on NN | 9057.46 | 0% |
 | 3-opt on NN | 9057.46 | 0% |
+| Lin-Kernighan on NN | 9057.46 | 0% |
 | Greedy | 9668.3 | 6.7% |
 | Nearest Insertion | 9668.3 | 6.7% |
 | Christofides | 10027.97 | 10.7% |
