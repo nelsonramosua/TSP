@@ -48,6 +48,7 @@ An educational implementation of **algorithms** to solve the Traveling Salesman 
 | Genetic Algorithm | Meta-heuristic | O(N² × gen × pop) |
 | Tabu Search | Meta-heuristic | O(N² × iterations) |
 | GRASP | Meta-heuristic | O(iterations × (N² + 2-Opt)) |
+| ISPO | Meta-heuristic | O(particles × iterations × N²) |
 
 Plus two lower bound utilities: **MST Lower Bound** and **Held-Karp Lagrangian Relaxation**.
 
@@ -85,6 +86,7 @@ Actual optimal: **9057.46 km**
 | Genetic Algorithm | 9057.46 | 0% |
 | Tabu Search | 9057.46 | 0% |
 | GRASP | 9057.46 | 0% |
+| ISPO | 9057.46 | 0% |
 | Farthest Insertion | 9057.46 | 0% |
 | Clarke-Wright Savings | 9057.46 | 0% |
 | Or-opt on NN | 9057.46 | 0% |

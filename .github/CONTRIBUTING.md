@@ -88,10 +88,10 @@ Use the [Bug Report](.github/ISSUE_TEMPLATE/bug_report.yml) issue template. Incl
 Use the [New Algorithm](.github/ISSUE_TEMPLATE/new_algorithm.yml) issue template before opening a PR. This lets us discuss feasibility and avoid duplicate work.
 
 Good candidates (not yet implemented):
-- ISPO (as mentioned in the README).
 - Convex-hull cheapest insertion (Euclidean instances).
+- Christofides-Serdyukov with Lin-Kernighan polishing, GVNS, or other hybrids.
 
-(Already implemented, for reference: Branch & Bound, Or-Opt / 3-Opt / Lin-Kernighan / Tabu Search / GRASP, Farthest Insertion, and Clarke-Wright Savings.)
+(Already implemented, for reference: Branch & Bound, Or-Opt / 3-Opt / Lin-Kernighan / Tabu Search / GRASP / ISPO, Farthest Insertion, and Clarke-Wright Savings.)
 
 ### Adding a New Graph
 

@@ -43,6 +43,7 @@ C_SRCS = $(GRAPH_DIR)/Graph.c \
          $(META_DIR)/LinKernighan.c \
          $(META_DIR)/TabuSearch.c \
          $(META_DIR)/GRASP.c \
+         $(META_DIR)/ISPO.c \
          $(META_DIR)/SimulatedAnnealing.c \
          $(META_DIR)/AntColony.c \
          $(META_DIR)/GeneticAlgorithm.c \

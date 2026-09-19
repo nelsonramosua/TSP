@@ -32,6 +32,11 @@ Reaches the known optimum on several instances (e.g. Bays29, Matrix20).
 Reuses one prebuilt NeighbourList + DistanceMatrix across all restarts (its 2-Opt is a quiet, self-contained variant). 
 Verified tour-valid, best cost == recomputed, valgrind-clean. 
 Reaches the optimum on Swiss42/Bays29/Oliver30 and is A280's best result here (2708 vs 2720 for Lin-Kernighan).
+- **ISPO** (`implementations/metaheuristics/ISPO.c`): the discrete-PSO method of Wang, Mu & Zhu (2013). 
+The velocity is a "mobile sequence" of "mobile operators" (each moves a city *k* steps along the tour); position update applies the sequence, velocity update combines the inertia-scaled old velocity with the pbest- and gbest-difference sequences (each operator retained probabilistically, per the paper's Def. 6). 
+Hybridised with a memetic 2-Opt descent on every particle (the paper's SA-neighbourhood role) and seeded with one Nearest-Neighbour tour, which is what makes it competitive -- pure discrete PSO drifts far from the optimum. 
+Verified tour-valid, best cost == recomputed, valgrind-clean; near-optimal on the tested instances (optimal on Bays29/Oliver30/Swiss42, +0.05% on kroA100). 
+Gated to $N \le 100$ in the driver.
 - **Or-opt** (`implementations/metaheuristics/OrOpt.c`): local search that relocates chains of 1–3 consecutive cities (optionally reversed), complementing 2-Opt.
 - **3-opt** (`implementations/metaheuristics/ThreeOpt.c`): local search removing three edges and trying all 7 reconnections; a strictly larger neighbourhood than 2-Opt. 
 Reaches the known optimum on several TSPLIB/known instances.

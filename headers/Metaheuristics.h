@@ -47,4 +47,13 @@
 #define GRASP_ITERATIONS 50    // # of randomized-greedy construction + 2-Opt restarts
 #define GRASP_ALPHA 0.3        // restricted-candidate-list greediness: 0 = pure greedy, 1 = fully random
 
+// Configuration for ISPO (discrete PSO with "mobile operators" + SA neighbourhood; Wang, Mu & Zhu 2013)
+#define ISPO_PARTICLES 40      // swarm size (paper: 40)
+#define ISPO_ITERATIONS 120    // main-loop iterations (each descends every particle to a 2-Opt optimum)
+#define ISPO_W_MAX 0.9         // inertia weight at iteration 0 (retain prob for the old velocity)
+#define ISPO_W_MIN 0.4         // inertia weight at the last iteration (linearly decreased)
+#define ISPO_C1 1.0            // cognitive coeff: retain each pbest-difference operator w.p. C1*rand
+#define ISPO_C2 1.0            // social coeff: retain each gbest-difference operator w.p. C2*rand
+#define ISPO_STAGNATION 10     // m: re-initialize velocities after this many stagnant iterations
+
 #endif // METAHEURISTICS_H

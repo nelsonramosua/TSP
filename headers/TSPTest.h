@@ -106,6 +106,11 @@ static Tour* GRASP_Adapter(const Graph* g, void* unused) {
     return GRASP_FindTour((Graph*)g);
 }
 
+static Tour* ISPO_Adapter(const Graph* g, void* unused) {
+    (void)unused;
+    return ISPO_FindTour((Graph*)g);
+}
+
 static Tour* GeneticAlgorithm_Adapter(const Graph* g, void* unused) {
     (void)unused;
     return GeneticAlgorithm_FindTour((Graph*)g);

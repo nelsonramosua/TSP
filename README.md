@@ -18,7 +18,7 @@ This project was done for academic, experimentation and fun purposes, and thus s
 
 ## Key Features
 
-- **19 Algorithms** - From brute-force and Branch & Bound to Lin-Kernighan, Tabu Search, GRASP and the genetic algorithm.
+- **20 Algorithms** - From brute-force and Branch & Bound to Lin-Kernighan, Tabu Search, GRASP, ISPO and the genetic algorithm.
 - **Built-in Benchmarks** - TSPLIB instances.
 - **Real-world Graphs** - Portuguese and European cities.
 - **Named Vertices** - City names support.
@@ -85,7 +85,8 @@ TSP/
 │   │   ├── GeneticAlgorithm.c
 │   │   ├── AntColony.c
 │   │   ├── TabuSearch.c
-│   │   └── GRASP.c
+│   │   ├── GRASP.c
+│   │   └── ISPO.c              # Discrete PSO (mobile operators) + memetic 2-Opt local search.
 │   └── mst/                    # Minimum Spanning Tree utilities (used by Christofides.c & LowerBound_MST.c).
 │       └── Prim_MST.c
 ├── graphs/                     # Predefined and generated graphs (.dot)
@@ -98,8 +99,9 @@ TSP/
 └── TravelingSalesmanProblem.h  # Main project header
 ```
 
-**Note**: In the future, I would like to implement ISPO, as described in this paper: https://www.researchgate.net/publication/271285365_ISPO_A_New_Way_to_Solve_Traveling_Salesman_Problem.\
-For the moment, I will leave that as an exercise to the contributer. :)
+**Note**: ISPO (from this paper: https://www.researchgate.net/publication/271285365_ISPO_A_New_Way_to_Solve_Traveling_Salesman_Problem) is now implemented in `implementations/metaheuristics/ISPO.c`.
+Despite the name, it is a *discrete* PSO: the velocity is a "mobile sequence" of "mobile operators" (each moves a city some steps along the tour), and it is hybridised with a local search. 
+Here, that local search is a memetic 2-Opt descent applied to every particle, which is what makes it competitive (near-optimal on the tested instances).
 
 ### Module Dependencies
 
@@ -152,6 +154,7 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 | **Genetic Algorithm (GA)** | Meta-heuristic | $O(N^2 \times \text{Generations} \times \text{Population})$ | Population-based search simulating evolution (selection, crossover, mutation). Depending on the # Generations, it can be very slow. For the current parameters, that's for around $N \ge 55$.|
 | **Tabu Search** | Meta-heuristic | $O(N^2 \times \text{Iterations}) = O(N^3 \times \text{TABU-MULTIPLIER})$ | Best-improvement 2-Opt search with a tabu list (recently-added edges are protected) plus an aspiration criterion; accepts worsening moves to escape local optima. |
 | **GRASP** | Meta-heuristic | $O(\text{Iterations} \times (N^2 + \text{2-Opt}))$ | Multi-start: each restart builds a randomized-greedy tour (restricted-candidate-list nearest neighbour) then improves it with 2-Opt; keeps the best. Reaches the optimum on several instances (e.g. Swiss42, Bays29). |
+| **ISPO** | Meta-heuristic | $O(\text{Particles} \times \text{Iterations} \times N^2)$ | Discrete PSO whose velocity is a "mobile sequence" of move-a-city-*k*-steps operators (Wang, Mu & Zhu 2013), hybridised with a memetic 2-Opt descent on every particle. Near-optimal on the tested instances (e.g. optimal on Bays29/Oliver30/Swiss42, ~0.5% on kroA100). |
 | **Lower Bound MST**     | Utility         | $O(N^2)$                          | Provides a minimum cost estimate using a **Minimum Spanning Tree**. |
 | **Lower Bound Held-Karp Lagrangian Relaxation**     | Utility         | $O(N^2)$                          | Provides a minimum cost estimate using a **Held-Karp Lagrangian Relaxation**. |
 
@@ -269,6 +272,7 @@ Install the CLI from the [CodeQL bundle releases](https://github.com/github/code
 | Genetic Algorithm | 9057.46 | 0% |
 | Tabu Search | 9057.46 | 0% |
 | GRASP | 9057.46 | 0% |
+| ISPO | 9057.46 | 0% |
 
 **Graph: TSPLIB kroA100** (Actual optimal: 21 282) -- a mid-size instance filling the gap between Eil51 and A280.
 
@@ -282,9 +286,10 @@ Install the CLI from the [CodeQL bundle releases](https://github.com/github/code
 | Christofides | 24 023 | 12.9% |
 | Simulated Annealing | ~21 900 | ~2.9% |
 | GRASP | 21 379 | 0.5% |
+| ISPO | 21 399 | 0.6% |
 | 3-opt / Ant Colony / Tabu / Genetic | disabled ($N > 60$) | n/a |
 
-GRASP gets within **0.5%** of the optimum here. 
+GRASP and ISPO both get within **~0.5%** of the optimum here. 
 The $O(N^3)$-per-pass 3-Opt and the population/colony methods are gated off (they take 10--16 s each at $N=100$ for worse results than GRASP gives in a fraction of a second).
 
 **Graph: TSPLIB A280** (Actual optimal: 2579) -- the largest instance, showing which methods scale.
@@ -303,6 +308,7 @@ The $O(N^3)$-per-pass 3-Opt and the population/colony methods are gated off (the
 | Simulated Annealing | 2839 | 10.1% |
 | GRASP | 2708 | 5.0% |
 | 3-opt / Ant Colony / Tabu / Genetic | disabled ($N > 60$) | n/a |
+| ISPO | disabled ($N > 100$) | n/a |
 
 The candidate-list local searches (2-Opt, Or-Opt, Lin-Kernighan), Simulated Annealing and GRASP all finish A280 in a few seconds or less (GRASP -- best here at 2708 -- runs 50 restarts sharing one candidate list and distance matrix).
 The $O(N^3)$-per-pass 3-Opt and the population/colony methods (Ant Colony, Tabu, Genetic) are gated off for $N > 60$ in the driver (Genetic at $N > 55$).
@@ -340,7 +346,8 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * For small graphs ($N \le 12$), Exhaustive Search guarantees optimal results. However, it is disabled. Uncomment to enable.
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended and will provide good approximations.
 * For large graphs ($N > 100$), the methods that scale are the candidate-list local searches (2-Opt, Or-Opt, Lin-Kernighan), Simulated Annealing and GRASP; these run on A280 ($N=280$) in a few seconds or less. 
-The $O(N^3)$-per-pass 3-Opt and the population/colony methods (Ant Colony, Tabu, Genetic) are gated off for larger $N$ in the driver ($N > 60$; Genetic $N > 55$) -- on kroA100 they take 10--16 s each for worse results than GRASP gives in a fraction of a second.
+The $O(N^3)$-per-pass 3-Opt and the population/colony methods (Ant Colony, Tabu, Genetic) are gated off for larger $N$ in the driver ($N > 60$; Genetic $N > 55$) -- on kroA100 they take 10--16 s each for worse results than GRASP gives in a fraction of a second. 
+ISPO (memetic PSO) is near-optimal up to kroA100 but its per-particle local search makes it costly at $N=280$, so it is gated at $N > 100$.
 * Use the local-search improvements (2-Opt, Or-Opt, 3-Opt, Lin-Kernighan) as a post-processing step to refine heuristic solutions. 
 At the moment, they are each applied to the Nearest Neighbour tour (Lin-Kernighan is the strongest, and scales best thanks to its candidate lists). 
 They could just as well be chained (e.g. 2-Opt then Or-Opt) or run on any other construction heuristic... Try variations. :)

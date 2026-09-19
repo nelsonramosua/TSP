@@ -188,6 +188,10 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
         .tspFun = GRASP_Adapter, .name = "GRASP", .maxVertices = 0, .extra = NULL });
 
+    // 8.8. ISPO (discrete PSO with mobile operators + SA neighbourhood)
+    executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+        .tspFun = ISPO_Adapter, .name = "ISPO", .maxVertices = 100, .extra = NULL });
+
     // 9. Genetic Algorithm
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
         .tspFun = GeneticAlgorithm_Adapter, .name = "Genetic Algorithm Optimization", .maxVertices = 55, .extra = NULL });
