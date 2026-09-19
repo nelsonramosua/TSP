@@ -18,7 +18,7 @@ This project was done for academic, experimentation and fun purposes, and thus s
 
 ## Key Features
 
-- **18 Algorithms** - From brute-force and Branch & Bound to Lin-Kernighan, Tabu Search and the genetic algorithm.
+- **19 Algorithms** - From brute-force and Branch & Bound to Lin-Kernighan, Tabu Search, GRASP and the genetic algorithm.
 - **Built-in Benchmarks** - TSPLIB instances.
 - **Real-world Graphs** - Portuguese and European cities.
 - **Named Vertices** - City names support.
@@ -46,7 +46,8 @@ TSP/
 │   ├── LowerBounds.h
 │   ├── Metaheuristics.h
 │   ├── NamedGraph.h            # Abstraction layer for graphs with names as vertices.
-│   ├── NeighbourList.h         # k-nearest-neighbour candidate lists (used by Lin-Kernighan).
+│   ├── NeighbourList.h         # k-nearest-neighbour candidate lists (used by Lin-Kernighan, 2-Opt and Or-Opt).
+│   ├── DistanceMatrix.h        # Dense N*N edge-weight cache for O(1) lookups (used by 2-Opt, Or-Opt, SA).
 │   ├── PriorityQueue.h         # Indexed min-heap ADT (used by Greedy & NeighbourList).
 │   ├── TSPTest.h               # Test driver header
 │   └── SortedList.h
@@ -62,6 +63,7 @@ TSP/
 │   │   ├── NamedGraph.c        # Abstraction layer for graphs with names as vertices.
 │   │   ├── PriorityQueue.c     # Indexed min-heap ADT.
 │   │   ├── NeighbourList.c     # k-nearest-neighbour candidate lists.
+│   │   ├── DistanceMatrix.c    # Dense N*N edge-weight cache for O(1) lookups.
 │   │   └── SortedList.c
 │   ├── heuristics/             # Heuristic algorithms
 │   │   ├── Greedy.c
@@ -81,7 +83,9 @@ TSP/
 │   │   ├── LinKernighan.c
 │   │   ├── SimulatedAnnealing.c
 │   │   ├── GeneticAlgorithm.c
-│   │   └── AntColony.c
+│   │   ├── AntColony.c
+│   │   ├── TabuSearch.c
+│   │   └── GRASP.c
 │   └── mst/                    # Minimum Spanning Tree utilities (used by Christofides.c & LowerBound_MST.c).
 │       └── Prim_MST.c
 ├── graphs/                     # Predefined and generated graphs (.dot)
@@ -139,14 +143,15 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 | **Farthest Insertion** | Heuristic | $O(N^3)$ | Constructive; inserts the node *farthest* from the current tour (cheapest position). Usually beats Nearest Insertion. |
 | **Clarke-Wright Savings** | Heuristic | $O(N^2 \times \log N)$ | Constructive; merges chains by decreasing "savings" $d(0,i)+d(0,j)-d(i,j)$ around a depot. |
 | **Christofides Algorithm**| Heuristic       | $O(N^3)$                               | Guarantees a tour $\le 1.5\times$ optimal for metric TSP. Uses Blossom algorithm. |
-| **2-Opt Improvement**     | Meta-heuristic  | $O(N^3)$      | Local search to improve an existing tour; often used after other algorithms. |
-| **Or-Opt Improvement**    | Meta-heuristic  | $O(N^3)$      | Local search that relocates chains of 1–3 cities (optionally reversed); complements 2-Opt. |
+| **2-Opt Improvement**     | Meta-heuristic  | $O(N \times k)$ per pass | Local search to improve an existing tour; often used after other algorithms. Uses $k$-nearest candidate lists (for $N \le k+1$ this is a full 2-Opt), so it scales to large instances. |
+| **Or-Opt Improvement**    | Meta-heuristic  | $O(N \times k)$ per pass | Local search that relocates chains of 1–3 cities (optionally reversed); complements 2-Opt. Candidate-list restricted, like 2-Opt. |
 | **3-Opt Improvement**     | Meta-heuristic  | $O(N^3)$      | Local search removing 3 edges and trying all 7 reconnections; stronger neighbourhood than 2-Opt. |
 | **Lin-Kernighan**         | Meta-heuristic  | $O(N^2)$ per pass | Variable-depth local search (chained edge exchanges) with nearest-neighbour candidate lists; the strongest local search here. |
 | **Simulated Annealing**   | Meta-heuristic  | $O(N^2 \times \text{Iterations}) = O(N^3 \times \text{SA-MULTIPLIER})$      | Probabilistic improvement using 2-opt swaps. |
 | **Ant Colony Optimization** | Meta-heuristic | $O(N^2 \times \text{Iterations} \times \text{Ants}) = O(N^3 \times \text{Iterations})$ | Probabilistic search guided by pheromone trails; computationally heavier but can yield high-quality solutions. |
 | **Genetic Algorithm (GA)** | Meta-heuristic | $O(N^2 \times \text{Generations} \times \text{Population})$ | Population-based search simulating evolution (selection, crossover, mutation). Depending on the # Generations, it can be very slow. For the current parameters, that's for around $N \ge 55$.|
 | **Tabu Search** | Meta-heuristic | $O(N^2 \times \text{Iterations}) = O(N^3 \times \text{TABU-MULTIPLIER})$ | Best-improvement 2-Opt search with a tabu list (recently-added edges are protected) plus an aspiration criterion; accepts worsening moves to escape local optima. |
+| **GRASP** | Meta-heuristic | $O(\text{Iterations} \times (N^2 + \text{2-Opt}))$ | Multi-start: each restart builds a randomized-greedy tour (restricted-candidate-list nearest neighbour) then improves it with 2-Opt; keeps the best. Reaches the optimum on several instances (e.g. Swiss42, Bays29). |
 | **Lower Bound MST**     | Utility         | $O(N^2)$                          | Provides a minimum cost estimate using a **Minimum Spanning Tree**. |
 | **Lower Bound Held-Karp Lagrangian Relaxation**     | Utility         | $O(N^2)$                          | Provides a minimum cost estimate using a **Held-Karp Lagrangian Relaxation**. |
 
@@ -263,6 +268,27 @@ Install the CLI from the [CodeQL bundle releases](https://github.com/github/code
 | Ant Colony | 9057.46 | 0% |
 | Genetic Algorithm | 9057.46 | 0% |
 | Tabu Search | 9057.46 | 0% |
+| GRASP | 9057.46 | 0% |
+
+**Graph: TSPLIB A280** (Actual optimal: 2579) -- the largest instance, showing which methods scale.
+
+| Algorithm | Cost | Error % |
+|-----------|------|---------|
+| Nearest-Neighbour | 3157 | 22.4% |
+| 2-opt on NN | 2761 | 7.1% |
+| Or-opt on NN | 2853 | 10.6% |
+| Lin-Kernighan on NN | 2720 | 5.5% |
+| Greedy | 2982 | 15.6% |
+| Nearest-Insertion | 3095 | 20.0% |
+| Farthest-Insertion | 3003 | 16.4% |
+| Clarke-Wright Savings | 2827 | 9.6% |
+| Christofides | 2891 | 12.1% |
+| Simulated Annealing | 2839 | 10.1% |
+| GRASP | 2708 | 5.0% |
+| 3-opt / Ant Colony / Tabu / Genetic | disabled ($N > 100$) | n/a |
+
+The candidate-list local searches (2-Opt, Or-Opt, Lin-Kernighan), Simulated Annealing and GRASP all finish A280 in a few seconds or less (GRASP -- best here at 2708 -- runs 50 restarts sharing one candidate list and distance matrix).
+The $O(N^3)$-per-pass 3-Opt and the population/colony methods (Ant Colony, Tabu, Genetic) are gated off for $N > 100$ in the driver.
 
 ---
 
@@ -294,7 +320,8 @@ dot -Tpng graphs/testGraph.dot -o graphs/testGraph.png
 * Some of these will fail for very sparse graphs... Test it and try. That's connected to how TSP is defined.
 * For small graphs ($N \le 12$), Exhaustive Search guarantees optimal results. However, it is disabled. Uncomment to enable.
 * For medium-sized graphs ($N \le 100$), heuristics like Christofides, Greedy, and Nearest Neighbor are recommended and will provide good approximations.
-* For large graphs ($N > 100$), meta-heuristics like Simulated Annealing and Ant Colony Optimization provide the best **approximations**.
+* For large graphs ($N > 100$), the methods that scale are the candidate-list local searches (2-Opt, Or-Opt, Lin-Kernighan) and Simulated Annealing; these run on A280 ($N=280$) in well under a second each. 
+The $O(N^3)$-per-pass 3-Opt and the population/colony methods (Ant Colony, Tabu, Genetic) are gated off for very large $N$ in the driver.
 * Use the local-search improvements (2-Opt, Or-Opt, 3-Opt, Lin-Kernighan) as a post-processing step to refine heuristic solutions. 
 At the moment, they are each applied to the Nearest Neighbour tour (Lin-Kernighan is the strongest, and scales best thanks to its candidate lists). 
 They could just as well be chained (e.g. 2-Opt then Or-Opt) or run on any other construction heuristic... Try variations. :)

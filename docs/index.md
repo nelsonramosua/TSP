@@ -39,14 +39,15 @@ An educational implementation of **algorithms** to solve the Traveling Salesman 
 | Farthest Insertion | Heuristic | O(N³) |
 | Clarke-Wright Savings | Heuristic | O(N² × log N) |
 | Christofides | Heuristic | O(N³) |
-| 2-Opt Improvement | Meta-heuristic | O(N³) |
-| Or-Opt Improvement | Meta-heuristic | O(N³) |
+| 2-Opt Improvement | Meta-heuristic | O(N × k) per pass (candidate lists) |
+| Or-Opt Improvement | Meta-heuristic | O(N × k) per pass (candidate lists) |
 | 3-Opt Improvement | Meta-heuristic | O(N³) |
 | Lin-Kernighan | Meta-heuristic | O(N²) per pass |
 | Simulated Annealing | Meta-heuristic | O(N³ × multiplier) |
 | Ant Colony Optimization | Meta-heuristic | O(N³ × iterations) |
 | Genetic Algorithm | Meta-heuristic | O(N² × gen × pop) |
 | Tabu Search | Meta-heuristic | O(N² × iterations) |
+| GRASP | Meta-heuristic | O(iterations × (N² + 2-Opt)) |
 
 Plus two lower bound utilities: **MST Lower Bound** and **Held-Karp Lagrangian Relaxation**.
 
@@ -83,6 +84,7 @@ Actual optimal: **9057.46 km**
 | Ant Colony | 9057.46 | 0% |
 | Genetic Algorithm | 9057.46 | 0% |
 | Tabu Search | 9057.46 | 0% |
+| GRASP | 9057.46 | 0% |
 | Farthest Insertion | 9057.46 | 0% |
 | Clarke-Wright Savings | 9057.46 | 0% |
 | Or-opt on NN | 9057.46 | 0% |

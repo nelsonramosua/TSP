@@ -749,21 +749,21 @@ int GraphWriteDOT(const Graph* g, const char* filename, char** vertexNames) {
 
 double GetEdgeWeight(const Graph* g, unsigned int v, unsigned int w) {
     if (v == w) return 0.0; // should not happen
+    assert(v < g->numVertices);
 
-    unsigned int* adj = GraphGetAdjacentsTo(g, v);
-    double* dist = GraphGetDistancesToAdjacents(g, v);
+    // Walk v's edge list in place.
+    // The older version called GraphGetAdjacentsTo / GraphGetDistancesToAdjacents, which each malloc and copy the whole adjacency row on every call -- ruinously slow in a tight loop on a dense graph.
+    // Same result, no allocation.
+    List* vertices = g->verticesList;
+    ListMove(vertices, v);
+    struct _Vertex* vPointer = ListGetCurrentItem(vertices);
 
-    unsigned int num_adj = (unsigned int)dist[0]; // 1st element of arr is number of adj vertices
-    double weight = DBL_MAX; // preset (vertex dne)
-
-    for (unsigned int i = 1; i <= num_adj; i++) {
-        if (adj[i] == w) {
-            weight = dist[i];
-            break;
-        }
+    List* adjList = vPointer->edgesList;
+    ListMoveToHead(adjList);
+    for (unsigned int i = 0; i < vPointer->outDegree; ListMoveToNext(adjList), i++) {
+        struct _Edge* ePointer = ListGetCurrentItem(adjList);
+        if (ePointer->adjVertex == w) return ePointer->weight;
     }
 
-    free(adj);
-    free(dist);
-    return weight;
+    return DBL_MAX; // no edge v -> w
 }

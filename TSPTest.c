@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
         {CreateOliver30Graph, "TSPLIB - Oliver30", 420},
         {CreateSwiss42Graph, "TSPLIB - Swiss42", 1273},
         {CreateBays29Graph, "TSPLIB - Bays29", 2020},
-        // {CreateA280Graph, "TSPLIB - A280", 2579} // takes very long. Uncomment to stress test.
+        {CreateA280Graph, "TSPLIB - A280", 2579} // largest instance; the cubic methods (3-Opt/Tabu/ACO) are gated off for it.
     };
     // Add your own! (Add in GraphFactory.c/.h (prototype!) and call here!). See GraphFactory.c for more info.
 
@@ -127,9 +127,10 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
 
     // 3.2. 3-Opt Improvement (based on Nearest Neighbour)
     if (nearestNeighbourTour) {
-        Tour* threeOptTour = TourDeepCopy(nearestNeighbourTour);
+        // gated (cubic per pass): only copy the seed when it will actually run, else executeDisplay leaks it
+        Tour* threeOptTour = (numVertices <= 100) ? TourDeepCopy(nearestNeighbourTour) : NULL;
         executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
-            .tspFun = ThreeOpt_Adapter, .name = "3-Opt Improvement", .maxVertices = 0, .extra = threeOptTour });
+            .tspFun = ThreeOpt_Adapter, .name = "3-Opt Improvement", .maxVertices = 100, .extra = threeOptTour });
     }
 
     // 3.3. Lin-Kernighan Improvement (based on Nearest Neighbour)
@@ -173,11 +174,15 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
 
     // 8. Ant Colony
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
-        .tspFun = AntColony_Adapter, .name = "Ant Colony Optimization", .maxVertices = 0, .extra = NULL });
+        .tspFun = AntColony_Adapter, .name = "Ant Colony Optimization", .maxVertices = 100, .extra = NULL });
 
     // 8.5. Tabu Search
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
-        .tspFun = TabuSearch_Adapter, .name = "Tabu Search", .maxVertices = 0, .extra = NULL });
+        .tspFun = TabuSearch_Adapter, .name = "Tabu Search", .maxVertices = 100, .extra = NULL });
+
+    // 8.7. GRASP (randomized-greedy construction + 2-Opt, multi-start)
+    executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+        .tspFun = GRASP_Adapter, .name = "GRASP", .maxVertices = 0, .extra = NULL });
 
     // 9. Genetic Algorithm
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){

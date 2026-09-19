@@ -22,6 +22,7 @@ C_SRCS = $(GRAPH_DIR)/Graph.c \
          $(GRAPH_DIR)/HashMap.c \
          $(GRAPH_DIR)/PriorityQueue.c \
          $(GRAPH_DIR)/NeighbourList.c \
+         $(GRAPH_DIR)/DistanceMatrix.c \
          $(MST_DIR)/Prim_MST.c \
          $(LOWER_BOUNDS_DIR)/LowerBound_MST.c \
          $(LOWER_BOUNDS_DIR)/LowerBound_HeldKarp.c \
@@ -41,6 +42,7 @@ C_SRCS = $(GRAPH_DIR)/Graph.c \
          $(META_DIR)/ThreeOpt.c \
          $(META_DIR)/LinKernighan.c \
          $(META_DIR)/TabuSearch.c \
+         $(META_DIR)/GRASP.c \
          $(META_DIR)/SimulatedAnnealing.c \
          $(META_DIR)/AntColony.c \
          $(META_DIR)/GeneticAlgorithm.c \

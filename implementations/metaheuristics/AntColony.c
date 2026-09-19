@@ -1,11 +1,11 @@
 // AntColony.c - Implements the Ant Colony Optimization (ACO) metaheuristic for TSP.
-// 
+//
 // O(N^2 * iterations * ants) = O(N^3 * iterations).
 //
 // Nelson Ramos, 124921.
 //
 // November, 2025.
-// 
+//
 // You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 // Resources used:
@@ -26,8 +26,8 @@
 
 // Forward declarations:
 
-static unsigned int selectNextCity(unsigned int current, int* visited, double** tau, double** eta, double alpha, double beta, unsigned int numVertices);
-static double tourCost(const Graph* g, unsigned int* tour, unsigned int numVertices);
+static unsigned int selectNextCity(unsigned int current, const int* visited, double** tau, double** eta, double alpha, double beta, unsigned int numVertices, double* probs);
+static double tourCost(const Graph* g, const unsigned int* tour, unsigned int numVertices);
 
 Tour* AntColony_FindTour(const Graph* g) {
     unsigned int numVertices = GraphGetNumVertices(g);
@@ -47,12 +47,13 @@ Tour* AntColony_FindTour(const Graph* g) {
     // alloc pheromone and heuristic matrices
     double** tau = malloc(numVertices * sizeof(double*));
     double** eta = malloc(numVertices * sizeof(double*));
+    if (!tau || !eta) { free(tau); free(eta); TourDestroy(&bestTour); return NULL; }
     for (unsigned int i = 0; i < numVertices; i++) {
         tau[i] = malloc(numVertices * sizeof(double));
         eta[i] = malloc(numVertices * sizeof(double));
 
         for (unsigned int j = 0; j < numVertices; j++) {
-            if (i == j) { tau[i][j] = 0.0; eta[i][j] = 0.0; } 
+            if (i == j) { tau[i][j] = 0.0; eta[i][j] = 0.0; }
             else {
                 double w = GetEdgeWeight(g, i, j);
                 tau[i][j] = 1.0;              // init uniform pheromone
@@ -61,38 +62,45 @@ Tour* AntColony_FindTour(const Graph* g) {
         }
     }
 
+    // Reusable scratch, allocated ONCE (not per iteration): the ant tours live in one contiguous pool (ant k occupies antTours[k*numVertices .. k*numVertices+numVertices-1]), and visited/probs are reset each ant instead of being re-created on the stack.
+    unsigned int* antTours = malloc((size_t)numAnts * numVertices * sizeof(unsigned int));
+    double* antCosts = malloc(numAnts * sizeof(double));
+    int* visited = malloc(numVertices * sizeof(int));
+    double* probs = malloc(numVertices * sizeof(double));
+    if (!antTours || !antCosts || !visited || !probs) {
+        free(antTours); free(antCosts); free(visited); free(probs);
+        for (unsigned int i = 0; i < numVertices; i++) { free(tau[i]); free(eta[i]); }
+        free(tau); free(eta); TourDestroy(&bestTour); return NULL;
+    }
+
     double bestCost = DBL_MAX;
 
     for (unsigned int iter = 0; iter < numIterations; iter++) {
-        // paths & costs for ants in the cur iter
-        unsigned int antTours[numAnts][numVertices];
-        double antCosts[numAnts];
-
         // each ant builds a tour
         for (unsigned int k = 0; k < numAnts; k++) {
-            int visited[numVertices];
+            unsigned int* antTour = &antTours[(size_t)k * numVertices];
             for (unsigned int i = 0; i < numVertices; i++) visited[i] = 0;
 
             // start ant at rand vertex
             unsigned int current = rand() % numVertices;
-            antTours[k][0] = current;
+            antTour[0] = current;
             visited[current] = 1;
 
             // build rest of path (numVertices-1 steps)
             for (unsigned int step = 1; step < numVertices; step++) {
-                unsigned int next = selectNextCity(current, visited, tau, eta, alpha, beta, numVertices);
-                antTours[k][step] = next;
+                unsigned int next = selectNextCity(current, visited, tau, eta, alpha, beta, numVertices, probs);
+                antTour[step] = next;
                 visited[next] = 1;
                 current = next;
             }
 
             // calc cost of completed tour
-            antCosts[k] = tourCost(g, antTours[k], numVertices);
+            antCosts[k] = tourCost(g, antTour, numVertices);
 
             // update best tour
             if (antCosts[k] < bestCost) {
                 bestCost = antCosts[k];
-                memcpy(bestTour->path, antTours[k], numVertices * sizeof(unsigned int));
+                memcpy(bestTour->path, antTour, numVertices * sizeof(unsigned int));
             }
         }
 
@@ -103,16 +111,17 @@ Tour* AntColony_FindTour(const Graph* g) {
 
         // deposit (new) pheromones based on how good ant tours wwere
         for (unsigned int k = 0; k < numAnts; k++) {
+            const unsigned int* antTour = &antTours[(size_t)k * numVertices];
             // delta is the amount of pheromone deposited Q / tourCost
             double delta = Q / antCosts[k];
 
             for (unsigned int i = 0; i < numVertices; i++) {
-                unsigned int a = antTours[k][i];
-                unsigned int b = antTours[k][(i + 1) % numVertices];
+                unsigned int a = antTour[i];
+                unsigned int b = antTour[(i + 1) % numVertices];
 
                 // deposit pheromones (undirected graph: deposit on both (u,v) and (v,u))
                 tau[a][b] += delta;
-                tau[b][a] += delta; 
+                tau[b][a] += delta;
             }
         }
     }
@@ -120,7 +129,8 @@ Tour* AntColony_FindTour(const Graph* g) {
     bestTour->path[numVertices] = bestTour->path[0]; // close the cycle
     bestTour->cost = bestCost;
 
-    // Free matrices
+    // Free scratch and matrices
+    free(antTours); free(antCosts); free(visited); free(probs);
     for (unsigned int i = 0; i < numVertices; i++) { free(tau[i]); free(eta[i]); }
     free(tau); free(eta);
 
@@ -131,10 +141,9 @@ Tour* AntColony_FindTour(const Graph* g) {
 // eta is desirability/visibility of each edge (1/distance).
 // alpha is pheromone influence factor.
 // beta is heuristic influence factor.
-static unsigned int selectNextCity(unsigned int current, int* visited, double** tau, double** eta, double alpha, double beta, unsigned int numVertices) {
+// probs is a caller-owned scratch buffer of numVertices doubles (reused across calls, not allocated here).
+static unsigned int selectNextCity(unsigned int current, const int* visited, double** tau, double** eta, double alpha, double beta, unsigned int numVertices, double* probs) {
     double sum = 0.0;
-    // probs[numVertices] stores numerator of selection prob formula
-    double probs[numVertices];
 
     // calc. product Pheromone^(alpha) * Heuristic^(beta) for unvisited neighbors
     for (unsigned int j = 0; j < numVertices; j++) {
@@ -160,7 +169,7 @@ static unsigned int selectNextCity(unsigned int current, int* visited, double** 
     return 0; // return vertex 0 if all else fails...
 }
 
-static double tourCost(const Graph* g, unsigned int* tour, unsigned int numVertices) {
+static double tourCost(const Graph* g, const unsigned int* tour, unsigned int numVertices) {
     double cost = 0.0;
     // Iterate numVertices times (numVertices edges in the cycle)
     for (unsigned int i = 0; i < numVertices; i++) {

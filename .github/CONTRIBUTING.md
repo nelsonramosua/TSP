@@ -89,10 +89,9 @@ Use the [New Algorithm](.github/ISSUE_TEMPLATE/new_algorithm.yml) issue template
 
 Good candidates (not yet implemented):
 - ISPO (as mentioned in the README).
-- GRASP (randomised greedy + local search).
 - Convex-hull cheapest insertion (Euclidean instances).
 
-(Already implemented, for reference: Branch & Bound, Or-Opt / 3-Opt / Lin-Kernighan / Tabu Search, Farthest Insertion, and Clarke-Wright Savings.)
+(Already implemented, for reference: Branch & Bound, Or-Opt / 3-Opt / Lin-Kernighan / Tabu Search / GRASP, Farthest Insertion, and Clarke-Wright Savings.)
 
 ### Adding a New Graph
 

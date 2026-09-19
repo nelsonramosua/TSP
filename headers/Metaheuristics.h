@@ -31,6 +31,9 @@
 #define GA_ELITISM_COUNT 5 // # top-performing individuals preserved for next gen
 #define GA_TOURNAMENT_SIZE 7 // # individuals in tournament selection
 
+// Configuration for neighbour-list local search (2-Opt / Or-Opt)
+#define LS_NEIGHBOURS 16  // candidate-list size per vertex; for N <= LS_NEIGHBOURS+1 the list is the whole graph, so the search is a full (unrestricted) 2-Opt / Or-Opt.
+
 // Configuration for Lin-Kernighan (LK)
 #define LK_NEIGHBOURS 10  // candidate-list size per vertex
 #define LK_MAX_DEPTH  6   // maximum chain length
@@ -39,5 +42,9 @@
 // Configuration for Tabu Search (TS)
 #define TABU_TENURE 15         // # iterations a reversed edge stays tabu
 #define TABU_MULTIPLIER 40     // # iterations = TABU_MULTIPLIER * numVertices
+
+// Configuration for GRASP (Greedy Randomized Adaptive Search Procedure)
+#define GRASP_ITERATIONS 50    // # of randomized-greedy construction + 2-Opt restarts
+#define GRASP_ALPHA 0.3        // restricted-candidate-list greediness: 0 = pure greedy, 1 = fully random
 
 #endif // METAHEURISTICS_H

@@ -16,6 +16,8 @@ Still exponential worst-case, so the driver gates it to N ≤ 15.
 - **PriorityQueue ADT** (`headers/PriorityQueue.h`, `implementations/graph/PriorityQueue.c`): an indexed binary min-heap over integer items with O(log n) insert / extract-min / decrease-key and O(1) contains (ties broken by item id for determinism). 
 This is the auxiliary ADT the README/Greedy/Prim notes kept pointing at.
 - **NeighbourList ADT** (`headers/NeighbourList.h`, `implementations/graph/NeighbourList.c`): per-vertex k-nearest-neighbour candidate lists, built with the PriorityQueue; used by Lin-Kernighan to restrict moves to promising partners.
+- **DistanceMatrix helper** (`headers/DistanceMatrix.h`, `implementations/graph/DistanceMatrix.c`): builds a dense `N*N` edge-weight cache once (`DIST_AT` indexes it) so hot inner loops get `O(1)` weight lookups instead of the `O(degree)` `GetEdgeWeight`. 
+Factored out of 2-Opt / Or-Opt / Simulated Annealing, which previously each carried an identical private copy.
 - **Lin-Kernighan** (`implementations/metaheuristics/LinKernighan.c`): variable-depth local search (chained edge exchanges via the gain criterion, realised as 2-Opt reversals, keeping the best-improving prefix) using the candidate lists. 
 The strongest local search in the project; verified tour-valid with tracked cost == recomputed cost, never worsens its seed, valgrind-clean. 
 Reaches the known optimum on several instances (e.g. Bays29, Swiss42) and is competitive with 3-Opt on the rest.
@@ -26,6 +28,10 @@ Reaches the known optimum on several instances (e.g. Bays29, Swiss42) and is com
 Rounds out the metaheuristic family (SA/ACO/GA). 
 Verified tour-valid, best cost == recomputed, valgrind-clean.
 Reaches the known optimum on several instances (e.g. Bays29, Matrix20).
+- **GRASP** (`implementations/metaheuristics/GRASP.c`): multi-start metaheuristic -- each restart builds a randomized-greedy tour (value-based restricted-candidate-list nearest neighbour, tuned by `GRASP_ALPHA`) and improves it with 2-Opt, keeping the best over `GRASP_ITERATIONS` restarts. 
+Reuses one prebuilt NeighbourList + DistanceMatrix across all restarts (its 2-Opt is a quiet, self-contained variant). 
+Verified tour-valid, best cost == recomputed, valgrind-clean. 
+Reaches the optimum on Swiss42/Bays29/Oliver30 and is A280's best result here (2708 vs 2720 for Lin-Kernighan).
 - **Or-opt** (`implementations/metaheuristics/OrOpt.c`): local search that relocates chains of 1–3 consecutive cities (optionally reversed), complementing 2-Opt.
 - **3-opt** (`implementations/metaheuristics/ThreeOpt.c`): local search removing three edges and trying all 7 reconnections; a strictly larger neighbourhood than 2-Opt. 
 Reaches the known optimum on several TSPLIB/known instances.
@@ -38,6 +44,21 @@ Rewrote it as a correct primal-dual weighted blossom (with blossom duals and exp
 Christofides now builds on a genuinely minimum matching and respects its 1.5× guarantee.
 
 ### Changed
+- **`GetEdgeWeight` -- no longer allocates per call**: it was implemented via the copying accessors `GraphGetAdjacentsTo` / `GraphGetDistancesToAdjacents`, so every edge-weight lookup malloc'd and freed two $N$-sized arrays. 
+It now walks the vertex's edge list directly (same adjacency-list representation, no ADT interface change), returning the same values with zero allocation. 
+This alone cut the full benchmark from ~1m58s to ~37s and sped up every caller that isn't matrix-cached (Nearest/Farthest Insertion on A280 ~8.7 s -> ~2 s, Greedy 2×, etc.). 
+The lookup is still $O(\text{degree})$; inner loops that need $O(1)$ use the distance-matrix cache below.
+- **2-Opt / Or-Opt -- now scale to large instances**: both local searches were rewritten to search only the $k$-nearest **candidate lists** of each edge's endpoints (via the NeighbourList ADT) instead of all $O(N^2)$ pairs, and to read edge weights from a cached $N \times N$ distance matrix ($O(1)$ vs the $O(\text{degree})$ `GetEdgeWeight`). 
+Per pass is now **O(N · k)** rather than **O(N²)**; on TSPLIB A280 ($N=280$) 2-Opt drops to ~0.17 s and Or-Opt from ~16 s to ~0.20 s. 
+For $N \le$ candidate-list size the neighbourhood is the whole graph, i.e. identical to the old full search. 
+Verified tour-valid, tracked cost == recomputed cost, never worse than the seed, valgrind-clean.
+- **Simulated Annealing -- distance-matrix cache**: the Metropolis loop called `GetEdgeWeight` four times per step; it now reads a cached $N \times N$ matrix ($O(1)$ lookups). 
+This lets SA run on A280 (previously > 45 s, effectively unusable). Same search, same results.
+- **Ant Colony -- per-iteration allocation removed**: the per-iteration ant tours, costs, `visited` and `probs` were stack VLAs re-created every iteration (a ~313 KB VLA per iteration on A280). 
+They are now heap buffers allocated **once** (ant tours share one contiguous pool). 
+The RNG call order is unchanged, so results are identical.
+- **Comparison driver -- A280 enabled**: `CreateA280Graph` ($N=280$) is now part of the default benchmark. 
+The methods that do not scale (3-Opt, Tabu Search, Ant Colony) are gated to $N \le 100$, joining the Genetic Algorithm's existing $N \le 55$ gate.
 - **Genetic Algorithm -- memory overhead**: removed the per-generation allocation churn (a temp `Tour` per fitness eval, deep-copied parents per selection, and a full population rebuilt every generation). 
 It now computes cost in place, selects parents by pointer, ping-pongs between two pre-allocated populations, and keeps each population's paths in one contiguous pool. 
 Allocation is now **O(population)** for the whole run instead of **O(population * generations)**; the search itself is unchanged.

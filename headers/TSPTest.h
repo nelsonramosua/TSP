@@ -101,6 +101,11 @@ static Tour* TabuSearch_Adapter(const Graph* g, void* unused) {
     return TabuSearch_FindTour((Graph*)g);
 }
 
+static Tour* GRASP_Adapter(const Graph* g, void* unused) {
+    (void)unused;
+    return GRASP_FindTour((Graph*)g);
+}
+
 static Tour* GeneticAlgorithm_Adapter(const Graph* g, void* unused) {
     (void)unused;
     return GeneticAlgorithm_FindTour((Graph*)g);

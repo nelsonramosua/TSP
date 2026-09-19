@@ -15,6 +15,7 @@
 
 #include "../../TravelingSalesmanProblem.h"
 #include "../../headers/Metaheuristics.h"
+#include "../../headers/DistanceMatrix.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,7 +26,7 @@
 
 static void swap(unsigned int* a, unsigned int* b);
 static void twoOptSwap(unsigned int* tour, unsigned int i, unsigned int j);
-static double tourCost(const Graph* g, unsigned int* tour, unsigned int numVertices);
+static double tourCost(const double* dist, unsigned int n, const unsigned int* tour, unsigned int numVertices);
 
 Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
     unsigned int numVertices = GraphGetNumVertices(g);
@@ -36,9 +37,11 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
 
     unsigned int* current = malloc(numVertices * sizeof(unsigned int));
     unsigned int* bestTour = malloc(numVertices * sizeof(unsigned int));
-    if (!current || !bestTour) {
+    double* D = DistanceMatrixBuild(g);
+    if (!current || !bestTour || !D) {
         free(current);   // free(NULL) is a no-op
         free(bestTour);
+        free(D);
         TourDestroy(&tour);
         return NULL;
     }
@@ -46,12 +49,12 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
     memcpy(current, initialTour, numVertices * sizeof(unsigned int));
     memcpy(bestTour, initialTour, numVertices * sizeof(unsigned int));
 
-    double currentCost = tourCost(g, current, numVertices);
+    double currentCost = tourCost(D, numVertices, current, numVertices);
     double bestCost = currentCost;
 
     if (bestCost == DBL_MAX) {
         fprintf(stderr, "[SA ERROR] Initial tour is invalid (DBL_MAX cost).\n");
-        free(current); free(bestTour); TourDestroy(&tour); return NULL;
+        free(current); free(bestTour); free(D); TourDestroy(&tour); return NULL;
     }
 
     // until now, just set up. now the alg actually starts
@@ -82,11 +85,11 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
             unsigned int d = current[(j + 1) % numVertices]; // right node of second removed edge (D)
 
             // removed edges: (A, B) and (C, D)
-            double weightAB = GetEdgeWeight(g, a, b);
-            double weightCD = GetEdgeWeight(g, c, d);
+            double weightAB = DIST_AT(D, numVertices, a, b);
+            double weightCD = DIST_AT(D, numVertices, c, d);
             // added edges: (A, C) and (B, D)
-            double weightAC = GetEdgeWeight(g, a, c);
-            double weightBD = GetEdgeWeight(g, b, d);
+            double weightAC = DIST_AT(D, numVertices, a, c);
+            double weightBD = DIST_AT(D, numVertices, b, d);
 
             if (weightAB == DBL_MAX || weightCD == DBL_MAX || weightAC == DBL_MAX || weightBD == DBL_MAX) continue;
 
@@ -113,7 +116,7 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
     tour->path[numVertices] = bestTour[0]; // close cycle
     tour->cost = bestCost;
 
-    free(current); free(bestTour);
+    free(current); free(bestTour); free(D);
     return tour;
 }
 
@@ -129,13 +132,13 @@ static void twoOptSwap(unsigned int* tour, unsigned int i, unsigned int j) {
     while (i < j) swap(&tour[i++], &tour[j--]);
 }
 
-// calc tour cost (same as ACO, yes)
-static double tourCost(const Graph* g, unsigned int* tour, unsigned int numVertices) {
+// calc tour cost from the cached distance matrix
+static double tourCost(const double* dist, unsigned int n, const unsigned int* tour, unsigned int numVertices) {
     double cost = 0.0;
     // Iterate N times (N edges in the cycle)
     for (unsigned int i = 0; i < numVertices; i++) {
         // Edge is (tour[i], tour[(i + 1) % N])
-        double w = GetEdgeWeight(g, tour[i], tour[(i + 1) % numVertices]);
+        double w = DIST_AT(dist, n, tour[i], tour[(i + 1) % numVertices]);
         if (w == DBL_MAX) return DBL_MAX; // invalid edge
         cost += w;
     }
