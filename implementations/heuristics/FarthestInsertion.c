@@ -17,6 +17,7 @@
 // https://youtu.be/W3n6p58mClI?si=bakuahmf1Xnmt9Su
 
 #include "../../TravelingSalesmanProblem.h"
+#include "../../headers/Trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,6 +90,19 @@ Tour* FarthestInsertion_FindTour(const Graph* g) {
 
         isVisited[vK] = 1;
         pathLength++;
+
+        // frame: the growing closed subtour (only assembled when an animation sink is installed)
+        if (TraceActive()) {
+            unsigned int frame[pathLength + 1];
+            double c = 0.0;
+            for (unsigned int i = 0; i < pathLength; i++) {
+                frame[i] = partialPath[i];
+                double w = GetEdgeWeight(g, partialPath[i], partialPath[(i + 1) % pathLength]);
+                if (w != DBL_MAX) c += w;
+            }
+            frame[pathLength] = partialPath[0]; // repeat first vertex => "closed" marker for the renderer
+            TraceEmit(frame, pathLength + 1, numVertices, c);
+        }
     }
 
     // copy path to final Tour struct.

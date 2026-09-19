@@ -16,6 +16,7 @@
 
 #include "../../TravelingSalesmanProblem.h"
 #include "../../headers/Metaheuristics.h"
+#include "../../headers/Trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,6 +125,7 @@ Tour* AntColony_FindTour(const Graph* g) {
                 tau[b][a] += delta;
             }
         }
+        TraceEmit(bestTour->path, numVertices, numVertices, bestCost); // frame: best tour after this iteration
     }
 
     bestTour->path[numVertices] = bestTour->path[0]; // close the cycle

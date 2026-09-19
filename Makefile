@@ -23,6 +23,7 @@ C_SRCS = $(GRAPH_DIR)/Graph.c \
          $(GRAPH_DIR)/PriorityQueue.c \
          $(GRAPH_DIR)/NeighbourList.c \
          $(GRAPH_DIR)/DistanceMatrix.c \
+         $(GRAPH_DIR)/Trace.c \
          $(MST_DIR)/Prim_MST.c \
          $(LOWER_BOUNDS_DIR)/LowerBound_MST.c \
          $(LOWER_BOUNDS_DIR)/LowerBound_HeldKarp.c \
@@ -114,6 +115,9 @@ codeql:
 		echo "(install 'jq' to print a findings summary here, or open the SARIF in your editor.)"; \
 	fi
 
+gifs:
+	@bash tools/make_gifs.sh
+
 clean:
 	rm -rf $(BUILD_DIR) $(TSP_COMPARISON) $(CODEQL_DB) $(CODEQL_SARIF)
 
@@ -150,4 +154,4 @@ help:
 	@echo "  make clean        - Remove build directory, the binary and the local CodeQL database and SARIF"
 	@echo ""
 
-.PHONY: all run runvc clean rebuild loc help codeql
+.PHONY: all run runvc clean rebuild loc help codeql gifs

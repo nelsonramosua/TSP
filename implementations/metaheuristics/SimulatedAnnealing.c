@@ -16,6 +16,7 @@
 #include "../../TravelingSalesmanProblem.h"
 #include "../../headers/Metaheuristics.h"
 #include "../../headers/DistanceMatrix.h"
+#include "../../headers/Trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -111,6 +112,7 @@ Tour* SimulatedAnnealing_FindTour(const Graph* g, unsigned int* initialTour) {
                 if (currentCost < bestCost) { bestCost = currentCost; memcpy(bestTour, current, numVertices * sizeof(unsigned int)); }
             }
         }
+        TraceEmit(current, numVertices, numVertices, currentCost); // frame: current tour at this temperature
         T *= alpha; // cool down
     }
 

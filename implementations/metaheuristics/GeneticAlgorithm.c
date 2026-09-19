@@ -30,6 +30,7 @@
 
 #include "../../TravelingSalesmanProblem.h"
 #include "../../headers/Metaheuristics.h"
+#include "../../headers/Trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,6 +125,7 @@ Tour* GeneticAlgorithm_FindTour(const Graph* g) {
             bestOverall.cost = population->individuals[0].cost;
             bestOverall.fitness = population->individuals[0].fitness;
         }
+        TraceEmit(bestOverall.path, numVertices, numVertices, bestOverall.cost); // frame: best-so-far each generation
     }
 
     // finalize and return

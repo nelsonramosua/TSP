@@ -5,19 +5,20 @@
 // Nelson Ramos, 124921.
 //
 // November, 2025.
-// 
+//
 // You may freely use and change this code, it has no warranty, and it is not necessary to give me credit.
 
 #include "../../TravelingSalesmanProblem.h"
+#include "../../headers/Trace.h"
 
 #include <stdlib.h>
 #include <float.h>
-#include <string.h> 
+#include <string.h>
 
 Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
     unsigned int numVertices = GraphGetNumVertices(g);
     if (numVertices == 0 || startVertex >= numVertices) return NULL;
-    
+
     Tour* tour = TourCreate(numVertices);
     if (!tour) return NULL;
 
@@ -51,6 +52,7 @@ Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
             visited[nextV] = 1;
             tour->cost += minWeight;
             currentV = nextV; // move to new vertex
+            TraceEmit(tour->path, pathIndex, numVertices, tour->cost); // frame: partial tour so far
         } else {
             // only happens if graph is disconnected (should not happen). mind your graph creations!
             fprintf(stderr, "Error: Nearest Neighbour failed to find next unvisited vertex.\n");
@@ -58,11 +60,11 @@ Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
         }
     }
 
-    // close tour 
+    // close tour
     tour->path[pathIndex] = startVertex;
-    
+
     double finalEdgeWeight = GetEdgeWeight(g, currentV, startVertex);
-    
+
     // check if final edge is valid
     if (finalEdgeWeight == DBL_MAX) {
         fprintf(stderr, "Error: Nearest Neighbour failed to close the tour (final edge missing).\n");
@@ -70,7 +72,8 @@ Tour* NearestNeighbour_FindTour(const Graph* g, unsigned int startVertex) {
     }
 
     tour->cost += finalEdgeWeight;
-    
+    TraceEmit(tour->path, numVertices, numVertices, tour->cost); // frame: closed tour
+
     free(visited);
     return tour;
 }

@@ -26,6 +26,7 @@
 #include "../../headers/NeighbourList.h"
 #include "../../headers/DistanceMatrix.h"
 #include "../../headers/Metaheuristics.h"
+#include "../../headers/Trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -168,6 +169,7 @@ Tour* GRASP_FindTour(const Graph* g) {
             bestCost = cost;
             for (unsigned int i = 0; i < n; i++) bestPath[i] = path[i];
         }
+        if (cost != DBL_MAX) TraceEmit(path, n, n, cost); // frame: this restart's local optimum
     }
 
     Tour* tour = NULL;

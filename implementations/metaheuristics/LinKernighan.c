@@ -24,6 +24,7 @@
 #include "../../TravelingSalesmanProblem.h"
 #include "../../headers/NeighbourList.h"
 #include "../../headers/Metaheuristics.h"
+#include "../../headers/Trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,6 +116,7 @@ Tour* LinKernighan_ImproveTour(const Graph* g, Tour* initialTour) {
     for (unsigned int i = 0; i < numVertices; i++) pos[tour[i]] = i;
 
     printf("  Starting Lin-Kernighan. Initial Cost: %.2f\n", initialTour->cost);
+    TraceEmit(tour, numVertices, numVertices, initialTour->cost); // frame: seed tour
 
     int improved = 1;
     while (improved) {
@@ -141,6 +143,7 @@ Tour* LinKernighan_ImproveTour(const Graph* g, Tour* initialTour) {
             if (bestFirst != numVertices && bestDelta < -LK_EPS) {
                 lkChain(g, tour, pos, neigh, numVertices, bestFirst, moves, 1);
                 initialTour->cost += bestDelta;
+                TraceEmit(tour, numVertices, numVertices, initialTour->cost); // frame: after improving chain
                 improved = 1;
             }
         }

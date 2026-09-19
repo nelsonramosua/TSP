@@ -23,6 +23,7 @@
 #include "../../headers/NeighbourList.h"
 #include "../../headers/Metaheuristics.h"
 #include "../../headers/DistanceMatrix.h"
+#include "../../headers/Trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,6 +48,7 @@ Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour) {
     for (unsigned int i = 0; i < numVertices; i++) pos[path[i]] = i;
 
     printf("  Starting 2-Opt. Initial Cost: %.2f\n", initialTour->cost);
+    TraceEmit(path, numVertices, numVertices, initialTour->cost); // frame: seed tour (no-op unless tracing)
 
     int improved = 1;
     while (improved) {
@@ -88,6 +90,7 @@ Tour* TwoOpt_ImproveTour(const Graph* g, Tour* initialTour) {
                         unsigned int hi = (i < j ? j : i);
                         reverseSegment(path, pos, lo, hi);
                         initialTour->cost -= gain;
+                        TraceEmit(path, numVertices, numVertices, initialTour->cost); // frame: after move
                         improved = 1;
                         goto nextEdge; // c1/c2 changed; move on to the next tour edge
                     }

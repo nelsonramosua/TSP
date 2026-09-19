@@ -125,6 +125,36 @@ This project explores the tradeoffs between exact, heuristic and metaheuristic a
 
 ---
 
+## Algorithm Animations
+
+Each animation shows the algorithm running on **TSPLIB Eil51** (51 cities). 
+They are produced by an optional, zero-overhead trace hook (`headers/Trace.h`) that is inert in normal runs; regenerate them with **`make gifs`** (needs `python3` + `matplotlib` + `Pillow`). 
+See [`tools/`](tools/).
+
+<table>
+<tr>
+<td align="center"><img src="docs/gifs/nn.gif" width="240"><br><sub><b>Nearest Neighbour</b><br>greedy walk; last edges forced long</sub></td>
+<td align="center"><img src="docs/gifs/farthest.gif" width="240"><br><sub><b>Farthest Insertion</b><br>outliers first sketch the outline</sub></td>
+<td align="center"><img src="docs/gifs/christofides.gif" width="240"><br><sub><b>Christofides</b><br>Euler tour shortcut into a cycle</sub></td>
+</tr>
+<tr>
+<td align="center"><img src="docs/gifs/2opt.gif" width="240"><br><sub><b>2-Opt</b><br>each move uncrosses two edges</sub></td>
+<td align="center"><img src="docs/gifs/lk.gif" width="240"><br><sub><b>Lin-Kernighan</b><br>variable-depth edge exchanges</sub></td>
+<td align="center"><sub>Or-Opt and 3-Opt animate almost identically to 2-Opt (edges uncrossing), so only 2-Opt and the stronger Lin-Kernighan are shown.</sub></td>
+</tr>
+<tr>
+<td align="center"><img src="docs/gifs/sa.gif" width="240"><br><sub><b>Simulated Annealing</b><br>jitter that cools into a tour</sub></td>
+<td align="center"><img src="docs/gifs/aco.gif" width="240"><br><sub><b>Ant Colony</b><br>best-so-far as pheromone builds</sub></td>
+<td align="center"><img src="docs/gifs/ga.gif" width="240"><br><sub><b>Genetic Algorithm</b><br>best-so-far across generations</sub></td>
+</tr>
+<tr>
+<td align="center"><img src="docs/gifs/grasp.gif" width="240"><br><sub><b>GRASP</b><br>each restart's local optimum</sub></td>
+<td colspan="2" align="center"><sub>Frames are emitted at each algorithm's natural step (a city added, a move applied, a new best); the title shows the current tour cost.</sub></td>
+</tr>
+</table>
+
+---
+
 ## Metaheuristic Algorithms
 
 The macro configurations for the metaheuristic algorithms can be tuned in headers/Metaheuristics.h.
@@ -455,9 +485,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - GitHub: [@nelsonramosua](https://github.com/nelsonramosua).
 - LinkedIn: [Nelson Ramos](https://www.linkedin.com/in/nelsonrocharamos/).
 
-November 2025 - January 2026.
+November 2025 - January 2026 - September 2026.
 
-(This project, once again I remind, used work of other people on the internet, that can be found in the links throughout its implementations)!
+(This project, once again I remind you, used work of other people on the internet, that can be found in the links throughout its implementations)!
 
 ---
 

@@ -19,3 +19,14 @@ codeql-results.sarif
 
 # Generated DOT files (optional — comment out if you want to track them)
 *.dot
+
+# LaTeX build artefacts (report/)
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+# Optionally, report itself:
+report/

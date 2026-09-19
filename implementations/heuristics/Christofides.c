@@ -19,6 +19,7 @@
 
 #include "../../TravelingSalesmanProblem.h"
 #include "blossom/BlossomWrapper.h"
+#include "../../headers/Trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -242,12 +243,14 @@ double shortcutEuler(const Graph* g, unsigned int* euler, unsigned int size, uns
             hamilton[pos++] = cur;
             visited[cur] = 1;
             last = cur;
+            TraceEmit(hamilton, pos, numVertices, cost); // frame: shortcut tour being laid down
         }
     }
 
     // close cycle
     cost += GetEdgeWeight(g, last, hamilton[0]);
     hamilton[pos] = hamilton[0];
+    TraceEmit(hamilton, numVertices, numVertices, cost); // frame: closed Hamiltonian tour
 
     free(visited);
     return cost;
