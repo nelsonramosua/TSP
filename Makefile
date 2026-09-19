@@ -1,4 +1,4 @@
-CC = /usr/bin/gcc
+CC ?= gcc
 CFLAGS = -Wall -Wextra -g -Iheaders -O3 -march=native
 CFLAGS_VALGRIND = -Wall -Wextra -g -Iheaders -O3
 # Note: add -march=native back to CFLAGS_VALGRIND if on native Linux (not WSL).
