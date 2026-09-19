@@ -41,6 +41,11 @@ static Tour* ExhaustiveSearchPruning_Adapter(const Graph* g, void* unused) {
     return ExhaustiveSearchPruning_FindTour((Graph*)g);
 }
 
+static Tour* BranchAndBound_Adapter(const Graph* g, void* unused) {
+    (void)unused;
+    return BranchAndBound_FindTour((Graph*)g);
+}
+
 static Tour* TwoOpt_Adapter(const Graph* g, void* extra) {
     return TwoOpt_ImproveTour((Graph*)g, (Tour*)extra);
 }

@@ -31,6 +31,7 @@ An educational implementation of **algorithms** to solve the Traveling Salesman 
 |:---|:---:|:---:|
 | Exhaustive Search | Exact | O(N!) |
 | Exhaustive Search with Pruning | Exact | O(N!) |
+| Branch & Bound | Exact | O(N!) worst case |
 | Held-Karp | Exact | O(N² × 2^N) |
 | Nearest Neighbour | Heuristic | O(N²) |
 | Greedy | Heuristic | O(N² × log N) |
@@ -77,6 +78,7 @@ Actual optimal: **9057.46 km**
 |---|---|---|
 | Held-Karp (exact) | 9057.46 | 0% |
 | Brute-Force w/ Pruning | 9057.46 | 0% |
+| Branch & Bound | 9057.46 | 0% |
 | Simulated Annealing | 9057.46 | 0% |
 | Ant Colony | 9057.46 | 0% |
 | Genetic Algorithm | 9057.46 | 0% |

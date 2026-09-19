@@ -93,6 +93,10 @@ static void runTSPAlgorithms(NamedGraph* namedGraph, const char* graphName, doub
     executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
         .tspFun = ExhaustiveSearchPruning_Adapter, .name = "Brute-Force w/ Pruning", .maxVertices = 12, .extra = NULL });
 
+    // 0.7. Branch & Bound (exact; lower-bound pruning). Gated small — worst case still exponential.
+    executeDisplay(namedGraph, numVertices, (TSPAlgorithm){
+        .tspFun = BranchAndBound_Adapter, .name = "Branch & Bound", .maxVertices = 15, .extra = NULL });
+
     // 1. Held-Karp (only for GraphGetNumVertices(ng->g) <= 20)
     printf("\n[Held-Karp]\n");
     if (heldKarpTour) TourDisplay(heldKarpTour);

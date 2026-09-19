@@ -48,6 +48,7 @@ double LowerBound_HeldKarp(const Graph* g);
 // Brute-force method (Implemented in ExhaustiveSearch.c)
 Tour* ExhaustiveSearch_FindTour(const Graph* g);
 Tour* ExhaustiveSearchPruning_FindTour(const Graph* g);
+Tour* BranchAndBound_FindTour(const Graph* g);
 
 Tour* HeldKarp_FindTour(const Graph* g);
 

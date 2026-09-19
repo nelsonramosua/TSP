@@ -10,6 +10,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **Branch & Bound** (`implementations/exact/BranchAndBound.c`): exact DFS with an admissible lower bound (each vertex still needing an outgoing edge contributes at least its cheapest incident edge), seeded with a Nearest Neighbour incumbent and expanding children nearest-first. 
+Prunes far more than the cost-only pruned brute force; verified to match Held-Karp's optimum on every gated instance, valgrind-clean. 
+Still exponential worst-case, so the driver gates it to N ≤ 15.
 - **PriorityQueue ADT** (`headers/PriorityQueue.h`, `implementations/graph/PriorityQueue.c`): an indexed binary min-heap over integer items with O(log n) insert / extract-min / decrease-key and O(1) contains (ties broken by item id for determinism). 
 This is the auxiliary ADT the README/Greedy/Prim notes kept pointing at.
 - **NeighbourList ADT** (`headers/NeighbourList.h`, `implementations/graph/NeighbourList.c`): per-vertex k-nearest-neighbour candidate lists, built with the PriorityQueue; used by Lin-Kernighan to restrict moves to promising partners.

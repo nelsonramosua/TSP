@@ -18,7 +18,7 @@ This project was done for academic, experimentation and fun purposes, and thus s
 
 ## Key Features
 
-- **17 Algorithms** - From brute-force to Lin-Kernighan, Tabu Search and the genetic algorithm.
+- **18 Algorithms** - From brute-force and Branch & Bound to Lin-Kernighan, Tabu Search and the genetic algorithm.
 - **Built-in Benchmarks** - TSPLIB instances.
 - **Real-world Graphs** - Portuguese and European cities.
 - **Named Vertices** - City names support.
@@ -54,6 +54,7 @@ TSP/
 │   ├── exact/                  # Exact algorithms
 │   |   ├── HeldKarp.c
 │   |   ├── ExhaustiveSearchPruning.c
+│   |   ├── BranchAndBound.c
 │   │   └── ExhaustiveSearch.c
 │   ├── graph/                  # Graph utilities
 │   │   ├── Graph.c
@@ -130,6 +131,7 @@ The macro configurations for the metaheuristic algorithms can be tuned in header
 | :------------------------ | :-------------: | :------------------------------------: | :------------------------------------------------------------------- |
 | **Exhaustive Search**     | Exact           | $O(N!)$                                | Finds the optimal solution; infeasible for $N \ge 12$.              |
 | **Exhaustive Search with Pruning** | Exact           | $O(N!)$                                | Optimized exhaustive search that prunes branches based on cost bounds. Still infeasible for $N \ge 12$.|
+| **Branch & Bound**        | Exact           | $O(N!)$ worst case                     | Exact DFS with an admissible lower bound (min-edge sum) + Nearest-Neighbour incumbent + nearest-first ordering; prunes hard, but still exponential (gated to small $N$). |
 | **Held-Karp Algorithm**            | Exact           | $O(N^2 \times 2^N)$                    | Dynamic programming approach; finds the optimal solution for small graphs. Too slow for $N \ge 20$.|
 | **Nearest Neighbour**      | Heuristic       | $O(N^2)$                               | Fast, but solution quality may vary; starting point affects the tour. |
 | **Greedy Heuristic**      | Heuristic       | $O(N^2 \times \log N)$                        | Cheapest-insertion construction; each step inserts the vertex with the cheapest insertion cost (kept in a min-heap -- see `PriorityQueue.h`). |
@@ -245,6 +247,7 @@ Install the CLI from the [CodeQL bundle releases](https://github.com/github/code
 |-----------|------|---------|
 | Brute-Force | doesn't execute (n>10) | n/a |
 | Brute-Force w/pruning | 9057.46 |  0% |
+| Branch & Bound | 9057.46 | 0% |
 | Held-Karp (exact) | 9057.46 | 0% |
 | Nearest-Neighbour | 10942.56 | 20.8% |
 | 2-opt on NN | 9982.25 | 10.2% |

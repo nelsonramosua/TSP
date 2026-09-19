@@ -27,6 +27,7 @@ C_SRCS = $(GRAPH_DIR)/Graph.c \
          $(LOWER_BOUNDS_DIR)/LowerBound_HeldKarp.c \
          $(EXACT_DIR)/ExhaustiveSearch.c \
          $(EXACT_DIR)/ExhaustiveSearchPruning.c \
+         $(EXACT_DIR)/BranchAndBound.c \
          $(EXACT_DIR)/HeldKarp.c \
          $(HEUR_DIR)/NearestNeighbour.c \
          $(HEUR_DIR)/Greedy.c \
@@ -115,7 +116,7 @@ clean:
 
 loc:
 	@echo "Lines of code (C/H source files):"
-	@find . \( -name '*.c' -o -name '*.h' \) | grep -v builds | xargs wc -l | sort -rn | head -20
+	@find . \( -name '*.c' -o -name '*.h' -o -name '*Makefile' \) | grep -v builds | xargs wc -l | sort -rn | head -20
 
 help:
 	@echo ""
